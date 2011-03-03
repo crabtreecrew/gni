@@ -17,12 +17,12 @@
         %span{:style => 'color:#aaa'}= char
     #search_help_body{:style => "display:#{@show_help ? 'block' : 'none'}"}
       %h4 Search Options
-      
+
       %span.green Examples:
       - ['Parus major', 'gen:Parus sp:major', 'can:Parus maj*', 'gen:Parus yr:1822', 'au:Lang* yr:1888'].each do |srch|
         = '&nbsp;' * 1
-        = link_to in_quotes(srch), 'search_term' => srch, 'help' => 'true'     
-      
+        = link_to in_quotes(srch), 'search_term' => srch, 'help' => 'true'
+
       %table.data.bordered{:style => 'margin-left:auto;margin-right:auto;'}
         %thead
           %tr
@@ -37,9 +37,17 @@
             %td Search by part of a word
             %td= link_to 'planta*', 'search_term' => 'planta*', 'help' => 'true'
           %tr
-            %td ns: 
+            %td exact:
+            %td exact name string
+            %td
+              Search for the exact match of a literal string
+              %br/
+              (other modifiers will be ignored)
+            %td= link_to 'exact:Parus major', 'search_term' => 'exact:Parus major', 'help' => 'true'
+          %tr
+            %td ns:
             %td name string
-            %td 
+            %td
               Search for literal string from its beginning
               %br/
               (other modifiers will be ignored)
@@ -47,7 +55,7 @@
           %tr
             %td.green can:
             %td canonical form
-            %td 
+            %td
               Search name without authors
               %br/
               (other modifiers will be ignored)
@@ -82,9 +90,9 @@
             %td year
             %td Search by year
             %td= link_to 'yr:2005', 'search_term' => 'yr:2005', 'help' => 'true'
-        
-      Note: 
-      %span.green green 
+
+      Note:
+      %span.green green
       modifiers work only for parsed names
 - if @char_triples
   %h4 Browse by clicking three-letter links (grey links are empty)
@@ -103,14 +111,14 @@
           %br/
 - else
   - if !@name_strings.blank?
-    %p 
-      Results 
+    %p
+      Results
       %b== #{@item_first} - #{@item_last}
       of total
       %b= @name_strings.total_entries
-      for 
+      for
       %em== '#{@search_term.gsub('%','*')}'
-    #data_layout 
+    #data_layout
       #name_column_left{:class=> (@name_strings.size == 0 ? 'empty' : '')}
         = will_paginate @name_strings
         - first_row = true
@@ -130,4 +138,4 @@
       Please use a wildcard character '*' if you are not searching for an exact string. Wildcard searches should include at least 3 latin letters.
       %br/
       %br/
-      Search examples: 'Plantago major', 'Plantago major*', 'plantago*', 'pla*' 
+      Search examples: 'Plantago major', 'Plantago major*', 'plantago*', 'pla*'

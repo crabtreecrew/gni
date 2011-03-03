@@ -1,6 +1,6 @@
 # A monkey patch to remove conversion by to_xml names like 'first_name' to 'first-name'
 module ActiveSupport #:nodoc:
-  module CoreExtensions #:nodoc:    
+  module CoreExtensions #:nodoc:
     module Hash #:nodoc:
       module Conversions
         #We force :dasherize to be false, since we never want it true.
@@ -62,7 +62,7 @@ module ActiveRecord #:nodoc:
           end
         end
       end
-    end  
+    end
   end
 end
 
@@ -79,7 +79,7 @@ class ApplicationController < ActionController::Base
   protect_from_forgery # :secret => '6cf3f472546ba6ae8b0a72276864ba59'
 
 
-  
+
 protected
 
   def json_callback(json_struct, callback)
@@ -89,7 +89,7 @@ protected
   def prepare_search_data()
     d = {}
     d[:page] = params[:page] || 1
-    d[:per_page] = (params[:per_page].to_i < 1) ? 30 : params[:per_page].to_i 
+    d[:per_page] = (params[:per_page].to_i < 1) ? 30 : params[:per_page].to_i
     d[:per_page] = PER_PAGE_MAX if d[:per_page] > PER_PAGE_MAX
     #TODO remove last gsub it is jsut to fix crawlers prolem till they switch to new links
     d[:search_term] = params[:search_term].strip.gsub(/\*\s*$/,'%').gsub("'", " ").gsub(/^([A-Z]{3}%)$/, 'ns:\1') rescue nil
@@ -119,10 +119,10 @@ protected
     end
     errors
   end
-  
+
   def resource_type
   end
-  
+
   def get_items_number(name_strings)
     item_start = 0
     item_end = 0

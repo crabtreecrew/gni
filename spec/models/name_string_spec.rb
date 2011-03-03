@@ -170,6 +170,17 @@ describe NameString do
     name_strings.size.should == 5
   end
 
+  it "should work with exact name string search" do
+    search_term = "exact:Adnaria frondosa (L.) Kuntze"
+    name_strings = NameString.search(search_term, nil, nil, 1, 10)
+    name_strings.should_not be_nil
+    name_strings.size.should == 1
+    name_strings[0].name.should == "Adnaria frondosa (L.) Kuntze"
+    search_term = "exact:Adnaria frondosa (L.) Kuntz"
+    name_strings = NameString.search(search_term, nil, nil, 1, 10)
+    name_strings.should == []
+  end
+
   it "should work with all qualifiers" do
     search_terms = ['can:Higena plumigera', 'yr:1787', 'sp:plumigera', 'gen:Adnatosphaeridium', 'uni:Higena', 'au:Williams au:G.', 'ssp:elegans']
     search_terms.each do |st|
