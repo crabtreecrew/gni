@@ -17,13 +17,13 @@ require File.expand_path(File.dirname(__FILE__) + "/factories")
 require File.expand_path(File.dirname(__FILE__) + "/gni_spec_helpers")
 require File.expand_path(File.dirname(__FILE__) + "/custom_matchers")
 
-require 'scenarios'
-Scenario.load_paths = [ File.join(RAILS_ROOT, 'scenarios') ]
+require 'eol_scenarios'
+EolScenario.load_paths = [ File.join(RAILS_ROOT, 'scenarios') ]
 
 require 'rackbox'
 
 Spec::Runner.configure do |config|
-  include Scenario::Spec
+  include EolScenario::Spec
   include GNI::Spec::Helpers
 
   config.include GNI::Spec::Matchers
@@ -65,6 +65,6 @@ Spec::Runner.configure do |config|
   # config.mock_with :rr
   #
   # == Notes
-  # 
+  #
   # For more information take a look at Spec::Example::Configuration and Spec::Runner
 end

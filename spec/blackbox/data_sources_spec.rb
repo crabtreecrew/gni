@@ -2,22 +2,22 @@ require File.dirname(__FILE__) + '/../spec_helper'
 
 describe '/data_sources' do
   before :all do
-    Scenario.load :application
+    EolScenario.load :application
   end
-  
+
   after :all do
     truncate_all_tables
   end
-  
+
   describe 'without loging in' do
-    
+
     it 'should render' do
       res = req('/data_sources')
       res.success?.should be_true
       res.body.should include("Scientific Names Repositories")
       res.body.should_not include("Your Repositories")
     end
-    
+
     it 'should show a repository settings' do
       repo = DataSource.find_by_title('ITIS')
       res = req("/data_sources/#{repo.id}")
@@ -25,26 +25,26 @@ describe '/data_sources' do
       res.body.should include("Repository &ldquo;ITIS&rdquo;")
       res.body.should_not include("Self-Harvesting")
     end
-    
+
     it 'should not allow user to access form for creation of new repositories' do
       res = req("/data_sources/new")
       res.redirect?.should be_true
     end
-    
+
     it 'should not allow user to create new repositories' do
       count = DataSource.count
       res = req("/data_sources", :params => { 'data_source[title]' => 'a title' })
       res.body.should  be_blank
       DataSource.count.should == count
     end
-    
+
     it 'should not allow user to update a repository' do
       new_title = 'new_title'
       res = req("/data_sources/#{DataSource.last.id}", :params => { '_method' => 'put', 'data_source[title]' => new_title })
       res.body.should be_blank
       DataSource.last.title.should_not == new_title
     end
-    
+
     it 'should not allow user to delete a repository' do
       DataSource.gen
       count = DataSource.count
@@ -52,14 +52,14 @@ describe '/data_sources' do
       DataSource.count.should == count
       res.body.should be_blank
     end
-    
+
     it 'should render search' do
       res = req("/data_sources/1?search_term=ADN*")
       res.success?.should be_true
     end
-      
+
   end
-  
+
   describe '/data_sources with logging in' do
 
     before :all do
@@ -67,7 +67,7 @@ describe '/data_sources' do
       @repo = @user.data_sources.first
       @others_repo = DataSource.all.select {|ds| !@user.data_sources.include? ds}.first
     end
-    
+
     before :each do
       login_as(:login => 'aaron', :password => 'monkey')
     end
@@ -85,7 +85,7 @@ describe '/data_sources' do
       res.body.should include("Repository &ldquo;#{@repo.title}&rdquo;")
       res.body.should include("Self-Harvesting")
     end
-    
+
     it 'should show a form to create new repository' do
       res = req("/data_sources/new")
       res.success?.should be_true
@@ -99,7 +99,7 @@ describe '/data_sources' do
         with_tag('input#data_source_submit[value="Create"]')
       end
     end
-    
+
     it 'should be able to create a new repository' do
       count = DataSource.count
       res = req("/data_sources", :params =>{
@@ -111,7 +111,7 @@ describe '/data_sources' do
       res.should redirect_to "/data_sources/#{DataSource.last.id}"
       DataSource.count.should == count + 1
     end
-    
+
     it 'should show a for to edit a repository' do
       res = req("/data_sources/#{@repo.id}/edit")
       res.success?.should be_true
@@ -129,7 +129,7 @@ describe '/data_sources' do
         with_tag('input#data_source_submit[value="Update"]')
       end
     end
-    
+
     it 'should be able to update their repository' do
       @repo.id.should == 1 #double check that it is a data_source with logo url
       new_description = "new description #{rand}"
@@ -145,9 +145,9 @@ describe '/data_sources' do
       #this cached url should appear in api
       #res = req("/data_sources/#{@repo.id}.xml")
       #res.success?.should be_true
-      #res.body.should include("<cached_logo_url>") 
+      #res.body.should include("<cached_logo_url>")
     end
-    
+
     it 'should be able to delete their repository' do
       new_repo = DataSource.gen
       DataSourceContributor.gen(:data_source_id => new_repo.id, :user_id => @user.id)
@@ -155,14 +155,14 @@ describe '/data_sources' do
       req("/data_sources/#{new_repo.id}", :params => {'_method' => 'delete'})
       DataSource.count.should == count - 1
     end
-    
+
     it 'should not see edit form for others repositories' do
       res = req("/data_sources/#{@others_repo.id}/edit")
       res.success?.should be_false
       res.redirect?.should be_true
-      res.should redirect_to "/data_sources"    
+      res.should redirect_to "/data_sources"
     end
-    
+
     it 'should not be able to update others repositories' do
       new_description = "new description #{rand}"
       res = req("/data_sources/#{@others_repo.id}", :params => {
@@ -172,13 +172,13 @@ describe '/data_sources' do
       res.body.should == ''
       DataSource.find(@others_repo.id).description.should_not == new_description
     end
-    
+
     it 'should not be able to delete others repositories' do
       count = DataSource.count
       res = req("/data_sources/#{@others_repo.id}", :params => {'_method' => 'delete'})
       DataSource.count.should == count
     end
-    
+
     it 'should delete trailing spaces from urls during create (Bug TAX-196)' do
       count = DataSource.count
       res = req("/data_sources", :params =>{
@@ -195,7 +195,7 @@ describe '/data_sources' do
       ds.logo_url.should == 'http://url_logo/logo.gif'
       ds.web_site_url.should == 'http://url_website/index.html'
     end
-    
+
     it 'should delete trailing spaces from urls during update (Bug TAX-196)' do
       Faker
       res = req("/data_sources/#{@repo.id}", :params => {

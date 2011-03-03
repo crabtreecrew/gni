@@ -2,13 +2,13 @@ require File.dirname(__FILE__) + '/../spec_helper'
 
 describe '/users' do
   before :all do
-    Scenario.load :application
+    EolScenario.load :application
   end
-  
+
   after :all do
     truncate_all_tables
   end
-  
+
   it '/signup should render' do
     res = req('/signup')
     res.success?.should be_true
@@ -20,7 +20,7 @@ describe '/users' do
       with_tag 'input[value="Sign Up"]'
     end
   end
-  
+
   it 'should create new user' do
     count = User.count
     res = req('/users', :params => {
@@ -33,7 +33,7 @@ describe '/users' do
     res.should redirect_to('/data_sources')
     User.count.should == count + 1
   end
-  
+
   it '/user/edit should render ' do
     user = User.find_by_login('aaron')
     res = req("/users/#{user.id}/edit")
@@ -45,7 +45,7 @@ describe '/users' do
       with_tag 'input[value="Save"]'
     end
   end
-  
+
   it 'should update user' do
     user = User.find_by_login('aaron')
     res = request("/users/#{user.id}", :params => {'_method' => 'put', 'user[email]' => 'updated@example.com'})
