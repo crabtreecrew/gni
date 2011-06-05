@@ -89,7 +89,13 @@ describe '/name_strings' do
     resp = req( '/name_strings/1' )
     resp.success?.should be_true
     resp.body.should include('Adnaria frondosa')
-    resp.body.should_not have_tag('body')
+  end
+
+  it "Should be able to use name string as an id" do
+    name_string = URI.encode("Adnaria frondosa (L.) Kuntze")
+    resp = req("/name_strings/#{name_string}")
+    resp.success?.should be_true
+    resp.body.should include('Adnaria frondosa')
   end
 
   it 'API should display a name_string info in xml or json' do
