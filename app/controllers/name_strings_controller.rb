@@ -88,7 +88,7 @@ class NameStringsController < ApplicationController
     begin
       if params[:id].match(/^[\d]+$/)
         @name_string = NameString.find(params[:id])
-      elsif params[:id].match(/^[\dabcdfABCDF]+$/)
+      elsif params[:id].match(/^[\d\-abcdefABCDEF]+$/)
         @name_string = NameString.find_by_uuid(NameString.uuid2bytes(params[:id]))
       else
         unless ['rdf', 'xml', 'json', 'html', 'htm'].include? params[:format]
