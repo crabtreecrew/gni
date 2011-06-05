@@ -84,11 +84,16 @@ describe '/name_strings' do
     resp.body.should include("should have at leat 3 letters")
   end
 
-  it 'should display a name_string page without layout' do
-    #individual name strings are only displayed asyncronously by ajax calls, so their repsonse has no layout
-    resp = req( '/name_strings/1' )
+  it 'should display a name_string page' do
+    resp = req( '/name_strings/1.xml' )
     resp.success?.should be_true
     resp.body.should include('Adnaria frondosa')
+    resp.body.should_not have_tag('body')
+  end
+
+  it 'should redirect html page to a name_string "id"' do
+    resp = req( '/name_strings/1' )
+    resp.should be_redirect
   end
 
   it "Should be able to use name string as an id" do

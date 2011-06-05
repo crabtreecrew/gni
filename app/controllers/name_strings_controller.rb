@@ -58,19 +58,24 @@ class NameStringsController < ApplicationController
   def show
     find_name_string
     if @name_string
-      @show_records = (params[:all_records] && params[:all_records] != '0') ? true : false
-      @parsed_name = Parser.new.parse(@name_string.name)
-      @data_sources_data = @name_string.name_indices.map do |ni|
-        res = {:name_index_id => ni.id, :data_source => ni.data_source, :records_number => ni.name_index_records.size}
-        res.merge!(:records =>  (NameIndexRecord.find_all_by_name_index_id(ni.id))) if @show_records
-        res
-      end
-      data = {:data => @data_sources_data, :name_string => @name_string}
-      respond_to do |format|
-        format.html {render :layout => (request.xhr? ? nil : "application")}
-        format.xml {render :xml => data.to_xml(:except => [:uuid], :methods => [:uuid_hex, :lsid, :resource_uri])}
-        format.json {render :json => json_callback(data.to_json,params[:callback])}
-        format.rdf
+
+      if !request.xhr? && (params[:format] == 'html' || !params[:format]) && uuid_or_fixnum?(params[:id])
+        redirect_to "/name_strings/#{URI.encode(@name_string.name.gsub(" ","_"))}"
+      else
+        @show_records = (params[:all_records] && params[:all_records] != '0') ? true : false
+        @parsed_name = Parser.new.parse(@name_string.name)
+        @data_sources_data = @name_string.name_indices.map do |ni|
+          res = {:name_index_id => ni.id, :data_source => ni.data_source, :records_number => ni.name_index_records.size}
+          res.merge!(:records =>  (NameIndexRecord.find_all_by_name_index_id(ni.id))) if @show_records
+          res
+        end
+        data = {:data => @data_sources_data, :name_string => @name_string}
+        respond_to do |format|
+          format.html {render :layout => (request.xhr? ? nil : "application")}
+          format.xml {render :xml => data.to_xml(:except => [:uuid], :methods => [:uuid_hex, :lsid, :resource_uri])}
+          format.json {render :json => json_callback(data.to_json,params[:callback])}
+          format.rdf
+        end
       end
     else
       flash[:notice] = "Name strid with id '#{params[:id]}' was not found"
@@ -88,10 +93,10 @@ class NameStringsController < ApplicationController
     begin
       if params[:id].match(/^[\d]+$/)
         @name_string = NameString.find(params[:id])
-      elsif params[:id].match(/^[\d\-abcdefABCDEF]+$/)
+      elsif uuid_or_fixnum?(params[:id]) #uuid in this case
         @name_string = NameString.find_by_uuid(NameString.uuid2bytes(params[:id]))
       else
-        unless params[:format] == nil || ['rdf', 'xml', 'json', 'html', 'htm'].include?(params[:format])
+        unless params[:format] == nil || ['rdf', 'xml', 'json', 'html'].include?(params[:format])
           params[:id] += ".#{params.delete(:format)}"
         end
         name_string = URI.decode(params[:id]).gsub(/[_]+/, " ")
@@ -101,4 +106,9 @@ class NameStringsController < ApplicationController
       @name_string = nil
     end
   end
+
+  def uuid_or_fixnum?(string)
+    string.match(/^[\d\-abcdefABCDEF]+$/)
+  end
+
 end
