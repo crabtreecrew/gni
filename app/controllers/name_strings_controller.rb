@@ -73,7 +73,7 @@ class NameStringsController < ApplicationController
         format.rdf
       end
     else
-      flash[:notice] = "Name you requested was not found"
+      flash[:notice] = "Name strid with id '#{params[:id]}' was not found"
       redirect_to root_url
     end
   end
@@ -91,10 +91,10 @@ class NameStringsController < ApplicationController
       elsif params[:id].match(/^[\d\-abcdefABCDEF]+$/)
         @name_string = NameString.find_by_uuid(NameString.uuid2bytes(params[:id]))
       else
-        unless ['rdf', 'xml', 'json', 'html', 'htm'].include? params[:format]
+        unless params[:format] == nil || ['rdf', 'xml', 'json', 'html', 'htm'].include?(params[:format])
           params[:id] += ".#{params.delete(:format)}"
         end
-        name_string = URI.decode(params[:id]).gsub("[_]\+", " ")
+        name_string = URI.decode(params[:id]).gsub(/[_]+/, " ")
         @name_string = NameString.find_by_name(name_string)
       end
     rescue ActiveRecord::RecordNotFound
