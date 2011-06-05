@@ -59,7 +59,7 @@ class NameStringsController < ApplicationController
     find_name_string
     if @name_string
 
-      if !request.xhr? && (params[:format] == 'html' || !params[:format]) && uuid_or_fixnum?(params[:id])
+      if !request.xhr? && (params[:format] == 'html' || !params[:format] || params[:format] == '') && uuid_or_fixnum?(params[:id])
         redirect_to "/name_strings/#{URI.encode(@name_string.name.gsub(" ","_"))}"
       else
         @show_records = (params[:all_records] && params[:all_records] != '0') ? true : false
