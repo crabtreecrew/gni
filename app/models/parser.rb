@@ -1,12 +1,12 @@
 #require 'rubygems'
 require 'biodiversity'
 class Parser
-  
+
   def initialize()
     @parser = ScientificNameParser.new
     @parsed = nil
   end
-  
+
   def parse_names_list(names, format = 'json')
     parsed_names = []
     if names && !names.strip.blank?
@@ -39,14 +39,14 @@ class Parser
       return html_string
     end
   end
-  
+
   def parse(name, format = nil)
     old_kcode = $KCODE
     $KCODE = 'NONE'
     begin
-      result = @parser.parse(name)     
+      result = @parser.parse(name)
       @parsed = @parser.parsed
-    rescue 
+    rescue
       result = {:scientificName => {:verbatim => name, :parsed => false, :error => 'Parser fatal error'}}
       @parsed = nil
     end
@@ -56,11 +56,11 @@ class Parser
     result.parsed = @parsed
     result
   end
-  
+
   def parsed_names
     @parsed_names
   end
-  
+
 private
   def self.traverse(struct, count = 0)
     count += 1
@@ -80,7 +80,7 @@ private
           if el.class == Hash
              retValue += traverse(el, count)
           else
-            vals << el 
+            vals << el
           end
         end
         retValue +=  "<node_value>" + vals.map { |val| GNI::XML.escape_xml(val) }.join("</node_value><node_value>") + "</node_value>"
@@ -92,7 +92,7 @@ private
     end
     retValue
   end
-  
+
   def self.render_html(struct)
     xml_string = traverse(struct)
     xml_string.gsub!('<node>', '<div class="tree">')
