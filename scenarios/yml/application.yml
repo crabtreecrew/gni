@@ -1,5 +1,5 @@
 ---
-User: 
+User:
   - id:                        1
     login:                     quentin
     email:                     quentin@example.com
@@ -14,8 +14,8 @@ User:
     salt:                      da4b9237bacccdf19c0760cab7aec4a8359010b0 # SHA1('1')
     password:                  monkey
     created_at:                <%= 1.days.ago.to_s :db %>
-    remember_token_expires_at: 
-    remember_token:            
+    remember_token_expires_at:
+    remember_token:
   - id:                        3
     login:                     old_password_holder
     email:                     salty_dog@example.com
@@ -27,7 +27,7 @@ NameString:
   - id: 1
     name: "Adnaria frondosa (L.) Kuntze"
     canonical_form_id:
-    is_canonical_form:      
+    is_canonical_form:
   - id: 2
     name: "Adnatosphaeridium tutulosum (Cookson & Eisenack 1960)"
     canonical_form_id:
@@ -113,7 +113,23 @@ NameString:
     canonical_form_id:
     is_canonical_form:
   - id: 23
-    name: Tauriaptychus crastobalensis (O'Connel )
+    name: "Tauriaptychus crastobalensis (O'Connel )"
+    canonical_form_id:
+    is_canonical_form:
+  - id: 24
+    name: Betula alba
+    canonical_form_id:
+    is_canonical_form:
+  - id: 25
+    name: Betula alba Linn.
+    canonical_form_id:
+    is_canonical_form:
+  - id: 26
+    name: Parus major
+    canonical_form_id:
+    is_canonical_form:
+  - id: 27
+    name: Parus major Linnaeus 1788
     canonical_form_id:
     is_canonical_form:
 
@@ -132,6 +148,10 @@ LexicalGroup:
     supercedure_id:
   - id: 7
     supercedure_id:
+  - id: 8
+    supercedure_id:
+  - id: 9
+    supercedure_id:
 
 LexicalGroupNameString:
   - id: 1
@@ -140,22 +160,22 @@ LexicalGroupNameString:
   - id: 2
     lexical_group_id: 1
     name_string_id: 8
-  - id: 3 
+  - id: 3
     lexical_group_id: 2
     name_string_id: 9
-  - id: 4 
+  - id: 4
     lexical_group_id: 2
     name_string_id: 11
   - id: 5
     lexical_group_id: 3
     name_string_id: 12
-  - id: 6 
+  - id: 6
     lexical_group_id: 4
     name_string_id: 12
-  - id: 7 
+  - id: 7
     lexical_group_id: 3
     name_string_id: 13
-  - id: 8 
+  - id: 8
     lexical_group_id: 4
     name_string_id: 14
   - id: 9
@@ -176,6 +196,18 @@ LexicalGroupNameString:
   - id: 14
     lexical_group_id: 7
     name_string_id: 20
+  - id: 15
+    lexical_group_id: 8
+    name_string_id: 24
+  - id: 16
+    lexical_group_id: 8
+    name_string_id: 25
+  - id: 17
+    lexical_group_id: 9
+    name_string_id: 26
+  - id: 18
+    lexical_group_id: 9
+    name_string_id: 27
 
 Kingdom:
   - id: 1
@@ -191,7 +223,7 @@ NameRank:
   - id: 2
     name: Species
 
-DataSource: 
+DataSource:
   - id: 1
     title: "ITIS"
     logo_url: "http://www.google.com/intl/en_ALL/images/logo.gif"
@@ -214,15 +246,15 @@ DataSource:
   - id: 7
     title: "Tropicos"
     refresh_period_days: 14
-  
+
 
 DataSourceContributor:
   - user_id: 2 #aaron
     data_source_id: 1 #ITIS
     data_source_admin: 1
-  - user_id: 1 #quentin 
+  - user_id: 1 #quentin
     data_source_id: 1 #ITIS
-  - user_id: 1 #quentin 
+  - user_id: 1 #quentin
     data_source_id: 2 #IPNI
   - user_id: 2 #aaron
     data_source_id: 3 #Index Fungorum
@@ -232,7 +264,7 @@ DataSourceContributor:
     data_source_id: 5 #Encyclopedia of Life
   - user_id: 2 #aaron
     data_source_id: 7 #Tropicos
-    
+
 ImportScheduler:
   - data_source_id: 1
     status: 4
@@ -245,10 +277,10 @@ ImportScheduler:
     message: 'Updated'
   - data_source_id: 4
     status: 4
-    message: 'Updated'    
+    message: 'Updated'
   - data_source_id: 5
     status: 4
-    message: 'Updated'    
+    message: 'Updated'
 
 NameIndex:
   - id: 1
@@ -304,10 +336,10 @@ NameIndex:
     data_source_id: 4
   - id: 18
     name_string_id: 17 #lexical group match, not strict match
-    data_source_id: 4 
+    data_source_id: 4
   - id: 19
     name_string_id: 7 #strict match
-    data_source_id: 4 
+    data_source_id: 4
   - id: 20
     name_string_id: 18
     data_source_id: 4
@@ -326,6 +358,18 @@ NameIndex:
   - id: 25
     name_string_id: 23
     data_source_id: 4
+  - id: 26
+    name_string_id: 24
+    data_source_id: 1
+  - id: 27
+    name_string_id: 25
+    data_source_id: 2
+  - id: 28
+    name_string_id: 26
+    data_source_id: 1
+  - id: 29
+    name_string_id: 27
+    data_source_id: 2
 
 NameIndexRecord:
   - name_index_id: 1
@@ -359,7 +403,11 @@ NameIndexRecord:
   - name_index_id: 21
   - name_index_id: 22
   - name_index_id: 23
-  
+  - name_index_id: 24
+  - name_index_id: 25
+  - name_index_id: 26
+  - name_index_id: 27
+
 SemanticMeaning:
   - id: 1
     name: uninomial

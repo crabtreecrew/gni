@@ -9,14 +9,15 @@ class ParsersController < ApplicationController
   # GET /parsers/new
   def new
   end
-  
+
   # POST /parsers
   def create
-    names = params[:file].read rescue params[:names] 
+    require 'ruby-debug'; debugger
+    names = params[:file].read rescue params[:names]
     parse_names(names)
   end
 
-private 
+private
   def parse_names(names)
     parser = Parser.new
     format = params[:format] ? params[:format] : 'json'

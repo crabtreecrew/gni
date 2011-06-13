@@ -16,6 +16,8 @@ ActionController::Routing::Routes.draw do |map|
 
   map.resources :parsers
 
+  map.resources :name_resolver, :only => [:index]
+
   map.resources :uuids
 
   map.resources :users, :has_many => [:data_source_contributors, :data_sources]

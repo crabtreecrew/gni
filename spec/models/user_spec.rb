@@ -2,7 +2,7 @@ require File.dirname(__FILE__) + '/../spec_helper'
 
 describe User do
   scenario :application
-      
+
   describe 'being created' do
     before do
       @user = nil
@@ -11,16 +11,16 @@ describe User do
         violated "#{@user.errors.full_messages.to_sentence}" if @user.new_record?
       end
     end
-    
+
     it 'increments User#count' do
       @creating_user.should change(User, :count).by(1)
     end
   end
-  
-  #              
+
+  #
   # Validations
   #
- 
+
   it 'requires login' do
     lambda do
       u = create_user(:login => nil)
@@ -29,7 +29,7 @@ describe User do
   end
 
    describe 'allows legitimate logins:' do
-     ['123', '1234567890_234567890_234567890_234567890', 
+     ['123', '1234567890_234567890_234567890_234567890',
       'hello.-_there@funnychar.com'].each do |login_str|
        it "'#{login_str}'" do
          lambda do
@@ -41,7 +41,7 @@ describe User do
    end
    describe 'disallows illegitimate logins:' do
      ['12', '1234567890_234567890_234567890_234567890_', "tab\t", "newline\n",
-      "Iñtërnâtiônàlizætiøn hasn't happened to ruby 1.8 yet", 
+      "Iñtërnâtiônàlizætiøn hasn't happened to ruby 1.8 yet",
       'semicolon;', 'quote"', 'tick\'', 'backtick`', 'percent%', 'plus+', 'space '].each do |login_str|
        it "'#{login_str}'" do
          lambda do
@@ -77,7 +77,7 @@ describe User do
      ['foo@bar.com', 'foo@newskool-tld.museum', 'foo@twoletter-tld.de', 'foo@nonexistant-tld.qq',
       'r@a.wk', '1234567890-234567890-234567890-234567890-234567890-234567890-234567890-234567890-234567890@gmail.com',
       'hello.-_there@funnychar.com', 'uucp%addr@gmail.com', 'hello+routing-str@gmail.com',
-      'domain@can.haz.many.sub.doma.in', 
+      'domain@can.haz.many.sub.doma.in',
      ].each do |email_str|
        it "'#{email_str}'" do
          lambda do
@@ -104,7 +104,7 @@ describe User do
    end
 
    describe 'allows legitimate names:' do
-     ['Andre The Giant (7\'4", 520 lb.) -- has a posse', 
+     ['Andre The Giant (7\'4", 520 lb.) -- has a posse',
       '', '1234567890_234567890_234567890_234567890_234567890_234567890_234567890_234567890_234567890_234567890',
      ].each do |name_str|
        it "'#{name_str}'" do
@@ -132,7 +132,7 @@ describe User do
      users(:quentin).update_attributes(:password => 'new password', :password_confirmation => 'new password')
      User.authenticate('quentin', 'new password').should == users(:quentin)
    end
-   
+
    # we currently don't allow changes in username
    # it 'does not rehash password' do
    #   users(:quentin).update_attributes(:login => 'quentin2')
@@ -151,7 +151,7 @@ describe User do
      User.authenticate('quentin', 'monkey').should == users(:quentin)
    end
 
-  unless REST_AUTH_SITE_KEY.blank? 
+  unless REST_AUTH_SITE_KEY.blank?
     it "doesn't authenticate a user against a hard-coded old-style password" do
       User.authenticate('old_password_holder', 'test').should be_nil
     end
@@ -208,15 +208,15 @@ describe User do
      users(:quentin).remember_token_expires_at.should_not be_nil
      users(:quentin).remember_token_expires_at.between?(before, after).should be_true
    end
-   
+
 protected
   def create_user(options = {})
     record = User.new({ :login => 'quire', :email => 'quire@example.com', :password => 'quire69', :password_confirmation => 'quire69' }.merge(options))
     record.save
     record
   end
-  
-  def users(login) 
+
+  def users(login)
     User.find_by_login(login.to_s)
   end
 end

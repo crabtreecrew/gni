@@ -232,7 +232,7 @@ describe NameString do
 
   describe "UUID handling" do
     before(:all) do
-      @name_string = NameString.last
+      @name_string = NameString.find(23)
     end
 
     it "should convert uuid to bytes" do
