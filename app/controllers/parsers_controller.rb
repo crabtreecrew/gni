@@ -12,7 +12,6 @@ class ParsersController < ApplicationController
 
   # POST /parsers
   def create
-    require 'ruby-debug'; debugger
     names = params[:file].read rescue params[:names]
     parse_names(names)
   end
