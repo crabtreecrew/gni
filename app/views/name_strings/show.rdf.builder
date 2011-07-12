@@ -2,17 +2,20 @@ xml = Builder::XmlMarkup.new(:indent => 2)
 gni_url = "http://gni.globalnames.org/name_strings/#{@name_string.uuid_hex}"
 xml.instruct!
 xml.rdf(:RDF,
-  "xmlns:rdfs"                    =>  "http://www.w3.org/2000/01/rdf-schema",
-  "xmlns:rdf"                     =>  "http://www.w3.org/1999/02/22-rdf-syntax-ns#",
-  "xmlns:owl"                     =>  "http://www.w3.org/2002/07/owl#",
-  "xmlns:skos"                    =>  "http://www.w3.org/2004/02/skos/core#",
-  "xmlns:dc"                      =>  "http://purl.org/dc/elements/1.1/",
-  "xmlns:dwc"                     =>  "http://rs.tdwg.org/dwc/terms/",
-  "xmlns:dcterms"                 =>  "http://purl.org/dc/terms/",
-  "xmlns:cc"                      =>  "http://creativecommons.org/ns#") do
-  
+  "xmlns:rdfs"    => "http://www.w3.org/2000/01/rdf-schema",
+  "xmlns:rdf"     => "http://www.w3.org/1999/02/22-rdf-syntax-ns#",
+  "xmlns:owl"     => "http://www.w3.org/2002/07/owl#",
+  "xmlns:skos"    => "http://www.w3.org/2004/02/skos/core#",
+  "xmlns:dc"      => "http://purl.org/dc/elements/1.1/",
+  "xmlns:dwc"     => "http://rs.tdwg.org/dwc/terms/",
+  "xmlns:dcterms" => "http://purl.org/dc/terms/",
+  "xmlns:cc"      => "http://creativecommons.org/ns#"),
+  "xmlns:wdrs"    => "http://www.w3.org/2007/05/powder-s#">do
+
   xml.rdf(:Description, "rdf:about" => gni_url) do
     xml.dcterms(:title, "About: " + @name_string.name)
+    xml.skos(:prefLabel, @name_string.name)
+    xml.dcterms(:description, "GNI Taxon Namestring: #{@name_string.name}")
     # xml.dcterms(:publisher, "rdf:resource" => PUBLISHER_URI)
     # xml.dcterms(:creator, "rdf:resource"   => CREATOR1_URI)
     # xml.dcterms(:creator, "rdf:resource"   => CREATOR2_URI)
@@ -20,9 +23,10 @@ xml.rdf(:RDF,
     xml.dcterms(:identifier, gni_url)
     xml.dwc(:ScientificName, @name_string.name)
     # xml.dcterms(:language, 'en')
-    # xml.dcterms(:isPartOf, "rdf:resource" => DATASET_URI )
     xml.dcterms(:modified, @name_string.updated_at.strftime('%Y-%m-%dT%H:%M:%S%z'))
+    xml.dcterms(:isPartOf, "rdf:resource" => "http://gni.globalnames.org/ontology/void#GNI")
     xml.cc(:license, "rdf:resource" => "http://creativecommons.org/licenses/publicdomain/")
+    xml.wdrs(:describedby, "rdf:resource" => "#{gni_url}.rdf")
     # xml.cc(:attributionURL, "rdf:resource" => ATTRIBUTION_URL)
     # xml.foaf(:primaryTopic,  "rdf:resource" => @se_uri)
     # xml.foaf(:topic,         "rdf:resource" => @se_url)
