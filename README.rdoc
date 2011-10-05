@@ -9,27 +9,19 @@ Some minimal settings for my.cnf file
   innodb_buffer_pool_size=256M
 
 
-== Testing
+== Testing and Development
+
+* install rvm and ruby 1.8.7 from .rvmrc file
 
 To setup testing for GNI you have to do the following:
 
-* install rspec for rails gem
+* run bundle
+    gem install bundle
+    bundle install
 
-    sudo gem install rspec-rails
-    sudo gem install facets
-    sudo gem install faker
-
-* Install additional gems from github
-
-    sudo gem install thoughtbot-factory_girl --source http://gems.github.com
-    sudo gem install openrain-scenarios -s http://gems.github.com
-    sudo gem install remi-rspec-custom-matchers -s http://gems.github.com
-    sudo gem install thin
-    sudo gem install remi-rackbox -s http://gems.github.com
-
-== Parser and Fuzzy Matcher
-
-	sudo gem install biodivesity
-  sudo gem install taxamatch_rb
+* install gems from github
+    gem instal remi-rspec-custom-matchers -s http://gems.github.com
+    gem instal remi-rails-rack-adapter -s http://gems.github.com
+    gem instal remi-indifferent-variable-hash -s http://gems.github.com
 
 
