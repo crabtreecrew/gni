@@ -12,7 +12,7 @@ import uuid
 from optparse import OptionParser
 import re
 #import cProfile
-    
+
 import pprint
 pp = pprint.PrettyPrinter(indent=2)
 packet_size = 5000
@@ -25,8 +25,8 @@ spaces_around = re.compile('([&])')
 multi_spaces = re.compile('\s{2,}')
 gna_namespace = uuid.uuid5(uuid.NAMESPACE_DNS, "globalnames.org")
 
-def run_imports(source, source_id, import_scheduler_id, environment): 
-    
+def run_imports(source, source_id, import_scheduler_id, environment):
+
     i = Importer(source, source_id, import_scheduler_id, environment)
     #cProfile.run('i.parse()')
     i.db_clean_imports()
@@ -109,7 +109,7 @@ class Importer: #{{{1
             urlopen(source).info
         except IOError:
             raise RuntimeError("Cannot access %s url" % source)
-        
+
         self.reader = libxml2.newTextReaderFilename(source)
         self.data_source_id = data_source_id
         self.import_scheduler_id = import_scheduler_id
@@ -125,7 +125,7 @@ class Importer: #{{{1
             ret = self.reader.Read()
         if ret != 0:
             raise RuntimeError("failed to parse xml")
-        #add the rest of the 'tail' data 
+        #add the rest of the 'tail' data
         self._insert()
 
     def process(self): #{{{2
@@ -134,13 +134,13 @@ class Importer: #{{{1
     def migrate_data(self): #{{{2
         c = self.db.cursor
         c.execute('delete ni, nir from name_indices ni join name_index_records nir on (ni.id=nir.name_index_id) where ni.data_source_id = %s' % self.data_source_id)
-        
+
         print "second query";
         c.execute('insert IGNORE into name_indices (name_string_id, data_source_id, created_at, updated_at) (select name_string_id, data_source_id, now(), now() from import_name_index_records)')
-        
+
         print "third query";
         c.execute('insert IGNORE into name_index_records (name_index_id, kingdom_id, name_rank_id, local_id, global_id, url, original_name_string, created_at, updated_at) (select ni.id, inir.kingdom_id, inir.name_rank_id, inir.local_id, inir.global_id, inir.url, inir.original_name_string, now(), now() from import_name_index_records inir join name_indices ni on (inir.name_string_id = ni.name_string_id) where ni.data_source_id = %s )' % self.data_source_id)
-    
+
     def find_overlaps(self):  #{{{2
         c = self.db.cursor
         c.execute("delete from data_source_overlaps where data_source_id_1 = %s or data_source_id_2 = %s", (self.data_source_id, self.data_source_id))
@@ -152,7 +152,7 @@ class Importer: #{{{1
             overlap = c.fetchone()[0]
             c.execute("insert into data_source_overlaps (data_source_id_1, data_source_id_2, strict_overlap, created_at, updated_at) values (%s, %s, %s, now(), now())", (self.data_source_id, i, overlap))
             c.execute("insert into data_source_overlaps (data_source_id_1, data_source_id_2, strict_overlap, created_at, updated_at) values (%s, %s, %s, now(), now())", (i, self.data_source_id, overlap))
-    
+
     def add_names_count(self):
         c = self.db.cursor
         c.execute('update data_sources set name_strings_count = (select count(*) from name_indices where data_source_id = %s) where id = %s', (self.data_source_id, self.data_source_id))
@@ -160,15 +160,15 @@ class Importer: #{{{1
         #c.execute("delete from unique_names")
         #c.execute("insert into unique_names (select null, data_source_id, name_string_id, now(), now() from name_indices group by name_string_id having count(*) = 1)")
         #c.execute("update data_sources ds1 set ds1.unique_names_count = (select count(*) from unique_names where data_source_id = ds1.id)")
-    
+
     def db_commit(self): #{{{2
         self.db.conn.commit()
-    
+
     def db_clean_imports(self): #{{{2
         c = self.db.cursor
         c.execute("truncate import_name_index_records")
         self.db_commit()
-        
+
     #private functions #{{{2
     def _prepare_dependencies(self):
         c = self.db.cursor
@@ -220,10 +220,10 @@ class Importer: #{{{1
                 else:
                     self._record[dependency[0]] = None
         self.imported_data.append(self._record.copy())
-            
+
     def _reset_record(self): #{{{2
         return {'data_source_id': self.data_source_id}
-        
+
     def _name_lookup(self, name_string): #{{{2
         normalized_name_string = normalize_name_string(name_string)
         if len(normalized_name_string) < 256:
@@ -265,7 +265,7 @@ class Importer: #{{{1
             name_string_id, normalized_string = self._name_lookup(i['Simple'])
             if name_string_id > 0:
                 i['name_string_id'] = name_string_id
-            
+
                 #keep name string if it was modified by normalization
                 if i['Simple'] == normalized_string:
                     i['OriginalNameString'] = None
@@ -280,11 +280,11 @@ class Importer: #{{{1
                     print data.values()
                     raise Exception
                 if len(records) >= packet_size:
-                    c.execute(insert_query % ",".join(records)) 
+                    c.execute(insert_query % ",".join(records))
                     #print(':mysql: records ' + str(count))
                     records=[]
         if records:
-            c.execute(insert_query % ",".join(records)) 
+            c.execute(insert_query % ",".join(records))
         #print(':mysql: name_index_records inserts are done')
         self.db_commit()
         self.imported_data = []
@@ -293,19 +293,19 @@ if __name__ == '__main__': #script part {{{1
     opts = OptionParser()
     opts.add_option("-e", "--environment", dest="environment", default="development",
         help="Specifies the environment of the system (development|test|producton).")
-    
+
     opts.add_option("-s", "--source", dest="source",
         help="Specifies url/filename which contains data for harvesting.")
-    
+
     opts.add_option("-i", "--source-id", dest="source_id",
         help="Identifier of the data_source in GNA database.")
 
-    
+
     (options, args) = opts.parse_args()
-    
+
     if not (options.source and options.source_id and type(int(options.source_id)) == type(1)):
         raise Exception("source file/url and source id are required")
-    
+
     for status in run_imports(options.source, options.source_id, 86, options.environment):
         print status
-    
+
