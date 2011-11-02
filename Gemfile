@@ -25,7 +25,7 @@ group :development do
   gem "rspec", "~> 1.3.0"
   gem "rspec-rails", "~> 1.3.2"
   gem "ruby-debug"
-  gem "capybara"
+  gem "capybara", "0.3.9"
   gem "factory_girl"
   gem "faker"
   gem "eol_scenarios"

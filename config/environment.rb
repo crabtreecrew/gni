@@ -69,6 +69,7 @@ Rails::Initializer.run do |config|
   #
   # config.gem 'biodiversity', :version => '>= 0.5.16', :lib => 'biodiversity'
   # config.gem 'taxamatch_rb', :lib => 'taxamatch_rb', :version => '>= 0.6.4'
+  config.gem 'sass' # to shut up a warning
 
 
 end

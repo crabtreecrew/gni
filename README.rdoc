@@ -26,12 +26,12 @@ To setup testing for GNI you have to do the following:
 
 * if you have troulbe with rmagic gem and use homebrew on Mac os X:
     brew install imagemagick --with-ghostscript
-    bunle install
+    bundle install
 
 * install gems from github
-    gem instal remi-rspec-custom-matchers -s http://gems.github.com
-    gem instal remi-rails-rack-adapter -s http://gems.github.com
-    gem instal remi-indifferent-variable-hash -s http://gems.github.com
+    gem install remi-rspec-custom-matchers -s http://gems.github.com
+    gem install remi-rails-rack-adapter -s http://gems.github.com
+    gem install remi-indifferent-variable-hash -s http://gems.github.com
 
 * prepare database
     rake db:drop:all

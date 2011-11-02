@@ -21,6 +21,8 @@ require 'eol_scenarios'
 EolScenario.load_paths = [ File.join(RAILS_ROOT, 'scenarios') ]
 
 require 'eol_rackbox'
+require 'capybara/rails'
+require 'capybara/dsl'
 
 Spec::Runner.configure do |config|
   include EolScenario::Spec
@@ -28,6 +30,7 @@ Spec::Runner.configure do |config|
 
   config.include GNI::Spec::Matchers
   config.use_blackbox = true
+  config.include(Capybara, :type => :integration)
 
   # If you're not using ActiveRecord you should remove these
   # lines, delete config/database.yml and disable :active_record
