@@ -11,17 +11,17 @@ describe '/data_source_overlaps' do
   end
 
   it "should render" do
-    res = request('/data_sources/3/data_source_overlaps')
-    res.success?.should be_true
-    res.body.should include("Name Bank")
+    visit('/data_sources/3/data_source_overlaps')
+    page.status_code.should == 200
+    body.should include("Name Bank")
   end
 
   it "should render after deletion of a repository (Bug: TAX-197)" do
     count = DataSource.count
     DataSource.last.destroy
     DataSource.count.should == count -1
-    res = request('/data_sources/3/data_source_overlaps')
-    res.success?.should be_true
-    res.body.should include("Name Bank")
+    visit('/data_sources/3/data_source_overlaps')
+    page.status_code.should == 200
+    body.should include("Name Bank")
   end
 end
