@@ -30,7 +30,4 @@ group :development do
   gem "faker"
   gem "eol_scenarios"
   gem "eol_rackbox"
-  gem "indifferent-variable-hash", :path => "vendor/git"
-  gem "rails-rack-adapter", :path => "vendor/git"
-  gem "rspec-custom-matchers", :path => "vendor/git"
 end

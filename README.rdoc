@@ -28,9 +28,7 @@ To setup testing for GNI you have to do the following:
     brew install imagemagick --with-ghostscript
     bundle install
 
-* install gems from github
-    gem install remi-rspec-custom-matchers -s http://gems.github.com
-    gem install remi-rails-rack-adapter -s http://gems.github.com
+* install a gem from github
     gem install remi-indifferent-variable-hash -s http://gems.github.com
 
 * prepare database
