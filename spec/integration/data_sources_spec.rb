@@ -7,55 +7,57 @@ describe '/data_sources' do
 
   after :all do
     truncate_all_tables
+    Capybara.reset_sessions!
   end
 
   describe 'without loging in' do
 
     it 'should render' do
-      res = req('/data_sources')
-      res.success?.should be_true
-      res.body.should include("Scientific Names Repositories")
-      res.body.should_not include("Your Repositories")
+      visit(data_sources_path)
+      page.status_code.should == 200
+      body.should include("Scientific Names Repositories")
+      body.should_not include("Your Repositories")
     end
 
     it 'should show a repository settings' do
       repo = DataSource.find_by_title('ITIS')
-      res = req("/data_sources/#{repo.id}")
-      res.success?.should be_true
-      res.body.should include("Repository &ldquo;ITIS&rdquo;")
-      res.body.should_not include("Self-Harvesting")
+      visit(data_source_path(repo))
+      page.status_code.should == 200
+      body.should include("Repository &ldquo;ITIS&rdquo;")
+      body.should_not include("Self-Harvesting")
     end
 
     it 'should not allow user to access form for creation of new repositories' do
-      res = req("/data_sources/new")
-      res.redirect?.should be_true
+      visit(new_data_source_path)
+      page.current_path.should == data_sources_path
     end
 
     it 'should not allow user to create new repositories' do
       count = DataSource.count
-      res = req("/data_sources", :params => { 'data_source[title]' => 'a title' })
-      res.body.should  be_blank
+      page.driver.post(data_sources_path,{ 'data_source[title]' => 'a title' })
+      body.blank?.should  be_true
       DataSource.count.should == count
     end
 
     it 'should not allow user to update a repository' do
       new_title = 'new_title'
-      res = req("/data_sources/#{DataSource.last.id}", :params => { '_method' => 'put', 'data_source[title]' => new_title })
-      res.body.should be_blank
+      page.driver.post(data_source_path(DataSource.last), { '_method' => 'put', 'data_source[title]' => new_title })
+      body.blank?.should be_true
       DataSource.last.title.should_not == new_title
     end
 
     it 'should not allow user to delete a repository' do
       DataSource.gen
       count = DataSource.count
-      res = req("/data_sources/#{DataSource.last.id}", :params => { '_method' => 'delete' })
+      page.driver.post(data_source_path(DataSource.last), { '_method' => 'delete' })
       DataSource.count.should == count
-      res.body.should be_blank
+      body.blank?.should be_true
     end
 
     it 'should render search' do
-      res = req("/data_sources/1?search_term=ADN*")
-      res.success?.should be_true
+      visit("/data_sources/1?search_term=ADN*")
+      page.status_code.should == 200
+      body.should include('Adnaria frondosa')
     end
 
   end
@@ -73,23 +75,22 @@ describe '/data_sources' do
     end
 
     it 'should show your repositories' do
-      res = req("/data_sources")
-      res.body.should include("Scientific Names Repositories")
-      res.body.should include("Your Repositories")
-      res.body.should include("add new repository")
+      visit(data_sources_path)
+      body.should include("Scientific Names Repositories")
+      body.should include("Your Repositories")
+      body.should include("add new repository")
     end
 
     it 'should show users their repositories' do
-      res = req("/data_sources/#{@repo.id}")
-      res.success?.should be_true
-      res.body.should include("Repository &ldquo;#{@repo.title}&rdquo;")
-      res.body.should include("Self-Harvesting")
+      visit(data_source_path(@repo))
+      page.status_code.should == 200
+      body.should include("Repository &ldquo;#{@repo.title}&rdquo;")
+      body.should include("Self-Harvesting")
     end
 
     it 'should show a form to create new repository' do
-      res = req("/data_sources/new")
-      res.success?.should be_true
-      res.body.should have_tag('form[action="/data_sources"]') do
+      visit("/data_sources/new")
+      body.should have_tag('form[action="/data_sources"]') do
         with_tag('input#data_source_title')
         with_tag('input#data_source_data_url')
         with_tag('input#data_source_refresh_period_days')
@@ -102,20 +103,19 @@ describe '/data_sources' do
 
     it 'should be able to create a new repository' do
       count = DataSource.count
-      res = req("/data_sources", :params =>{
-        'data_source[title]' =>'New Title',
-        'data_source[data_url]' =>'http://example.com/data.xml',
-        'data_source[refresh_period_days]' =>'3'
-      })
-      res.redirect?.should be_true
-      res.should redirect_to "/data_sources/#{DataSource.last.id}"
+      visit(new_data_source_path)
+      fill_in "data_source_title", :with => "New Title"
+      fill_in "data_source_data_url", :with => "http://example.com/data.xml"
+      fill_in "data_source_refresh_period_days", :with => 3
+      click_button "Create" 
+      page.current_path.should == data_source_path(DataSource.last)
       DataSource.count.should == count + 1
     end
 
-    it 'should show a for to edit a repository' do
-      res = req("/data_sources/#{@repo.id}/edit")
-      res.success?.should be_true
-      res.body.should have_tag("form[action=?]", "/data_sources/#{@repo.id}") do
+    it 'should show an edit form for a repository' do
+      visit(edit_data_source_path(@repo))
+      page.status_code.should == 200
+      body.should have_tag("form[action=?]", "/data_sources/#{@repo.id}") do
         with_tag('input') do
           '[value="put"]'
           '[name="_method"]'
@@ -133,62 +133,52 @@ describe '/data_sources' do
     it 'should be able to update their repository' do
       @repo.id.should == 1 #double check that it is a data_source with logo url
       new_description = "new description #{rand}"
-      res = req("/data_sources/#{@repo.id}", :params => {
-        '_method' => 'put',
-        'data_source[description]' => new_description
-      })
-      res.redirect?.should be_true
-      res.should redirect_to("/data_sources/#{@repo.id}")
+      visit(edit_data_source_path(@repo))
+      fill_in "data_source_description", :with => new_description
+      click_button "Update"
+      page.current_path.should == data_source_path(@repo)
       DataSource.find(@repo.id).description.should == new_description
-      #icons are not generated for tests
-      #update should generate logo url for the repository
-      #this cached url should appear in api
-      #res = req("/data_sources/#{@repo.id}.xml")
-      #res.success?.should be_true
-      #res.body.should include("<cached_logo_url>")
     end
 
     it 'should be able to delete their repository' do
       new_repo = DataSource.gen
       DataSourceContributor.gen(:data_source_id => new_repo.id, :user_id => @user.id)
       count = DataSource.count
-      req("/data_sources/#{new_repo.id}", :params => {'_method' => 'delete'})
+      page.driver.post(data_source_path(new_repo), {'_method' => 'delete'})
       DataSource.count.should == count - 1
     end
 
     it 'should not see edit form for others repositories' do
-      res = req("/data_sources/#{@others_repo.id}/edit")
-      res.success?.should be_false
-      res.redirect?.should be_true
-      res.should redirect_to "/data_sources"
+      visit(edit_data_source_path(@others_repo))
+      page.current_path.should == data_sources_path
     end
 
     it 'should not be able to update others repositories' do
       new_description = "new description #{rand}"
-      res = req("/data_sources/#{@others_repo.id}", :params => {
+      page.driver.post(data_source_path(@others_repo), {
         '_method' => 'put',
         'data_source[description]' => new_description
       })
-      res.body.should == ''
+      body.should == ''
       DataSource.find(@others_repo.id).description.should_not == new_description
     end
 
     it 'should not be able to delete others repositories' do
       count = DataSource.count
-      res = req("/data_sources/#{@others_repo.id}", :params => {'_method' => 'delete'})
+      page.driver.post(data_source_path(@others_repo), :params => {'_method' => 'delete'})
       DataSource.count.should == count
     end
 
     it 'should delete trailing spaces from urls during create (Bug TAX-196)' do
       count = DataSource.count
-      res = req("/data_sources", :params =>{
-        'data_source[title]' => "Random title " + rand.to_s,
-        'data_source[data_url]' => ' http://data/data.xml ',
-        'data_source[logo_url]' => '  http://url_logo/logo.gif ',
-        'data_source[web_site_url]' => '      http://url_website/index.html ',
-        'data_source[refresh_period_days]' =>'3'
-      })
-      res.redirect?.should be_true
+      visit(new_data_source_path)
+      fill_in "data_source_title", :with => "Random title " + rand.to_s
+      fill_in "data_source_data_url", :with => " http://data/data.xml "
+      fill_in "data_source_logo_url", :with => "  http://url_logo/logo.gif "
+      fill_in "data_source_web_site_url", :with => "      http://url_website/index.html "
+      fill_in "data_source_refresh_period_days", :with =>'3'
+      click_button "Create"
+      page.current_path.should == data_source_path(DataSource.last)
       DataSource.count.should == count + 1
       ds = DataSource.last
       ds.data_url.should == 'http://data/data.xml'
@@ -198,13 +188,12 @@ describe '/data_sources' do
 
     it 'should delete trailing spaces from urls during update (Bug TAX-196)' do
       Faker
-      res = req("/data_sources/#{@repo.id}", :params => {
-        '_method' => 'put',
-        'data_source[data_url]' => '          http://data/data123.xml ',
-        'data_source[logo_url]' => '     http://url_logo/logo123.gif ',
-        'data_source[web_site_url]' => '         http://url_website123/index.html ',
-      })
-      res.redirect?.should be_true
+      visit(edit_data_source_path(@repo))
+      fill_in "data_source_data_url", :with => "          http://data/data123.xml "
+      fill_in "data_source_logo_url", :with => "     http://url_logo/logo123.gif "
+      fill_in "data_source_web_site_url", :with => "         http://url_website123/index.html "
+      click_button "Update"
+      page.current_path.should == data_source_path(@repo)
       ds = DataSource.find(@repo.id)
       ds.data_url.should == 'http://data/data123.xml'
       ds.logo_url.should == 'http://url_logo/logo123.gif'

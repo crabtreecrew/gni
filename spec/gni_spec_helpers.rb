@@ -16,7 +16,7 @@ def truncate_all_tables options = { }
 end
 
 def login_as options = { }
-  req('/session', :params => { 
+  page.driver.post(session_path, { 
       'login' => options[:login], 
       'password' => options[:password] })
 end
