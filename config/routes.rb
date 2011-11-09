@@ -1,4 +1,6 @@
 Gni::Application.routes.draw do
+  resources :data_sources
+
   devise_for :users, :controllers => { :omniauth_callbacks => "users/omniauth_callbacks" }
 
   resources :name_strings, :only => [:index, :show]
