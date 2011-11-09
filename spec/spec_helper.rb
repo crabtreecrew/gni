@@ -1,34 +1,33 @@
-# This file is copied to ~/spec when you run 'ruby script/generate rspec'
-# from the project root directory.
-ENV["RAILS_ENV"] = "test"
-require File.expand_path(File.dirname(__FILE__) + "/../config/environment")
-require 'spec/autorun'
-#require 'spec'
-require 'spec/rails'
+# This file is copied to spec/ when you run 'rails generate rspec:install'
+ENV["RAILS_ENV"] ||= 'test'
+require File.expand_path("../../config/environment", __FILE__)
+require 'rspec/rails'
+# require 'rspec/autorun'
 
-#hack added to make has_tag method compatible with rails 2.3.4
-require 'action_controller'
-require 'action_controller/assertions/selector_assertions'
-include ActionController::Assertions::SelectorAssertions
-#end hack
+# Requires supporting ruby files with custom matchers and macros, etc,
+# in spec/support/ and its subdirectories.
+Dir[Rails.root.join("spec/support/**/*.rb")].each {|f| require f}
 
+RSpec.configure do |config|
+  # == Mock Framework
+  #
+  # If you prefer to use mocha, flexmock or RR, uncomment the appropriate line:
+  #
+  config.mock_with :mocha
+  # config.mock_with :flexmock
+  # config.mock_with :rr
+  # config.mock_with :rspec
 
-require File.expand_path(File.dirname(__FILE__) + "/factories")
-require File.expand_path(File.dirname(__FILE__) + "/gni_spec_helpers")
+  # Remove this line if you're not using ActiveRecord or ActiveRecord fixtures
+  # config.fixture_path = "#{::Rails.root}/spec/fixtures"
 
-require 'eol_scenarios'
-EolScenario.load_paths = [ File.join(RAILS_ROOT, 'scenarios') ]
-
-#require 'eol_rackbox'
-require 'capybara/rails'
-require 'capybara/dsl'
-
-Spec::Runner.configure do |config|
-  include EolScenario::Spec
-  include GNI::Spec::Helpers
-
-  config.include(Capybara, :type => :integration)
+  # If you're not using ActiveRecord, or you'd prefer not to run each of your
+  # examples within a transaction, remove the following line or assign false
+  # instead of true.
   config.use_transactional_fixtures = true
-  config.use_instantiated_fixtures  = false
-  config.fixture_path = RAILS_ROOT + '/spec/fixtures/'
+
+  # If true, the base class of anonymous controllers will be inferred
+  # automatically. This will be the default behavior in future versions of
+  # rspec-rails.
+  config.infer_base_class_for_anonymous_controllers = false
 end

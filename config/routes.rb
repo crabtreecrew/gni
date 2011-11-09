@@ -1,70 +1,62 @@
-ActionController::Routing::Routes.draw do |map|
-  map.resources :statistics
+Gni::Application.routes.draw do
+  devise_for :users, :controllers => { :omniauth_callbacks => "users/omniauth_callbacks" }
 
-  map.resources :data_source_overlaps
+  resources :name_strings, :only => [:index, :show]
 
-  map.resources :name_index_records
+  # The priority is based upon order of creation:
+  # first created -> highest priority.
 
-  map.resources :data_source_contributors
+  # Sample of regular route:
+  #   match 'products/:id' => 'catalog#view'
+  # Keep in mind you can assign values other than :controller and :action
 
-  map.logout '/logout', :controller => 'sessions', :action => 'destroy'
-  map.login '/login', :controller => 'sessions', :action => 'new'
-  map.register '/register', :controller => 'users', :action => 'create'
-  map.signup '/signup', :controller => 'users', :action => 'new'
-  map.about '/about', :controller => 'name_strings', :action => 'about'
-  map.forgotten_password '/forgotten_password', :controller => 'users', :action => 'forgotten_password'
+  # Sample of named route:
+  #   match 'products/:id/purchase' => 'catalog#purchase', :as => :purchase
+  # This route can be invoked with purchase_url(:id => product.id)
 
-  map.resources :parsers
+  # Sample resource route (maps HTTP verbs to controller actions automatically):
+  #   resources :products
 
-  map.resources :name_resolver, :only => [:index]
+  # Sample resource route with options:
+  #   resources :products do
+  #     member do
+  #       get 'short'
+  #       post 'toggle'
+  #     end
+  #
+  #     collection do
+  #       get 'sold'
+  #     end
+  #   end
 
-  map.resources :uuids
+  # Sample resource route with sub-resources:
+  #   resources :products do
+  #     resources :comments, :sales
+  #     resource :seller
+  #   end
 
-  map.resources :users, :has_many => [:data_source_contributors, :data_sources]
+  # Sample resource route with more complex sub-resources
+  #   resources :products do
+  #     resources :comments
+  #     resources :sales do
+  #       get 'recent', :on => :collection
+  #     end
+  #   end
 
-  map.resource :session
+  # Sample resource route within a namespace:
+  #   namespace :admin do
+  #     # Directs /admin/products/* to Admin::ProductsController
+  #     # (app/controllers/admin/products_controller.rb)
+  #     resources :products
+  #   end
 
-  map.resources :name_indices, :has_many => [:name_index_records]
+  # You can have the root of your site routed with "root"
+  # just remember to delete public/index.html.
+  root :to => 'name_strings#index'
 
-  map.resources :response_formats
+  # See how all your routes lay out with "rake routes"
 
-  map.resources :uri_types
-
-  map.resources :kingdoms
-
-  map.resources :name_strings, :has_many => [:data_sources]
-
-  map.root :controller => 'name_strings'
-
-  map.resources :access_rules
-
-  map.resources :url_check
-
-  map.resources :access_types, :has_many => :access_rules
-
-  map.resources :data_sources, :has_many => [:data_providers, :access_rules, :data_source_overlaps, :name_indices, :name_strings, :name_index_records]
-
-  map.resources :participant_contacts
-
-  map.resources :data_providers, :has_many => :data_provider_roles
-
-  map.resources :data_provider_roles
-
-  map.resources :participants, :has_many => :participant_contacts, :has_one => :data_provider
-
-  map.resources :participant_people, :has_many => :participant_contacts, :has_one => :data_provider
-
-  map.resources :participant_organizations, :has_many => :participant_contacts, :has_one => :data_provider
-
-  map.resources :organization_memberships
-
-  map.resources :organizations, :has_many => [:participant_organizations, :organization_memberships]
-
-  map.resources :people, :has_many => [:participant_people, :participant_contacts, :organization_memberships]
-
-  map.resources :import_schedulers
-
-  map.resources :data_source_imports, :has_many => [:data_source_import_details]
-  map.connect ':controller/:action/:id'
-  map.connect ':controller/:action/:id.:format'
+  # This is a legacy wild controller route that's not recommended for RESTful applications.
+  # Note: This route will make all actions in every controller accessible via GET requests.
+  # match ':controller(/:action(/:id(.:format)))'
 end
