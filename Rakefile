@@ -9,7 +9,7 @@ require 'resque/tasks'
 Gni::Application.load_tasks
 
 task(:default).clear
-task :default => [:cucumber, :spec]
+task :default => [:spec, :cucumber]
 
 task "resque:setup" => :environment do
 end
