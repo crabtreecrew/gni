@@ -21,5 +21,4 @@ class CreateNameStrings < ActiveRecord::Migration
   def down
     drop_table :name_strings
   end
-
 end
