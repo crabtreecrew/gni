@@ -2,8 +2,8 @@ class CreateNameStrings < ActiveRecord::Migration
   def up
     execute "CREATE TABLE `name_strings` (
       `id` int(11) UNSIGNED NOT NULL AUTO_INCREMENT,
-      `name` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
-      `normalized` varchar(255) CHARACTER SET ascii DEFAULT NULL,
+      `name` varchar(255) COLLATE utf8_bin DEFAULT NULL,
+      `normalized` varchar(255) CHARACTER SET ascii COLLATE ascii_general_ci DEFAULT NULL,
       `canonical_form_id` int(11) DEFAULT NULL,
       `has_words` tinyint(1) DEFAULT NULL,
       `uuid` binary(16) DEFAULT NULL,

@@ -9,17 +9,17 @@ class JobLogger
     an_object_id, message = message.split("|")[1..2]
     if an_object_id && @subscriptions[an_object_id.to_i]
       job_id = @subscriptions[an_object_id.to_i][:job_id]
-      job_type = @subscriptions[an_object_id.to_i][:job_type]
-      puts [job_type, job_id, message].join "|"
-      JobLog.create(:job_id => job_id, :message => message, :type => job_type)
+      type = @subscriptions[an_object_id.to_i][:type]
+      puts [type, job_id, message].join "|"
+      JobLog.create(:job_id => job_id, :message => message, :type => type)
     end
   end
 
   def subscribe(opts)
     an_object_id = opts[:an_object_id]
     job_id =  opts[:job_id]
-    job_type = opts[:job_type]
-    @subscriptions[an_object_id] = { :job_id => job_id, :job_type => job_type }
+    type = opts[:type]
+    @subscriptions[an_object_id] = { :job_id => job_id, :type => type }
   end
 
   def unsubscribe(an_object_id)

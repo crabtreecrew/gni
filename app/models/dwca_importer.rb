@@ -45,9 +45,9 @@ class DwcaImporter < ActiveRecord::Base
       dlr = Gni::Downloader.new(url, tarball_path)
       downloaded_length = dlr.download_with_percentage do |r|
         msg = sprintf("Downloaded %.0f%% in %.0f seconds ETA is %.0f seconds", r[:percentage], r[:elapsed_time], r[:eta])
-        JobLog.create(:job_type => "DwcaImporter", :job_id => self.id, :message => msg)
+        JobLog.create(:type => "DwcaImporterLog", :job_id => self.id, :message => msg)
       end
-      JobLog.create(:job_type => "DwcaImporter", :job_id => self.id, :message => "Download finished, Size: %s" % downloaded_length)
+      JobLog.create(:type => "DwcaImporterLog", :job_id => self.id, :message => "Download finished, Size: %s" % downloaded_length)
     else
       Kernel.system("curl -s #{url} > #{tarball_path}")
     end
@@ -55,7 +55,7 @@ class DwcaImporter < ActiveRecord::Base
   
   def read_tarball
     @dwc               = DarwinCore.new(tarball_path)
-    DarwinCore.logger.subscribe(:an_object_id => @dwc.object_id, :job_id => self.id, :job_type => 'DwcaImporter')
+    DarwinCore.logger.subscribe(:an_object_id => @dwc.object_id, :job_id => self.id, :type => 'DwcaImporterLog')
     normalizer        = DarwinCore::ClassificationNormalizer.new(@dwc)
     @data = normalizer.normalize
     @tree             = normalizer.tree
@@ -103,7 +103,6 @@ class DwcaImporter < ActiveRecord::Base
           right outer join name_strings ns on ns.id = cf.name_string_id 
         where ns.name = %s" % canonical_name_sql)[0]
       unless canonical_name_id
-        require 'ruby-debug'; debugger unless cf_name_string_id.is_a? Fixnum
         len = canonical_name.size
         first_letter = canonical_name[0] != "×" ? canonical_name[0] : canonical_name.gsub(/^×\s*/,'')[0]
         NameString.connection.execute("
@@ -124,23 +123,20 @@ class DwcaImporter < ActiveRecord::Base
       now = time_string
       DarwinCore.logger_write(@dwc.object_id, "Preparing %s index record" % i) if i % 10000 == 0 && i != 0
       t.classification_path.each do |path|
-        if path.encoding != 'utf-8'
-          require 'ruby-debug'; debugger
+        name_string = NameString.connection.quote(NameString.normalize(@data[k].current_name))
+        record = [t.id, nil, nil, t.rank, nil, nil, nil, nil, nil, t.classification_path.join("|"), t.classification_path_id.join("|"), now, now, t.current_name_canonical]
+        record_to_index(name_string, record)
+        t.synonyms.each do |s|
+          name_string = NameString.connection.quote(NameString.normalize(s.name))
+          record = [s.id, nil, nil, t.rank, t.id, 'synonym', nil, nil, nil, t.classification_path.join("|"), t.classification_path_id.join("|"), now, now, s.canonical_name]
+          record_to_index(name_string, record)
+        end
+        t.vernacular_names.each do |v|
+          name_string = NameString.connection.quote(NameString.normalize(v.name))
+          record = [nil, nil, nil, t.rank, t.id, nil, 1, v.language, v.locality, t.classification_path.join("|"), t.classification_path_id.join("|"), now, now, nil]
+          record_to_index(name_string, record)
         end
       end
-      # name_string = NameString.connection.quote(NameString.normalize(@data[k].current_name))
-      # record = [t.id, nil, nil, t.rank, nil, nil, nil, nil, nil, t.classification_path.join("|"), t.classification_path_id.join("|"), now, now, t.current_name_canonical]
-      # record_to_index(name_string, record)
-      # t.synonyms.each do |s|
-      #   name_string = NameString.connection.quote(NameString.normalize(s.name))
-      #   record = [s.id, nil, nil, t.rank, t.id, 'synonym', nil, nil, nil, t.classification_path.join("|"), t.classification_path_id.join("|"), now, now, s.canonical_name]
-      #   record_to_index(name_string, record)
-      # end
-      # t.vernacular_names.each do |v|
-      #   name_string = NameString.connection.quote(NameString.normalize(v.name))
-      #   record = [nil, nil, nil, t.rank, t.id, nil, 1, v.language, v.locality, t.classification_path.join("|"), t.classification_path_id.join("|"), now, now, nil]
-      #   record_to_index(name_string, record)
-      # end
     end
   end
 
@@ -164,7 +160,7 @@ class DwcaImporter < ActiveRecord::Base
       count += NAME_BATCH_SIZE
       DarwinCore.logger_write(@dwc.object_id, "Inserting %s index record" % count)
       group = group.compact.join('), (')
-      q = "INSERT IGNORE INTO name_string_index_records 
+      q = "INSERT INTO name_string_index_records 
         (taxon_id, global_id, url, rank, accepted_taxon_id, 
         synonym, vernacular, language, locality,
         classification_path, classification_path_ids, 

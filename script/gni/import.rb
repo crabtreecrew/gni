@@ -2,9 +2,9 @@
 ENV["RAILS_ENV"] ||= 'production'
 require File.expand_path("../../../config/environment", __FILE__)
 
-ds = DataSource.create(title:"NCBI")
+ds = DataSource.create(title:"Diatoms")
 # url = "file://"
 # url += File.expand_path File.join('~/tmp/col.tar.gz')
-url = "http://gnaclr.globalnames.org/files/3666f5ad-ca51-449c-8bfa-2c26c096366f/ncbi.tar.gz"
+url = "http://gnaclr.globalnames.org/files/e3b1908d-0e17-47f5-a9a0-7b1071007fe2/diatoms.tar.gz"
 di = DwcaImporter.create(data_source:ds, url:url)
 di.import
