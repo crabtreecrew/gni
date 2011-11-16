@@ -10,7 +10,8 @@ class JobLogger
     if an_object_id && @subscriptions[an_object_id.to_i]
       job_id = @subscriptions[an_object_id.to_i][:job_id]
       job_type = @subscriptions[an_object_id.to_i][:job_type]
-      JobLog.create(:job_id => job_id, :message => message, :job_type => job_type)
+      puts [job_type, job_id, message].join "|"
+      JobLog.create(:job_id => job_id, :message => message, :type => job_type)
     end
   end
 

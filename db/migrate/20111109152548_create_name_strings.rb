@@ -4,7 +4,6 @@ class CreateNameStrings < ActiveRecord::Migration
       `id` int(11) UNSIGNED NOT NULL AUTO_INCREMENT,
       `name` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
       `normalized` varchar(255) CHARACTER SET ascii DEFAULT NULL,
-      `is_canonical_form` tinyint(4) DEFAULT NULL,
       `canonical_form_id` int(11) DEFAULT NULL,
       `has_words` tinyint(1) DEFAULT NULL,
       `uuid` binary(16) DEFAULT NULL,
