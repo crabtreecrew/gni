@@ -11,7 +11,8 @@ gem "oa-oauth", :require => "omniauth/oauth"
 gem "oa-openid", :require => "omniauth/openid"
 gem "thin"
 gem "resque"
-gem "dwc-archive", ">= 0.7.4"
+gem "dwc-archive", ">= 0.7.5"
+gem "taxamatch_rb", ">= 0.6.5"
 
 
 group :assets do

@@ -13,7 +13,6 @@ class DwcaImporter < ActiveRecord::Base
     gi.import
   end
 
-
   def import
     begin
       fetch_tarball
@@ -29,12 +28,40 @@ class DwcaImporter < ActiveRecord::Base
       false
     end
   end
-  
+
   private
+
+  def parse_canonicals
+    DarwinCore.logger_write(@dwc.object_id, "Parsing incomding strings")
+    parser = ScientificNameParser.new
+    count = 0
+    while true do
+      q = "select id, name from name_strings where has_words is null limit %s" % NAME_BATCH_SIZE
+      res = NameString.connection.select_rows(q)
+      set_size = res.size
+      break if set_size == 0
+      ids = []
+      names = []
+      res = res.map { |id, name| [id, parser.parse(name)] }
+
+      sql_data = res.map do |id, data|
+        parsed = data[:scientificName][:parsed] ? 1 : 0
+        parser_run = data[:scientificName][:parser_run]
+        parser_version = data[:scientificName][:parser_version]
+        canonical = parsed == 1 ? NameString.connection.quote(data[:scientificName][:canonical]) : "NULL"
+        dump_data = NameString.connection.quote(Marshal.dump(data))
+        "%s, %s, '%s', %s, %s, %s" % [id, parsed, parser_version, parser_run, canonical, dump_data]
+      end.join("),(")
+      NameString.connection.execute("insert ignore into parsed_name_strings (id, parsed, parser_version, pass_num, canonical_form, data) values (%s)" % sql_data)
+      NameString.connection.execute("update name_strings set has_words = 1 where id in (#{res.map{|i| i[0]}.join(",")})")
+      count += set_size
+      DarwinCore.logger_write(@dwc.object_id, "Parsed %s name" % count)
+    end
+  end
 
   def update_canonical_form_ids
     DarwinCore.logger_write(@dwc.object_id, "Adding information about canonical forms of name_strings")
-    @update_canonical_list.each_with_index do |data, i| 
+    @update_canonical_list.each_with_index do |data, i|
       name_string_id, canonical_form_id = data
       DarwinCore.logger_write(@dwc.object_id, "Added canonical forms info to %s name" % i) if i % NAME_BATCH_SIZE == 0 && i != 0
       NameString.connection.execute("update name_strings set canonical_form_id = %s where id = %s" % [canonical_form_id, name_string_id])
@@ -53,7 +80,7 @@ class DwcaImporter < ActiveRecord::Base
       Kernel.system("curl -s #{url} > #{tarball_path}")
     end
   end
-  
+
   def read_tarball
     @dwc               = DarwinCore.new(tarball_path)
     DarwinCore.logger.subscribe(:an_object_id => @dwc.object_id, :job_id => self.id, :type => 'DwcaImporterLog')
@@ -72,12 +99,14 @@ class DwcaImporter < ActiveRecord::Base
     count = 0
     @name_strings.in_groups_of(NAME_BATCH_SIZE).each do |group|
       count += NAME_BATCH_SIZE
-      now = time_string 
+      now = time_string
       group = group.compact.map do |name_string|
         name_string = NameString.connection.quote(NameString.normalize(name_string)).force_encoding('utf-8')
-        "%s,'%s','%s'" % [name_string, now, now] 
+        normalized = Taxamatch::Normalizer.normalize(name_string);
+        puts normalized
+        "%s, %s, '%s','%s'" % [name_string, normalized, now, now]
       end.join('), (')
-      NameString.connection.execute "INSERT IGNORE INTO name_strings (name, created_at, updated_at) VALUES (#{group})"
+      NameString.connection.execute "INSERT IGNORE INTO name_strings (name, normalized, created_at, updated_at) VALUES (#{group})"
       DarwinCore.logger_write(@dwc.object_id, "Traversed %s scientific name strings" % count)
     end
   end
@@ -88,27 +117,27 @@ class DwcaImporter < ActiveRecord::Base
 
   def record_to_index(name_string, record)
     canonical_name = record.pop
-    record = record.map  do |r| 
+    record = record.map  do |r|
       NameString.connection.quote(r)
     end
     record << canonical_name
-    @index[name_string] ? @index[name_string] << record : @index[name_string] = [record] 
+    @index[name_string] ? @index[name_string] << record : @index[name_string] = [record]
   end
-  
+
   def process_canonical_form(name_string_id, canonical_name)
     if canonical_name && !canonical_name.empty?
       canonical_name_sql = NameString.connection.quote(canonical_name)
       canonical_name_id, cf_name_string_id = NameString.connection.select_rows("
         select cf.id, ns.id
-        from canonical_forms cf 
-          right outer join name_strings ns on ns.id = cf.name_string_id 
+        from canonical_forms cf
+          right outer join name_strings ns on ns.id = cf.name_string_id
         where ns.name = %s" % canonical_name_sql)[0]
       unless canonical_name_id
         len = canonical_name.size
         first_letter = canonical_name[0] != "×" ? canonical_name[0] : canonical_name.gsub(/^×\s*/,'')[0]
         NameString.connection.execute("
-            insert into canonical_forms 
-            (name_string_id, first_letter, length) 
+            insert into canonical_forms
+            (name_string_id, first_letter, length)
             values
             (%s, '%s', %s)" % [cf_name_string_id, first_letter, len])
         canonical_name_id = NameString.connection.select_rows("select last_insert_id()")[0][0]
@@ -148,24 +177,24 @@ class DwcaImporter < ActiveRecord::Base
       name_string_id = NameString.connection.select_rows("select id from name_strings where name = %s" % name_string)[0][0]
       NameString.connection.execute "INSERT INTO name_string_indices (name_string_id, data_source_id, created_at, updated_at) VALUES (%s, %s, now(), now())" % [name_string_id, data_source_id]
       idx_id = NameString.connection.select_rows("select last_insert_id()")[0][0]
-      rows = @index.delete(name_string) 
-      rows = rows.map do |row| 
-        process_canonical_form(name_string_id, row.pop) 
+      rows = @index.delete(name_string)
+      rows = rows.map do |row|
+        process_canonical_form(name_string_id, row.pop)
         row << idx_id
         row.join(",")
       end
-      rows.size == 1 ? records << rows[0] : records += rows      
+      rows.size == 1 ? records << rows[0] : records += rows
     end
     count = 0
     records.in_groups_of(NAME_BATCH_SIZE).each do |group|
       count += NAME_BATCH_SIZE
       DarwinCore.logger_write(@dwc.object_id, "Inserting %s index record" % count)
       group = group.compact.join('), (')
-      q = "INSERT INTO name_string_index_records 
-        (taxon_id, global_id, url, rank, accepted_taxon_id, 
+      q = "INSERT INTO name_string_index_records
+        (taxon_id, global_id, url, rank, accepted_taxon_id,
         synonym, vernacular, language, locality,
-        classification_path, classification_path_ids, 
-        created_at, updated_at, name_index_id) 
+        classification_path, classification_path_ids,
+        created_at, updated_at, name_index_id)
         VALUES (#{group})"
       NameString.connection.execute q
     end
