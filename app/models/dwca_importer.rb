@@ -19,9 +19,10 @@ class DwcaImporter < ActiveRecord::Base
       fetch_tarball
       read_tarball
       store_name_strings
-      build_index
-      process_records
-      update_canonical_form_ids
+      parse_canonicals
+      # build_index
+      # process_records
+      # update_canonical_form_ids
       true
     rescue RuntimeError => e
       DarwinCore.logger_write(@dwc.object_id, "Import Failed: %s" % e)
@@ -57,7 +58,7 @@ class DwcaImporter < ActiveRecord::Base
     @dwc               = DarwinCore.new(tarball_path)
     DarwinCore.logger.subscribe(:an_object_id => @dwc.object_id, :job_id => self.id, :type => 'DwcaImporterLog')
     normalizer        = DarwinCore::ClassificationNormalizer.new(@dwc)
-    @data = normalizer.normalize
+    @data = normalizer.normalize(:with_canonical_names => false);
     @tree             = normalizer.tree
     @name_strings     = normalizer.name_strings
     @languages        = {}
