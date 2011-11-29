@@ -7,21 +7,15 @@ class CreateNameStringIndexRecords < ActiveRecord::Migration
       `global_id` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
       `url` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
       `rank` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
-
       `accepted_taxon_id` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
       `synonym` set('synonym', 'lexical','homotypic', 'heterotypic') DEFAULT NULL,
-      `vernacular` tinyint default NULL,
-      `language` varchar(255) COLLATE utf8_unicode_ci default NULL,
-      `locality` varchar(255) COLLATE utf8_unicode_ci default NULL,
-
       `classification_path` text DEFAULT NULL,
       `classification_path_ids` text DEFAULT NULL,
       `created_at` datetime DEFAULT NULL,
       `updated_at` datetime DEFAULT NULL,
       PRIMARY KEY (`id`),
       KEY `idx_name_index_records_1` (`name_index_id`),
-      KEY `idx_name_index_records_3` (`synonym`),
-      KEY `idx_name_index_records_4` (`vernacular`)
+      KEY `idx_name_index_records_3` (`synonym`)
     ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci"
   end
 

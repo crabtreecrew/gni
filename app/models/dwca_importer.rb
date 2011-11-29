@@ -18,6 +18,7 @@ class DwcaImporter < ActiveRecord::Base
       fetch_tarball
       read_tarball
       store_name_strings
+      store_vernacular_name_strings
       parse_canonicals
       # build_index
       # process_records
@@ -30,34 +31,6 @@ class DwcaImporter < ActiveRecord::Base
   end
 
   private
-
-  def parse_canonicals
-    DarwinCore.logger_write(@dwc.object_id, "Parsing incomding strings")
-    parser = ScientificNameParser.new
-    count = 0
-    while true do
-      q = "select id, name from name_strings where has_words is null limit %s" % NAME_BATCH_SIZE
-      res = NameString.connection.select_rows(q)
-      set_size = res.size
-      break if set_size == 0
-      ids = []
-      names = []
-      res = res.map { |id, name| [id, parser.parse(name)] }
-
-      sql_data = res.map do |id, data|
-        parsed = data[:scientificName][:parsed] ? 1 : 0
-        parser_run = data[:scientificName][:parser_run]
-        parser_version = data[:scientificName][:parser_version]
-        canonical = parsed == 1 ? NameString.connection.quote(data[:scientificName][:canonical]) : "NULL"
-        dump_data = NameString.connection.quote(Marshal.dump(data))
-        "%s, %s, '%s', %s, %s, %s" % [id, parsed, parser_version, parser_run, canonical, dump_data]
-      end.join("),(")
-      NameString.connection.execute("insert ignore into parsed_name_strings (id, parsed, parser_version, pass_num, canonical_form, data) values (%s)" % sql_data)
-      NameString.connection.execute("update name_strings set has_words = 1 where id in (#{res.map{|i| i[0]}.join(",")})")
-      count += set_size
-      DarwinCore.logger_write(@dwc.object_id, "Parsed %s name" % count)
-    end
-  end
 
   def update_canonical_form_ids
     DarwinCore.logger_write(@dwc.object_id, "Adding information about canonical forms of name_strings")
@@ -88,6 +61,7 @@ class DwcaImporter < ActiveRecord::Base
     @data = normalizer.normalize(:with_canonical_names => false);
     @tree             = normalizer.tree
     @name_strings     = normalizer.name_strings
+    @vernacular_name_strings = normalizer.vernacular_name_strings
     @languages        = {}
     @record_count     = 0
     @update_canonical_list = {}
@@ -95,7 +69,7 @@ class DwcaImporter < ActiveRecord::Base
 
   def store_name_strings
     DarwinCore.logger_write(@dwc.object_id, "Populating local database")
-    DarwinCore.logger_write(@dwc.object_id, "Processing name strings")
+    DarwinCore.logger_write(@dwc.object_id, "Processing scientific name strings")
     count = 0
     @name_strings.in_groups_of(NAME_BATCH_SIZE).each do |group|
       count += NAME_BATCH_SIZE
@@ -103,12 +77,62 @@ class DwcaImporter < ActiveRecord::Base
       group = group.compact.map do |name_string|
         name_string = NameString.connection.quote(NameString.normalize(name_string)).force_encoding('utf-8')
         normalized = Taxamatch::Normalizer.normalize(name_string);
-        puts normalized
         "%s, %s, '%s','%s'" % [name_string, normalized, now, now]
       end.join('), (')
       NameString.connection.execute "INSERT IGNORE INTO name_strings (name, normalized, created_at, updated_at) VALUES (#{group})"
       DarwinCore.logger_write(@dwc.object_id, "Traversed %s scientific name strings" % count)
     end
+  end
+
+  def store_vernacular_name_strings
+    DarwinCore.logger_write(@dwc.object_id, "Processing vernacular name strings")
+    count = 0
+    @vernacular_name_strings.in_groups_of(NAME_BATCH_SIZE).each do |group|
+      count += NAME_BATCH_SIZE
+      now = time_string
+      group = group.compact.map do |name_string|
+        name_string = NameString.connection.quote(NameString.normalize(name_string)).force_encoding('utf-8')
+        "%s, '%s','%s'" % [name_string, now, now]
+      end.join('), (')
+      NameString.connection.execute "INSERT IGNORE INTO vernacular_name_strings (name, created_at, updated_at) VALUES (#{group})"
+      DarwinCore.logger_write(@dwc.object_id, "Traversed %s vernacular name strings" % count)
+    end
+  end
+
+  def parse_canonicals
+    DarwinCore.logger_write(@dwc.object_id, "Parsing incomding strings")
+    parser = ScientificNameParser.new
+    count = 0
+    while true do
+      q = "select id, name from name_strings where has_words is null limit %s" % NAME_BATCH_SIZE
+      res = NameString.connection.select_rows(q)
+      set_size = res.size
+      break if set_size == 0
+      ids = []
+      names = []
+      res = res.map { |id, name| [id, parser.parse(name)] }
+
+      sql_data = res.map do |id, data|
+        parsed = data[:scientificName][:parsed] ? 1 : 0
+        insert_words(id, data) if parsed == 1
+        parser_run = data[:scientificName][:parser_run]
+        parser_version = data[:scientificName][:parser_version]
+        canonical = parsed == 1 ? NameString.connection.quote(data[:scientificName][:canonical]) : "NULL"
+        dump_data = NameString.connection.quote(Marshal.dump(data))
+        "%s, %s, '%s', %s, %s, %s" % [id, parsed, parser_version, parser_run, canonical, dump_data]
+      end.join("),(")
+
+      NameString.connection.execute("insert ignore into parsed_name_strings (id, parsed, parser_version, pass_num, canonical_form, data) values (%s)" % sql_data)
+      NameString.connection.execute("update name_strings set has_words = 1 where id in (#{res.map{|i| i[0]}.join(",")})")
+      count += set_size
+      DarwinCore.logger_write(@dwc.object_id, "Parsed %s name" % count)
+    end
+  end
+
+  def insert_words(name_string_id, parsed_data)
+    words = {}
+    dbg
+    puts ''
   end
 
   def tarball_path
