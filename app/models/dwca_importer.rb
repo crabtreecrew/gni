@@ -94,7 +94,7 @@ class DwcaImporter < ActiveRecord::Base
         name_string = NameString.connection.quote(NameString.normalize(name_string)).force_encoding('utf-8')
         "%s, '%s','%s'" % [name_string, now, now]
       end.join('), (')
-      NameString.connection.execute "INSERT IGNORE INTO vernacular_name_strings (name, created_at, updated_at) VALUES (#{group})"
+      NameString.connection.execute "INSERT IGNORE INTO vernacular_strings (name, created_at, updated_at) VALUES (#{group})"
       DarwinCore.logger_write(@dwc.object_id, "Traversed %s vernacular name strings" % count)
     end
   end
@@ -131,7 +131,7 @@ class DwcaImporter < ActiveRecord::Base
 
   def insert_words(name_string_id, parsed_data)
     words = {}
-    dbg
+    require 'ruby-debug'; debugger
     puts ''
   end
 

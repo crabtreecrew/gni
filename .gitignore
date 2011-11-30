@@ -5,6 +5,7 @@ log/*.log
 tmp/*
 .sass-cache/
 database.yml
+tags
 *.swp
 *.swo
 *.sql

@@ -42,7 +42,7 @@ GEM
       parallel
       treetop
       treetop
-    biodiversity19 (1.0.8)
+    biodiversity19 (1.0.9)
       parallel
       parallel
       treetop
@@ -282,6 +282,7 @@ PLATFORMS
   ruby
 
 DEPENDENCIES
+  biodiversity19 (>= 1.0.9)
   capistrano
   capybara
   coffee-rails (~> 3.1.1)
