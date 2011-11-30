@@ -2,7 +2,7 @@ class CreateNameStringIndexRecords < ActiveRecord::Migration
   def up
     execute "CREATE TABLE `name_string_index_records` (
       `id` int(11) NOT NULL AUTO_INCREMENT,
-      `name_index_id` int(11) DEFAULT NULL,
+      `name_index_id` int(11) UNSIGNED NOT NULL,
       `taxon_id` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
       `global_id` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
       `url` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,

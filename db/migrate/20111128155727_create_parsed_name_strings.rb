@@ -9,7 +9,7 @@ class CreateParsedNameStrings < ActiveRecord::Migration
       t.timestamps
     end
 
-    execute "ALTER TABLE `parsed_name_strings` MODIFY COLUMN `id` int(11) UNSIGNED NOT NULL AUTO_INCREMENT"
+    execute "ALTER TABLE `parsed_name_strings` MODIFY COLUMN `id` int(11) UNSIGNED NOT NULL"
     add_index :parsed_name_strings, :parser_version, :name => :idx_parsed_name_strings_1
     add_index :parsed_name_strings, :pass_num, :name => :idx_parsed_name_strings_2
   end
