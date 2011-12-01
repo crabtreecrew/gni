@@ -2,7 +2,7 @@ class CreateCanonicalForms < ActiveRecord::Migration
   def up
     execute "CREATE TABLE `canonical_forms` (
       `id` int(11) UNSIGNED NOT NULL AUTO_INCREMENT,
-      `name` varchar(255) CHARACTER SET utf8 COLLATE utf8_general_ci DEFAULT NULL,
+      `name` varchar(255) CHARACTER SET utf8 COLLATE utf8_unicode_ci DEFAULT NULL,
       `first_letter` char(1) NOT NULL,
       `length` int(11) NOT NULL,
       `created_at` datetime DEFAULT NULL,

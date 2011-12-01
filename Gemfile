@@ -13,7 +13,8 @@ gem "thin"
 gem "resque"
 gem "biodiversity19", ">=1.0.9"
 gem "dwc-archive", ">= 0.7.6"
-gem "taxamatch_rb", ">= 0.6.5"
+gem "taxamatch_rb", ">= 0.8.1"
+gem "composite_primary_keys", ">= 4.0.0"
 
 
 group :assets do
