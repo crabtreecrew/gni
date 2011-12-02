@@ -1,4 +1,6 @@
 # encoding: utf-8
+require 'ruby-prof'
+
 class DwcaImporter < ActiveRecord::Base
   belongs_to :data_source
 
@@ -33,6 +35,8 @@ class DwcaImporter < ActiveRecord::Base
       parse_name_strings
         now = get_time(now)
       store_index
+        now = get_time(now)
+      publish_new_data
         now = get_time(now)
       true
     rescue RuntimeError => e
@@ -108,7 +112,7 @@ class DwcaImporter < ActiveRecord::Base
     count = 0
     while true do
       now = time_string
-      q = "select id, name from name_strings where has_words is null limit %s" % NAME_BATCH_SIZE
+      q = "select id, name from name_strings where has_words is null limit %s" % 1000
       parser = ScientificNameParser.new
       res = NameString.connection.select_rows(q)
       set_size = res.size
@@ -120,18 +124,18 @@ class DwcaImporter < ActiveRecord::Base
       sql_data = res.map do |id, data|
         parsed = data[:scientificName][:parsed] ? 1 : 0
         collect_words(words, id, data) if parsed == 1
-        parser_run = data[:scientificName][:parser_run]
+        parser_run = data[:scientificName][:parser_run].to_i
         parser_version = data[:scientificName][:parser_version]
         canonical = parsed == 1 ? NameString.connection.quote(data[:scientificName][:canonical]) : "NULL"
-        dump_data = NameString.connection.quote(Marshal.dump(data))
+        dump_data = NameString.connection.quote(data.to_json)
         "%s, %s, '%s', %s, %s, %s, '%s', '%s'" % [id, parsed, parser_version, parser_run, canonical, dump_data, now, now]
       end.join("),(")
-      NameString.connection.execute("insert ignore into parsed_name_strings (id, parsed, parser_version, pass_num, canonical_form, data, created_at, updated_at) values (%s)" % sql_data)
-      NameString.connection.execute("update name_strings set has_words = 1 where id in (#{res.map{|i| i[0]}.join(",")})")
-      insert_words(words)
+      NameString.connection.execute("INSERT IGNORE INTO parsed_name_strings (id, parsed, parser_version, pass_num, canonical_form, data, created_at, updated_at) VALUES (%s)" % sql_data)
+      NameString.connection.execute("UPDATE name_strings SET has_words = 1 WHERE id IN (#{res.map{|i| i[0]}.join(",")})")
+      insert_words(words) if words.size > 0
       process_canonical_form(res)
       count += set_size
-      DarwinCore.logger_write(@dwc.object_id, "Parsed %s name" % count)
+      DarwinCore.logger_write(@dwc.object_id, "Parsed %s names" % count)
     end
   end
 
@@ -144,13 +148,14 @@ class DwcaImporter < ActiveRecord::Base
       length = word_end - word_start
       word = Taxamatch::Normalizer.normalize_word(name_string[word_start..word_end])
       word_type = SemanticMeaning.send(pos[key][0]).id  
-      words << [NameString.connection.quote(word), "'" + word[0] + "'", word.size, word_start, length, name_string_id, word_type] 
+      first_letter = word[0] ? word[0] : "" 
+      words << [NameString.connection.quote(word), "'" + first_letter + "'", word.size, word_start, length, name_string_id, word_type] 
     end
   end
 
   def insert_words(words)
     insert_words = words.map { |w| w[0..2].join(",") }.join("),(")
-    NameString.connection.execute("insert ignore into name_words (word, first_letter, length) values (#{insert_words})") 
+    NameString.connection.execute("INSERT IGNORE INTO name_words (word, first_letter, length) VALUES (#{insert_words})") 
     insert_semantic_words = words.map do |data|
       word_id = NameString.connection.select_rows("select id from name_words where word = #{data[0]}")[0][0]
       name_string_id = data[5]
@@ -159,7 +164,7 @@ class DwcaImporter < ActiveRecord::Base
       length = data[4]
       [word_id, name_string_id, semantic_meaning_id, word_pos, length].join(",")
     end.join("),(")
-    NameString.connection.execute("insert into name_word_semantic_meanings (name_word_id, name_string_id, semantic_meaning_id, position, length) values (#{insert_semantic_words})")
+    NameString.connection.execute("INSERT INTO name_word_semantic_meanings (name_word_id, name_string_id, semantic_meaning_id, position, length) VALUES (#{insert_semantic_words})")
   end
 
   def tarball_path
@@ -184,15 +189,22 @@ class DwcaImporter < ActiveRecord::Base
         first_letter = canonical_form[0] != "×" ? canonical_form[0] : canonical_form.gsub(/^×\s*/,'')[0]
         "'%s','%s', %s" % [canonical_form, first_letter, len]
     end.join("),(")
-    NameString.connection.execute(" insert ignore into canonical_forms (name, first_letter, length) values (#{insert_canonical_forms})")
-    NameString.connection.execute("create temporary table tmp_name_string_canonical  (select pns.id as id, cf.id as canonical_form_id from parsed_name_strings pns join canonical_forms cf on cf.name = pns.canonical_form where pns.id in (#{ids}))")
-    NameString.connection.execute("update name_strings ns join tmp_name_string_canonical tnsc on ns.id = tnsc.id set ns.canonical_form_id = tnsc.canonical_form_id")
-    #TODO will indexing of the temp table help in any way?
-    NameString.connection.execute("drop temporary table tmp_name_string_canonical")
+    if insert_canonical_forms.size > 0
+      NameString.connection.execute("INSERT IGNORE INTO canonical_forms (name, first_letter, length) VALUES (#{insert_canonical_forms})")
+      NameString.connection.execute("create temporary table tmp_name_string_canonical  (select pns.id as id, cf.id as canonical_form_id from parsed_name_strings pns join canonical_forms cf on cf.name = pns.canonical_form where pns.id in (#{ids}))")
+      NameString.connection.execute("update name_strings ns join tmp_name_string_canonical tnsc on ns.id = tnsc.id set ns.canonical_form_id = tnsc.canonical_form_id")
+      #TODO will indexing of the temp table help in any way?
+      NameString.connection.execute("drop temporary table tmp_name_string_canonical")
+    end
   end
 
   def store_index
+    DarwinCore.logger_write(@dwc.object_id, "Inserting indices")
     c = NameString.connection
+    c.execute("DROP TEMPORARY TABLE IF EXISTS `tmp_name_string_indices`")
+    c.execute("DROP TEMPORARY TABLE IF EXISTS `tmp_vernacular_string_indices`")
+    c.execute("CREATE TEMPORARY TABLE `tmp_name_string_indices` LIKE `name_string_indices`")
+    c.execute("CREATE TEMPORARY TABLE `tmp_vernacular_string_indices` LIKE `vernacular_string_indices`")
     count = 0
     @data.keys.in_groups_of(NAME_BATCH_SIZE) do |group|
       count += NAME_BATCH_SIZE
@@ -203,35 +215,73 @@ class DwcaImporter < ActiveRecord::Base
         taxon = @data[key]
         name_string_id = get_name_string_id(taxon.current_name)
         taxon_id = c.quote(key)
-        rank = taxon.rank ? c.quote(taxon.rank) : "NULL"
-        classification_path = c.quote(get_classification_path(taxon))
-        classification_path_id = c.quote(taxon.classification_path_id.join("|"))
-        names_index << [data_source_id, name_string_id, taxon_id, rank, "NULL", "NULL", classification_path, classification_path_id, now, now].join(",") 
+        rank = taxon.rank.blank? ? "NULL" : c.quote(taxon.rank)
+        classification_path_id =  taxon.classification_path_id.compact
+        classification_path = "''"
+        if classification_path_id.blank?
+          classification_path_id = "''"
+        else
+          classification_path = c.quote(get_classification_path(taxon))
+          classification_path_id = c.quote(classification_path_id.join("|").force_encoding("utf-8"))
+        end
+        if name_string_id != "NULL"
+          begin
+            names_index << [data_source_id, name_string_id, taxon_id, rank, "NULL", "NULL", classification_path, classification_path_id, now, now].join(",") 
+          rescue Encoding::CompatibilityError
+            require 'ruby-debug'; debugger
+            puts ''
+          end
+        else
+          puts "*" * 80
+          puts taxon
+          puts "*" * 80
+        end
         taxon.synonyms.each do |synonym|
+          count += 1
           synonym_string_id = get_name_string_id(synonym.name)
-          names_index << [data_source_id, synonym_string_id, taxon_id, rank, name_string_id, "'synonym'", classification_path, classification_path_id, now, now].join(",")
+          synonym_taxon_id = synonym.id ? synonym.id : taxon_id
+          if synonym_string_id != "NULL"
+            names_index << [data_source_id, synonym_string_id, synonym_taxon_id, rank, name_string_id, "'synonym'", classification_path, classification_path_id, now, now].join(",")
+          end
         end
         taxon.vernacular_names.each do |vernacular|
+          count += 1
           vernacular_string_id = get_name_string_id(vernacular.name, true)
           language = c.quote(vernacular.language)
           locality = c.quote(vernacular.locality)
-          vernacular_index << [data_source_id, vernacular_string_id, taxon_id, language, locality, now, now].join(",")
+          if vernacular_string_id
+            vernacular_index << [data_source_id, vernacular_string_id, taxon_id, language, locality, now, now].join(",")
+          end
         end
       end
       names_index = names_index.join("),(")
       vernacular_index = vernacular_index.join("),(")
-      c.transaction do
-        c.execute("delete from name_string_indices where data_source_id = #{data_source_id}")
-        c.execute("insert into name_string_indices (data_source_id, name_string_id, taxon_id, rank, accepted_taxon_id, synonym, classification_path, classification_path_ids, created_at, updated_at) values (#{names_index})")
+      if names_index.size > 0
+        c.execute("insert into tmp_name_string_indices (data_source_id, name_string_id, taxon_id, rank, accepted_taxon_id, synonym, classification_path, classification_path_ids, created_at, updated_at) values (#{names_index})")
       end
-      c.transaction do
-        c.execute("delete from vernacular_string_indices where data_source_id = #{data_source_id}")
-        c.execute("insert into vernacular_string_indices (data_source_id, vernacular_string_id, taxon_id, language, locality, created_at, updated_at) values (#{vernacular_index})")
+      if vernacular_index.size > 0
+        c.execute("insert into tmp_vernacular_string_indices (data_source_id, vernacular_string_id, taxon_id, language, locality, created_at, updated_at) values (#{vernacular_index})")
       end
+      DarwinCore.logger_write(@dwc.object_id, "Processed %s indices" % count)
     end
   end
 
+  def publish_new_data
+    DarwinCore.logger_write(@dwc.object_id, "Making new data available")
+    c = NameString.connection
+    c.transaction do
+      c.execute("delete from name_string_indices where data_source_id = #{data_source_id}")
+      c.execute("delete from vernacular_string_indices where data_source_id = #{data_source_id}")
+      c.execute("insert into name_string_indices (select * from tmp_name_string_indices)") 
+      c.execute("insert into vernacular_string_indices (select * from tmp_vernacular_string_indices)")
+      c.execute("drop temporary table tmp_name_string_indices")
+      c.execute("drop temporary table tmp_vernacular_string_indices")
+    end
+    DarwinCore.logger_write(@dwc.object_id, "Import finished")
+  end
+
   def get_name_string_id(name_string, vernacular = false)
+    return "NULL" if name_string.blank? # bad dwca record, we are salvaging synonyms here
     table_name = vernacular ? "vernacular_strings" : "name_strings"
     string_hash = vernacular ? @vernacular_string_hash : @name_string_hash
     unless string_hash[name_string][:id]
@@ -241,12 +291,13 @@ class DwcaImporter < ActiveRecord::Base
   end
 
   def get_classification_path(taxon)
-    taxon.classification_path_id.map do |key|
+    taxon.classification_path_id.compact.map do |key|
       if @data[key].current_name_canonical
         @data[key].current_name_canonical
       else
         name_string = NameString.connection.quote(NameString.normalize(taxon.current_name))
-        @data[key].current_name_canonical = NameString.connection.select_rows("select cf.name from name_strings ns join canonical_forms cf on ns.canonical_form_id = cf.id where ns.name = #{name_string}")[0][0]
+        res = NameString.connection.select_rows("select cf.name from name_strings ns join canonical_forms cf on ns.canonical_form_id = cf.id where ns.name = #{name_string}")[0]
+        @data[key].current_name_canonical = res ? res : ''
       end
     end.join("|")
   end
