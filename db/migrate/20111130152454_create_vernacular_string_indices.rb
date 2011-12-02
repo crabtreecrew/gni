@@ -7,8 +7,8 @@ class CreateVernacularStringIndices < ActiveRecord::Migration
         `taxon_id` varchar(255) COLLATE utf8_unicode_ci NOT NULL,
         `language` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
         `locality` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
-        `created_at` datetime DEFAULT timestamp,
-        `updated_at` datetime DEFAULT timestamp,
+        `created_at` datetime DEFAULT NULL,
+        `updated_at` datetime DEFAULT NULL,
         PRIMARY KEY (`data_source_id`, `vernacular_string_id`, `taxon_id`),
         KEY `idx_vernacular_string_index_records_1` (`vernacular_string_id`)
       ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_unicode_ci"

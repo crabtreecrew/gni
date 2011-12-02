@@ -65,7 +65,7 @@ class DwcaImporter < ActiveRecord::Base
     @name_strings     = normalizer.name_strings
     @name_string_hash = {}
     @vernacular_name_strings = normalizer.vernacular_name_strings
-    @vernacular_name_hash = {}
+    @vernacular_string_hash = {}
     @languages        = {}
     @record_count     = 0
     @update_canonical_list = {}
@@ -80,8 +80,8 @@ class DwcaImporter < ActiveRecord::Base
       now = time_string
       group = group.compact.map do |name_string|
         @name_string_hash[name_string] = {normalized: NameString.connection.quote(NameString.normalize(name_string)).force_encoding('utf-8')}
-        normalized = Taxamatch::Normalizer.normalize(@name_string_hash[name_string][:normalized]);
-        "%s, %s, '%s','%s'" % [name_string, normalized, now, now]
+        tm_normalized = Taxamatch::Normalizer.normalize(@name_string_hash[name_string][:normalized]);
+        "%s, %s, '%s','%s'" % [@name_string_hash[name_string][:normalized], tm_normalized, now, now]
       end.join('), (')
       NameString.connection.execute "INSERT IGNORE INTO name_strings (name, normalized, created_at, updated_at) VALUES (#{group})"
       DarwinCore.logger_write(@dwc.object_id, "Traversed %s scientific name strings" % count)
@@ -96,7 +96,7 @@ class DwcaImporter < ActiveRecord::Base
       now = time_string
       group = group.compact.map do |name_string|
         @vernacular_string_hash[name_string] = {normalized: NameString.connection.quote(NameString.normalize(name_string)).force_encoding('utf-8')}
-        "%s, '%s','%s'" % [name_string, now, now]
+        "%s, '%s','%s'" % [@vernacular_string_hash[name_string][:normalized], now, now]
       end.join('), (')
       NameString.connection.execute "INSERT IGNORE INTO vernacular_strings (name, created_at, updated_at) VALUES (#{group})"
       DarwinCore.logger_write(@dwc.object_id, "Traversed %s vernacular name strings" % count)
@@ -198,39 +198,40 @@ class DwcaImporter < ActiveRecord::Base
       count += NAME_BATCH_SIZE
       names_index = []
       vernacular_index = []
-      group.each do |key|
+      group.compact.each do |key|
+        now = c.quote(time_string)
         taxon = @data[key]
         name_string_id = get_name_string_id(taxon.current_name)
         taxon_id = c.quote(key)
-        rank = taxon.rank ? c.quote(taxon) : "NULL"
+        rank = taxon.rank ? c.quote(taxon.rank) : "NULL"
         classification_path = c.quote(get_classification_path(taxon))
         classification_path_id = c.quote(taxon.classification_path_id.join("|"))
-        names_index << [data_source_id, name_string_id, taxon_id, rank, "NULL", "NULL", classification_path, classification_path_id].join(",") 
+        names_index << [data_source_id, name_string_id, taxon_id, rank, "NULL", "NULL", classification_path, classification_path_id, now, now].join(",") 
         taxon.synonyms.each do |synonym|
           synonym_string_id = get_name_string_id(synonym.name)
-          names_index << [data_source_id, synonym_string_id, taxon_id, rank, name_string_id, "'synonym'", classification_path, classification_path_id].join(",")
+          names_index << [data_source_id, synonym_string_id, taxon_id, rank, name_string_id, "'synonym'", classification_path, classification_path_id, now, now].join(",")
         end
         taxon.vernacular_names.each do |vernacular|
           vernacular_string_id = get_name_string_id(vernacular.name, true)
           language = c.quote(vernacular.language)
           locality = c.quote(vernacular.locality)
-          vernacular_index << [data_source_id, vernacular_string_id, taxon_id, language, locality].join(",")
+          vernacular_index << [data_source_id, vernacular_string_id, taxon_id, language, locality, now, now].join(",")
         end
       end
       names_index = names_index.join("),(")
       vernacular_index = vernacular_index.join("),(")
       c.transaction do
         c.execute("delete from name_string_indices where data_source_id = #{data_source_id}")
-        c.execute("insert into name_string_indices (data_source_id, name_string_id, taxon_id, accepted_taxon_id, synonym, classification_path, classification_path_id) values (#{names_index})")
+        c.execute("insert into name_string_indices (data_source_id, name_string_id, taxon_id, rank, accepted_taxon_id, synonym, classification_path, classification_path_ids, created_at, updated_at) values (#{names_index})")
       end
       c.transaction do
         c.execute("delete from vernacular_string_indices where data_source_id = #{data_source_id}")
-        c.execute("insert into vernacular_string_indices (data_source_id, vernacular_string_id, taxon_id, language, locality) values (#{vernacular_index})"
+        c.execute("insert into vernacular_string_indices (data_source_id, vernacular_string_id, taxon_id, language, locality, created_at, updated_at) values (#{vernacular_index})")
       end
     end
   end
 
-  def get_name_string_id(name_string, verncaular = false)
+  def get_name_string_id(name_string, vernacular = false)
     table_name = vernacular ? "vernacular_strings" : "name_strings"
     string_hash = vernacular ? @vernacular_string_hash : @name_string_hash
     unless string_hash[name_string][:id]
@@ -241,11 +242,11 @@ class DwcaImporter < ActiveRecord::Base
 
   def get_classification_path(taxon)
     taxon.classification_path_id.map do |key|
-      if @data[key].canonical_name
-        @data[key].canonical_name
+      if @data[key].current_name_canonical
+        @data[key].current_name_canonical
       else
         name_string = NameString.connection.quote(NameString.normalize(taxon.current_name))
-        @data[key].canonical_name = NameString.connection.select_rows("select cf.name from name_strings ns join canonical_forms cf on ns.canonical_form_id = canonical_form.id where ns.name = #{name_string}")[0][0]
+        @data[key].current_name_canonical = NameString.connection.select_rows("select cf.name from name_strings ns join canonical_forms cf on ns.canonical_form_id = cf.id where ns.name = #{name_string}")[0][0]
       end
     end.join("|")
   end
