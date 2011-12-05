@@ -22,30 +22,33 @@ class DwcaImporter < ActiveRecord::Base
   end
 
   def import
-    now = Time.now()
     begin
       fetch_tarball
-        now = get_time(now)
       read_tarball
-        now = get_time(now)
       store_name_strings
-        now = get_time(now)
       store_vernacular_strings
-        now = get_time(now)
       parse_name_strings
-        now = get_time(now)
       store_index
-        now = get_time(now)
       publish_new_data
-        now = get_time(now)
       true
-    rescue RuntimeError => e
-      DarwinCore.logger_write(@dwc.object_id, "Import Failed: %s" % e)
+    rescue Exception => e
+      DarwinCore.logger_write(@dwc.object_id, "Import Failed: %s" % e.message)
       false
     end
   end
 
   private
+
+  def read_metadata
+    DarwinCore.logger_write(@dwc.object_id, "Reading metadata")
+    data_source.title = @dwc.eml.title unless @dwc.eml.title.blank?
+    if @dwc.eml.abstract.is_a?(Hash) && @dwc.eml.abstract.has_key?(:para)
+      data_source.description = @dwc.eml.abstract[:para].to_s.strip
+    elsif @dwc.eml.abstract.is_a?(String) && !@dwc.eml.abstract.strip.blank?
+      data_source.description = @dwc.eml.abstract.strip
+    end
+    data_source.save!
+  end
 
   def fetch_tarball
     if url.match(/^\s*http:\/\//)
@@ -63,6 +66,8 @@ class DwcaImporter < ActiveRecord::Base
   def read_tarball
     @dwc               = DarwinCore.new(tarball_path)
     DarwinCore.logger.subscribe(:an_object_id => @dwc.object_id, :job_id => self.id, :type => 'DwcaImporterLog')
+    DarwinCore.logger_write(@dwc.object_id, "Import started for data source %s" % data_source.title)
+    read_metadata
     normalizer        = DarwinCore::ClassificationNormalizer.new(@dwc)
     @data = normalizer.normalize(:with_canonical_names => false);
     @tree             = normalizer.tree
@@ -110,7 +115,7 @@ class DwcaImporter < ActiveRecord::Base
     count = 0
     while true do
       now = time_string
-      q = "select id, name from name_strings where has_words is null limit %s" % 1000
+      q = "SELECT id, name FROM name_strings WHERE has_words IS NULL LIMIT %s" % NAME_BATCH_SIZE
       parser = ScientificNameParser.new
       res = NameString.connection.select_rows(q)
       set_size = res.size
@@ -155,7 +160,7 @@ class DwcaImporter < ActiveRecord::Base
     insert_words = words.map { |w| w[0..2].join(",") }.join("),(")
     NameString.connection.execute("INSERT IGNORE INTO name_words (word, first_letter, length) VALUES (#{insert_words})")
     insert_semantic_words = words.map do |data|
-      word_id = NameString.connection.select_rows("select id from name_words where word = #{data[0]}")[0][0]
+      word_id = NameString.connection.select_rows("SELECT id FROM name_words WHERE word = #{data[0]}")[0][0]
       name_string_id = data[5]
       semantic_meaning_id = data[6]
       word_pos = data[3]
@@ -180,7 +185,7 @@ class DwcaImporter < ActiveRecord::Base
 
   def process_canonical_form(data)
     ids = data.map { |d| d[0] }.join(",")
-    q = "select id, canonical_form from parsed_name_strings where id in (#{ids}) and canonical_form is not null"
+    q = "SELECT id, canonical_form FROM parsed_name_strings WHERE id IN (#{ids}) AND canonical_form IS NOT NULL"
     res = NameString.connection.select_rows(q)
     insert_canonical_forms = res.map do |id, canonical_form|
         len = canonical_form.size
@@ -189,10 +194,10 @@ class DwcaImporter < ActiveRecord::Base
     end.join("),(")
     if insert_canonical_forms.size > 0
       NameString.connection.execute("INSERT IGNORE INTO canonical_forms (name, first_letter, length) VALUES (#{insert_canonical_forms})")
-      NameString.connection.execute("create temporary table tmp_name_string_canonical  (select pns.id as id, cf.id as canonical_form_id from parsed_name_strings pns join canonical_forms cf on cf.name = pns.canonical_form where pns.id in (#{ids}))")
-      NameString.connection.execute("update name_strings ns join tmp_name_string_canonical tnsc on ns.id = tnsc.id set ns.canonical_form_id = tnsc.canonical_form_id")
+      NameString.connection.execute("CREATE TEMPORARY TABLE tmp_name_string_canonical  (SELECT pns.id AS id, cf.id AS canonical_form_id FROM parsed_name_strings pns JOIN canonical_forms cf ON cf.name = pns.canonical_form WHERE pns.id in (#{ids}))")
+      NameString.connection.execute("UPDATE name_strings ns JOIN tmp_name_string_canonical tnsc ON ns.id = tnsc.id SET ns.canonical_form_id = tnsc.canonical_form_id")
       #TODO will indexing of the temp table help in any way?
-      NameString.connection.execute("drop temporary table tmp_name_string_canonical")
+      NameString.connection.execute("DROP TEMPORARY TABLE tmp_name_string_canonical")
     end
   end
 
@@ -256,10 +261,10 @@ class DwcaImporter < ActiveRecord::Base
       names_index = names_index.join("),(")
       vernacular_index = vernacular_index.join("),(")
       if names_index.size > 0
-        c.execute("insert into tmp_name_string_indices (data_source_id, name_string_id, taxon_id, rank, accepted_taxon_id, synonym, classification_path, classification_path_ids, created_at, updated_at) values (#{names_index})")
+        c.execute("INSERT INTO tmp_name_string_indices (data_source_id, name_string_id, taxon_id, rank, accepted_taxon_id, synonym, classification_path, classification_path_ids, created_at, updated_at) VALUES (#{names_index})")
       end
       if vernacular_index.size > 0
-        c.execute("insert into tmp_vernacular_string_indices (data_source_id, vernacular_string_id, taxon_id, language, locality, created_at, updated_at) values (#{vernacular_index})")
+        c.execute("INSERT IGNORE INTO tmp_vernacular_string_indices (data_source_id, vernacular_string_id, taxon_id, language, locality, created_at, updated_at) VALUES (#{vernacular_index})")
       end
       DarwinCore.logger_write(@dwc.object_id, "Processed %s indices" % count)
     end
@@ -269,12 +274,12 @@ class DwcaImporter < ActiveRecord::Base
     DarwinCore.logger_write(@dwc.object_id, "Making new data available")
     c = NameString.connection
     c.transaction do
-      c.execute("delete from name_string_indices where data_source_id = #{data_source_id}")
-      c.execute("delete from vernacular_string_indices where data_source_id = #{data_source_id}")
-      c.execute("insert into name_string_indices (select * from tmp_name_string_indices)")
-      c.execute("insert into vernacular_string_indices (select * from tmp_vernacular_string_indices)")
-      c.execute("drop temporary table tmp_name_string_indices")
-      c.execute("drop temporary table tmp_vernacular_string_indices")
+      c.execute("DELETE FROM name_string_indices WHERE data_source_id = #{data_source_id}")
+      c.execute("DELETE FROM vernacular_string_indices WHERE data_source_id = #{data_source_id}")
+      c.execute("INSERT INTO name_string_indices (SELECT * FROM tmp_name_string_indices)")
+      c.execute("INSERT INTO vernacular_string_indices (SELECT * FROM tmp_vernacular_string_indices)")
+      c.execute("DROP TEMPORARY TABLE tmp_name_string_indices")
+      c.execute("DROP TEMPORARY TABLE tmp_vernacular_string_indices")
     end
     DarwinCore.logger_write(@dwc.object_id, "Import finished")
   end
@@ -284,7 +289,7 @@ class DwcaImporter < ActiveRecord::Base
     table_name = vernacular ? "vernacular_strings" : "name_strings"
     string_hash = vernacular ? @vernacular_strings : @name_strings
     unless string_hash[name_string][:id]
-      string_hash[name_string][:id] = NameString.connection.select_rows("select id from %s where name = %s" % [table_name, string_hash[name_string][:normalized]])[0][0]
+      string_hash[name_string][:id] = NameString.connection.select_rows("SELECT id FROM %s WHERE name = %s" % [table_name, string_hash[name_string][:normalized]])[0][0]
     end
     string_hash[name_string][:id]
   end
@@ -295,13 +300,13 @@ class DwcaImporter < ActiveRecord::Base
         @data[key].current_name_canonical
       else
         name_string = NameString.connection.quote(NameString.normalize(taxon.current_name))
-        res = NameString.connection.select_rows("select cf.name from name_strings ns join canonical_forms cf on ns.canonical_form_id = cf.id where ns.name = #{name_string}")[0]
+        res = NameString.connection.select_rows("SELECT cf.name FROM name_strings ns JOIN canonical_forms cf ON ns.canonical_form_id = cf.id WHERE ns.name = #{name_string}")[0]
         @data[key].current_name_canonical = res ? res : ''
       end
     end.join("|")
   end
 
   def time_string
-    NameString.connection.select_rows("select now()")[0][0]
+    NameString.connection.select_rows("SELECT NOW()")[0][0]
   end
 end
