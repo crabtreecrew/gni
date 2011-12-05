@@ -30,7 +30,7 @@ class DwcaImporter < ActiveRecord::Base
         now = get_time(now)
       store_name_strings
         now = get_time(now)
-      store_vernacular_name_strings
+      store_vernacular_strings
         now = get_time(now)
       parse_name_strings
         now = get_time(now)
@@ -66,10 +66,8 @@ class DwcaImporter < ActiveRecord::Base
     normalizer        = DarwinCore::ClassificationNormalizer.new(@dwc)
     @data = normalizer.normalize(:with_canonical_names => false);
     @tree             = normalizer.tree
-    @name_strings     = normalizer.name_strings
-    @name_string_hash = {}
-    @vernacular_name_strings = normalizer.vernacular_name_strings
-    @vernacular_string_hash = {}
+    @name_strings     = normalizer.name_strings(with_hash: true)
+    @vernacular_strings = normalizer.vernacular_name_strings(with_hash: true)
     @languages        = {}
     @record_count     = 0
     @update_canonical_list = {}
@@ -79,28 +77,28 @@ class DwcaImporter < ActiveRecord::Base
     DarwinCore.logger_write(@dwc.object_id, "Populating local database")
     DarwinCore.logger_write(@dwc.object_id, "Processing scientific name strings")
     count = 0
-    @name_strings.in_groups_of(NAME_BATCH_SIZE).each do |group|
+    @name_strings.keys.in_groups_of(NAME_BATCH_SIZE).each do |group|
       count += NAME_BATCH_SIZE
       now = time_string
       group = group.compact.map do |name_string|
-        @name_string_hash[name_string] = {normalized: NameString.connection.quote(NameString.normalize(name_string)).force_encoding('utf-8')}
-        tm_normalized = Taxamatch::Normalizer.normalize(@name_string_hash[name_string][:normalized]);
-        "%s, %s, '%s','%s'" % [@name_string_hash[name_string][:normalized], tm_normalized, now, now]
+        @name_strings[name_string] = { normalized: NameString.connection.quote(NameString.normalize(name_string)) }
+        tm_normalized = Taxamatch::Normalizer.normalize(@name_strings[name_string][:normalized]);
+        "%s, %s, '%s','%s'" % [@name_strings[name_string][:normalized], tm_normalized, now, now]
       end.join('), (')
       NameString.connection.execute "INSERT IGNORE INTO name_strings (name, normalized, created_at, updated_at) VALUES (#{group})"
       DarwinCore.logger_write(@dwc.object_id, "Traversed %s scientific name strings" % count)
     end
   end
 
-  def store_vernacular_name_strings
+  def store_vernacular_strings
     DarwinCore.logger_write(@dwc.object_id, "Processing vernacular name strings")
     count = 0
-    @vernacular_name_strings.in_groups_of(NAME_BATCH_SIZE).each do |group|
+    @vernacular_strings.keys.in_groups_of(NAME_BATCH_SIZE).each do |group|
       count += NAME_BATCH_SIZE
       now = time_string
       group = group.compact.map do |name_string|
-        @vernacular_string_hash[name_string] = {normalized: NameString.connection.quote(NameString.normalize(name_string)).force_encoding('utf-8')}
-        "%s, '%s','%s'" % [@vernacular_string_hash[name_string][:normalized], now, now]
+        @vernacular_strings[name_string] = {normalized: NameString.connection.quote(NameString.normalize(name_string)).force_encoding('utf-8')}
+        "%s, '%s','%s'" % [@vernacular_strings[name_string][:normalized], now, now]
       end.join('), (')
       NameString.connection.execute "INSERT IGNORE INTO vernacular_strings (name, created_at, updated_at) VALUES (#{group})"
       DarwinCore.logger_write(@dwc.object_id, "Traversed %s vernacular name strings" % count)
@@ -147,15 +145,15 @@ class DwcaImporter < ActiveRecord::Base
       word_end = pos[key][1]
       length = word_end - word_start
       word = Taxamatch::Normalizer.normalize_word(name_string[word_start..word_end])
-      word_type = SemanticMeaning.send(pos[key][0]).id  
-      first_letter = word[0] ? word[0] : "" 
-      words << [NameString.connection.quote(word), "'" + first_letter + "'", word.size, word_start, length, name_string_id, word_type] 
+      word_type = SemanticMeaning.send(pos[key][0]).id
+      first_letter = word[0] ? word[0] : ""
+      words << [NameString.connection.quote(word), "'" + first_letter + "'", word.size, word_start, length, name_string_id, word_type]
     end
   end
 
   def insert_words(words)
     insert_words = words.map { |w| w[0..2].join(",") }.join("),(")
-    NameString.connection.execute("INSERT IGNORE INTO name_words (word, first_letter, length) VALUES (#{insert_words})") 
+    NameString.connection.execute("INSERT IGNORE INTO name_words (word, first_letter, length) VALUES (#{insert_words})")
     insert_semantic_words = words.map do |data|
       word_id = NameString.connection.select_rows("select id from name_words where word = #{data[0]}")[0][0]
       name_string_id = data[5]
@@ -226,7 +224,7 @@ class DwcaImporter < ActiveRecord::Base
         end
         if name_string_id != "NULL"
           begin
-            names_index << [data_source_id, name_string_id, taxon_id, rank, "NULL", "NULL", classification_path, classification_path_id, now, now].join(",") 
+            names_index << [data_source_id, name_string_id, taxon_id, rank, "NULL", "NULL", classification_path, classification_path_id, now, now].join(",")
           rescue Encoding::CompatibilityError
             require 'ruby-debug'; debugger
             puts ''
@@ -240,6 +238,7 @@ class DwcaImporter < ActiveRecord::Base
           count += 1
           synonym_string_id = get_name_string_id(synonym.name)
           synonym_taxon_id = synonym.id ? synonym.id : taxon_id
+          synonym_taxon_id = NameString.connection.quote(synonym_taxon_id)
           if synonym_string_id != "NULL"
             names_index << [data_source_id, synonym_string_id, synonym_taxon_id, rank, name_string_id, "'synonym'", classification_path, classification_path_id, now, now].join(",")
           end
@@ -272,7 +271,7 @@ class DwcaImporter < ActiveRecord::Base
     c.transaction do
       c.execute("delete from name_string_indices where data_source_id = #{data_source_id}")
       c.execute("delete from vernacular_string_indices where data_source_id = #{data_source_id}")
-      c.execute("insert into name_string_indices (select * from tmp_name_string_indices)") 
+      c.execute("insert into name_string_indices (select * from tmp_name_string_indices)")
       c.execute("insert into vernacular_string_indices (select * from tmp_vernacular_string_indices)")
       c.execute("drop temporary table tmp_name_string_indices")
       c.execute("drop temporary table tmp_vernacular_string_indices")
@@ -283,7 +282,7 @@ class DwcaImporter < ActiveRecord::Base
   def get_name_string_id(name_string, vernacular = false)
     return "NULL" if name_string.blank? # bad dwca record, we are salvaging synonyms here
     table_name = vernacular ? "vernacular_strings" : "name_strings"
-    string_hash = vernacular ? @vernacular_string_hash : @name_string_hash
+    string_hash = vernacular ? @vernacular_strings : @name_strings
     unless string_hash[name_string][:id]
       string_hash[name_string][:id] = NameString.connection.select_rows("select id from %s where name = %s" % [table_name, string_hash[name_string][:normalized]])[0][0]
     end
@@ -301,7 +300,7 @@ class DwcaImporter < ActiveRecord::Base
       end
     end.join("|")
   end
-  
+
   def time_string
     NameString.connection.select_rows("select now()")[0][0]
   end
