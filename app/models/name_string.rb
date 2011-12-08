@@ -3,11 +3,12 @@ class NameString < ActiveRecord::Base
   has_many :name_string_indices, :foreign_key => [:data_source_id, :name_string_id, :taxon_id]
   belongs_to :parsed_name_string, :foreign_key => :id
 
-  def self.normalize(nstring)
+  def self.normalize_space(nstring)
     nstring.gsub(/\s{2,}/, ' ').strip
   end
 
-  def parsed
-    @parsed ||= JSON.parse(self.parsed_name_string.data, symbolize_names: true)[:scientificName] rescue nil
+  def uuid
+    res = super
+    res ? res : UUID.create_v5(NameString.normalize_name_string(name), GNA_NAMESPACE).raw_bytes
   end
 end

@@ -3,7 +3,7 @@ class CreateVernacularStrings < ActiveRecord::Migration
     execute "CREATE TABLE `vernacular_strings` (
       `id` int(11) UNSIGNED NOT NULL AUTO_INCREMENT,
       `name` varchar(255) COLLATE utf8_bin DEFAULT NULL,
-      `uuid` binary(16) DEFAULT NULL,
+      `uuid` decimal(39,0) NOT NULL UNIQUE,
       `created_at` datetime DEFAULT NULL,
       `updated_at` datetime DEFAULT NULL,
       PRIMARY KEY (`id`),

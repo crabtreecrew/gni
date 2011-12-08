@@ -6,7 +6,7 @@ class CreateNameStrings < ActiveRecord::Migration
       `normalized` varchar(255) CHARACTER SET ascii COLLATE ascii_general_ci DEFAULT NULL,
       `canonical_form_id` int(11) DEFAULT NULL,
       `has_words` tinyint(1) DEFAULT NULL,
-      `uuid` binary(16) DEFAULT NULL,
+      `uuid` decimal(39.0) NOT NULL UNIQUE,
       `created_at` datetime DEFAULT NULL,
       `updated_at` datetime DEFAULT NULL,
       PRIMARY KEY (`id`),

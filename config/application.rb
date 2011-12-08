@@ -62,4 +62,9 @@ module Gni
       g.template_engine :haml
     end
   end
+
+  require Rails.root.join('vendor', 'lib', 'ruby-uuid', 'uuid')
+  Config = OpenStruct.new(
+    uuid_namespace: ::UUID.create_v5("globalnames.org", UUID::NameSpace_DNS)
+  )
 end
