@@ -3,7 +3,7 @@ class CreateDataSources < ActiveRecord::Migration
     execute "CREATE TABLE `data_sources` (
       `id` int(11) NOT NULL AUTO_INCREMENT,
       `title` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
-      `description` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
+      `description` text DEFAULT NULL,
       `logo_url` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
       `web_site_url` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
       `data_url` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,

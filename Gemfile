@@ -12,7 +12,7 @@ gem "oa-openid", :require => "omniauth/openid"
 gem "thin"
 gem "resque"
 gem "biodiversity19", ">=1.0.9"
-gem "dwc-archive", ">= 0.7.10"
+gem "dwc-archive", ">= 0.7.11"
 gem "taxamatch_rb", ">= 0.8.1"
 gem "composite_primary_keys", ">= 4.0.0"
 

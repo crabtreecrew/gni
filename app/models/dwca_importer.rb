@@ -227,6 +227,7 @@ class DwcaImporter < ActiveRecord::Base
         name_string_id = get_name_string_id(taxon.current_name)
         taxon_id = @db.quote(key)
         rank = taxon.rank.blank? ? "NULL" : @db.quote(taxon.rank)
+        source = taxon.source.blank? ? "NULL" : @db.quote(taxon.source)
         classification_path_id =  taxon.classification_path_id.compact
         classification_path = "''"
         if classification_path_id.blank?
@@ -236,7 +237,7 @@ class DwcaImporter < ActiveRecord::Base
           classification_path_id = @db.quote(classification_path_id.join("|"))
         end
         if name_string_id != "NULL"
-          names_index << [data_source_id, name_string_id, taxon_id, rank, "NULL", "NULL", classification_path, classification_path_id, now, now].join(",")
+          names_index << [data_source_id, name_string_id, taxon_id, source, rank, taxon_id, "NULL", classification_path, classification_path_id, now, now].join(",")
         else
           puts "*" * 80
           puts "Taxon with id %s was not created" % key
@@ -245,9 +246,10 @@ class DwcaImporter < ActiveRecord::Base
           count += 1
           synonym_string_id = get_name_string_id(synonym.name)
           synonym_taxon_id = synonym.id ? synonym.id : taxon_id
+          synonym_source = synonym.source.blank? ? source : @db.quote(synonym.source)
           synonym_taxon_id = @db.quote(synonym_taxon_id)
           if synonym_string_id != "NULL"
-            names_index << [data_source_id, synonym_string_id, synonym_taxon_id, rank, name_string_id, "'synonym'", classification_path, classification_path_id, now, now].join(",")
+            names_index << [data_source_id, synonym_string_id, synonym_taxon_id, synonym_source, rank, taxon_id, "'synonym'", classification_path, classification_path_id, now, now].join(",")
           end
         end
         taxon.vernacular_names.each do |vernacular|
@@ -264,7 +266,7 @@ class DwcaImporter < ActiveRecord::Base
       names_index = names_index.join("),(")
       vernacular_index = vernacular_index.join("),(")
       if names_index.size > 0
-        @db.execute("INSERT IGNORE INTO tmp_name_string_indices (data_source_id, name_string_id, taxon_id, rank, accepted_taxon_id, synonym, classification_path, classification_path_ids, created_at, updated_at) VALUES (#{names_index})")
+        @db.execute("INSERT IGNORE INTO tmp_name_string_indices (data_source_id, name_string_id, taxon_id, url, rank, accepted_taxon_id, synonym, classification_path, classification_path_ids, created_at, updated_at) VALUES (#{names_index})")
       end
       if vernacular_index.size > 0
         @db.execute("INSERT IGNORE INTO tmp_vernacular_string_indices (data_source_id, vernacular_string_id, taxon_id, language, locality, country_code, created_at, updated_at) VALUES (#{vernacular_index})")
