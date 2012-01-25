@@ -11,9 +11,9 @@ gem "oa-oauth", :require => "omniauth/oauth"
 gem "oa-openid", :require => "omniauth/openid"
 gem "thin"
 gem "resque"
-gem "biodiversity19", ">=1.0.9"
+gem "biodiversity19", ">=1.0.10"
 gem "dwc-archive", ">= 0.7.16"
-gem "taxamatch_rb", ">= 0.8.1"
+gem "taxamatch_rb", ">= 0.8.2"
 gem "composite_primary_keys", ">= 4.0.0"
 
 
@@ -25,7 +25,7 @@ end
 
 group :test do
   gem "ruby-prof"
-  # gem "ruby-debug19", :require => "ruby-debug"
+  gem "ruby-debug19", :require => "ruby-debug"
   gem "database_cleaner"
   gem "rails3-generators"
   gem "rspec-rails"

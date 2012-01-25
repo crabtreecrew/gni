@@ -230,12 +230,10 @@ class DwcaImporter < ActiveRecord::Base
         source = taxon.source.blank? ? "NULL" : @db.quote(taxon.source)
         classification_path_id =  taxon.classification_path_id.compact
         classification_path = "''"
-        if classification_path_id.blank?
-          classification_path_id = "''"
-        else
+        unless classification_path_id.blank?
           classification_path = @db.quote(get_classification_path(taxon))
-          classification_path_id = @db.quote(classification_path_id.join("|"))
         end
+        classification_path_id = @db.quote(classification_path_id.join("|"))
         if name_string_id != "NULL"
           names_index << [data_source_id, name_string_id, taxon_id, source, rank, taxon_id, "NULL", classification_path, classification_path_id, now, now].join(",")
         else
@@ -266,7 +264,8 @@ class DwcaImporter < ActiveRecord::Base
       names_index = names_index.join("),(")
       vernacular_index = vernacular_index.join("),(")
       if names_index.size > 0
-        @db.execute("INSERT IGNORE INTO tmp_name_string_indices (data_source_id, name_string_id, taxon_id, url, rank, accepted_taxon_id, synonym, classification_path, classification_path_ids, created_at, updated_at) VALUES (#{names_index})")
+        q = "INSERT IGNORE INTO tmp_name_string_indices (data_source_id, name_string_id, taxon_id, url, rank, accepted_taxon_id, synonym, classification_path, classification_path_ids, created_at, updated_at) VALUES (#{names_index})"
+        @db.execute(q)
       end
       if vernacular_index.size > 0
         @db.execute("INSERT IGNORE INTO tmp_vernacular_string_indices (data_source_id, vernacular_string_id, taxon_id, language, locality, country_code, created_at, updated_at) VALUES (#{vernacular_index})")
@@ -300,12 +299,12 @@ class DwcaImporter < ActiveRecord::Base
 
   def get_classification_path(taxon)
     taxon.classification_path_id.compact.map do |key|
-      if @data[key].current_name_canonical
+      if @data[key].current_name_canonical # reuse canonica data if exists
         @data[key].current_name_canonical
       else
-        name_string = @db.quote(NameString.normalize_space(taxon.current_name))
+        name_string = @db.quote(NameString.normalize_space(@data[key].current_name))
         res = @db.select_rows("SELECT cf.name FROM name_strings ns JOIN canonical_forms cf ON ns.canonical_form_id = cf.id WHERE ns.name = #{name_string}")[0]
-        @data[key].current_name_canonical = res ? res : ''
+        @data[key].current_name_canonical = res.blank? ? '' : res[0]
       end
     end.join("|")
   end
