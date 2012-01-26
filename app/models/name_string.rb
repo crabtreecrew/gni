@@ -4,7 +4,11 @@ class NameString < ActiveRecord::Base
   belongs_to :parsed_name_string, :foreign_key => :id
 
   def self.normalize_space(nstring)
-    nstring.gsub(/\s{2,}/, ' ').strip
+    nstring.gsub(/\s{2,}/, ' ').strip[0...255]
+  end
+
+  def self.normalize(nstring)
+    Taxamatch::Normalizer.normalize(nstring)[0...255]
   end
 
   def uuid

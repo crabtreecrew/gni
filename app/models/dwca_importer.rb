@@ -90,7 +90,7 @@ class DwcaImporter < ActiveRecord::Base
         name = NameString.normalize_space(name_string)
         uuid = get_uuid(name)
         @name_strings[name_string] = { normalized: @db.quote(name) }
-        tm_normalized = @db.quote(Taxamatch::Normalizer.normalize(name))
+        tm_normalized = @db.quote(NameString.normalize(name))
         "%s, %s, %s, '%s','%s'" % [@name_strings[name_string][:normalized], uuid, tm_normalized, now, now]
       end.join('), (')
       @db.execute "INSERT IGNORE INTO name_strings (name, uuid, normalized, created_at, updated_at) VALUES (#{group})"
@@ -224,7 +224,7 @@ class DwcaImporter < ActiveRecord::Base
       group.compact.each do |key|
         now = @db.quote(time_string)
         taxon = @data[key]
-        name_string_id = get_name_string_id(taxon.current_name)
+        name_string_id = @db.quote(get_name_string_id(taxon.current_name))
         taxon_id = @db.quote(key)
         rank = taxon.rank.blank? ? "NULL" : @db.quote(taxon.rank)
         source = taxon.source.blank? ? "NULL" : @db.quote(taxon.source)
@@ -242,7 +242,7 @@ class DwcaImporter < ActiveRecord::Base
         end
         taxon.synonyms.each do |synonym|
           count += 1
-          synonym_string_id = get_name_string_id(synonym.name)
+          synonym_string_id = @db.quote(get_name_string_id(synonym.name))
           synonym_taxon_id = synonym.id ? synonym.id : taxon_id
           synonym_source = synonym.source.blank? ? source : @db.quote(synonym.source)
           synonym_taxon_id = @db.quote(synonym_taxon_id)
@@ -252,11 +252,11 @@ class DwcaImporter < ActiveRecord::Base
         end
         taxon.vernacular_names.each do |vernacular|
           count += 1
-          vernacular_string_id = get_name_string_id(vernacular.name, true)
+          vernacular_string_id = @db.quote(get_name_string_id(vernacular.name, true))
           language = @db.quote(vernacular.language)
           locality = @db.quote(vernacular.locality)
           country_code = @db.quote(vernacular.country_code)
-          if vernacular_string_id
+          if vernacular_string_id != "NULL"
             vernacular_index << [data_source_id, vernacular_string_id, taxon_id, language, locality, country_code, now, now].join(",")
           end
         end
@@ -288,11 +288,16 @@ class DwcaImporter < ActiveRecord::Base
   end
 
   def get_name_string_id(name_string, vernacular = false)
-    return "NULL" if name_string.blank? # bad dwca record, we are salvaging synonyms here
+    return nil if name_string.blank? # bad dwca record, we are salvaging synonyms here
     table_name = vernacular ? "vernacular_strings" : "name_strings"
     string_hash = vernacular ? @vernacular_strings : @name_strings
+    begin
     unless string_hash[name_string][:id]
-      string_hash[name_string][:id] = @db.select_rows("SELECT id FROM %s WHERE name = %s" % [table_name, string_hash[name_string][:normalized]])[0][0]
+      res = @db.select_rows("SELECT id FROM %s WHERE name = %s" % [table_name, string_hash[name_string][:normalized]])[0][0]
+      string_hash[name_string][:id] = res.blank? ? nil : res[0][0]
+    end
+    rescue
+      string_hash[name_string][:id] = nil
     end
     string_hash[name_string][:id]
   end

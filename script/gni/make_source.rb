@@ -2,11 +2,11 @@
 ENV["RAILS_ENV"] ||= 'production'
 require File.expand_path("../../../config/environment", __FILE__)
 #Catalogue of Life
-# ds = DataSource.find(1)
+# ds = DataSource.create(title: "Catalogue of Life")
 # url = "http://betula.mbl.edu/gna_test/catalogue_of_life/col.tar.gz"
 # Wikispecies
-# ds = DataSource.find(2)
-# url = "http://betula.mbl.edu/gna_test/wikispecies/dwca.tar.gz"
+ds = DataSource.create(title: "Wikispecies")
+url = "http://betula.mbl.edu/gna_test/wikispecies/dwca.tar.gz"
 # ITIS
 # ds = DataSource.create(title: "ITIS")
 # url = "http://betula.mbl.edu/gna_test/itis/dwca.tar.gz"
@@ -29,8 +29,8 @@ require File.expand_path("../../../config/environment", __FILE__)
 # ds = DataSource.create(title: "WoRMS")
 # url = "http://betula.mbl.edu/gna_test/worms/dwca.tar.gz"
 #Freebase
-ds = DataSource.create(title: "Freebase")
-url = "http://betula.mbl.edu/gna_test/freebase/dwca.tar.gz"
+# ds = DataSource.create(title: "Freebase")
+# url = "http://betula.mbl.edu/gna_test/freebase/dwca.tar.gz"
 # GBIF
 # ds = DataSource.create(title: "GBIF")
 # url = "http://betula.mbl.edu/gna_test/gbif/gbif.tar.gz"
