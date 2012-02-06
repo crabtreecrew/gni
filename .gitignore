@@ -30,6 +30,7 @@ config/deploy.rb
 config/deploy
 *_gni_site.rb
 vendor/gni_deploy
+vendor/gni_private
 script/gni/batch_scripts/*
 script/gni/experiment/
 restart.txt
