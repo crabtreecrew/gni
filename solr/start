@@ -1,3 +1,5 @@
 #!/bin/sh
 
 java -Dsolr.solr.home=multicore -jar start.jar
+
+# this should work http://localhost:8983/solr/canonical_forms/select?q=*:*
