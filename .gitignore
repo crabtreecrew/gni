@@ -11,3 +11,4 @@ tags
 *.sql
 config/environments/development_local.rb
 restart.txt
+vendor/gni_private

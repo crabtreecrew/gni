@@ -1,0 +1,1 @@
+../../vendor/gni_private/config/environments/production_gni_site.rb
