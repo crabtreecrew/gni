@@ -12,16 +12,16 @@ gem "haml"
 gem "sass"
 gem "will_paginate", ">= 2.3.2"
 gem "json"
-gem "biodiversity", ">= 0.5.16"
+gem "biodiversity", ">= 0.7.3"
 gem "taxamatch_rb", ">= 0.6.4"
 gem "rmagick"
-gem "mysql", ">= 2.7"
 
 group :production do
   gem "newrelic_rpm"
 end
 
 group :development do
+  gem "mysql" #mysql is in a weird place in production, skipping...
   gem "rspec", "~> 1.3.0"
   gem "rspec-rails", "~> 1.3.2"
   gem "ruby-debug"
