@@ -14,7 +14,6 @@ gem "will_paginate", ">= 2.3.2"
 gem "json"
 gem "biodiversity", ">= 0.7.3"
 gem "taxamatch_rb", ">= 0.6.4"
-gem "rmagick"
 
 group :production do
   gem "newrelic_rpm"
@@ -22,6 +21,7 @@ end
 
 group :development do
   gem "mysql" #mysql is in a weird place in production, skipping...
+  gem "rmagick" #rmagic has to be old to work
   gem "rspec", "~> 1.3.0"
   gem "rspec-rails", "~> 1.3.2"
   gem "ruby-debug"
