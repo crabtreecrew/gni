@@ -15,7 +15,7 @@ gem "json"
 gem "biodiversity", ">= 0.5.16"
 gem "taxamatch_rb", ">= 0.6.4"
 gem "rmagick"
-gem "mysql"
+gem "mysql", ">= 2.7"
 
 group :production do
   gem "newrelic_rpm"
