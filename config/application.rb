@@ -65,9 +65,14 @@ module Gni
 
   require Rails.root.join('vendor', 'lib', 'ruby-uuid', 'uuid')
   Config = OpenStruct.new(
-    uuid_namespace: ::UUID.create_v5("globalnames.org", UUID::NameSpace_DNS)
-    batch_size: 10_000
-    temp_dir: "/tmp"
-    solr_url: "http://localhost:8983/solr"
+    uuid_namespace: ::UUID.create_v5("globalnames.org", UUID::NameSpace_DNS),
+    batch_size: 10_000,
+    temp_dir: "/tmp",
+    solr_url: "http://localhost:8983/solr",
   )
+
+  begin
+      require File.join(File.dirname(__FILE__), "application_local")
+  rescue LoadError
+  end
 end

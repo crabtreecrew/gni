@@ -45,7 +45,7 @@ class Gni
 
   end
 
-  class SolrCoreCanonicalForm
+  class CoreCanonicalForm
     attr :update_csv_params, :fields, :name
 
     def initialize

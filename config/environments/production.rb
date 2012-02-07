@@ -58,3 +58,9 @@ Gni::Application.configure do
   # Send deprecation notices to registered listeners
   config.active_support.deprecation = :notify
 end
+
+begin
+    require File.join(File.dirname(__FILE__), "production_gni_site")
+rescue LoadError
+    puts '********************WARNING: COULD NOT LOAD PRODUCTION_GNI_SITE FILE***********************'
+end

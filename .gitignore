@@ -10,6 +10,8 @@ tags
 *.swo
 *.sql
 config/environments/development_local.rb
+config/environments/production_gni_site.rb
 vendor/gni_private
 vendor/gni_deploy
 restart.txt
+config/application_local.rb
