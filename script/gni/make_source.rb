@@ -5,8 +5,8 @@ require File.expand_path("../../../config/environment", __FILE__)
 # ds = DataSource.create(title: "Catalogue of Life")
 # url = "http://betula.mbl.edu/gna_test/catalogue_of_life/col.tar.gz"
 # Wikispecies
-ds = DataSource.create(title: "Wikispecies")
-url = "http://betula.mbl.edu/gna_test/wikispecies/dwca.tar.gz"
+# ds = DataSource.create(title: "Wikispecies")
+# url = "http://betula.mbl.edu/gna_test/wikispecies/dwca.tar.gz"
 # ITIS
 # ds = DataSource.create(title: "ITIS")
 # url = "http://betula.mbl.edu/gna_test/itis/dwca.tar.gz"
@@ -34,5 +34,5 @@ url = "http://betula.mbl.edu/gna_test/wikispecies/dwca.tar.gz"
 # GBIF
 # ds = DataSource.create(title: "GBIF")
 # url = "http://betula.mbl.edu/gna_test/gbif/gbif.tar.gz"
-di = DwcaImporter.create(data_source:ds, url:url)
-di.import
+# di = DwcaImporter.create(data_source:ds, url:url)
+# di.import

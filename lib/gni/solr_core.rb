@@ -1,17 +1,17 @@
-class Gni
+module Gni
   class SolrIngest
-    @queue = :solr_ingest
+    # @queue = :solr_ingest
 
-    def self.perform(classification_id, solr_url = SOLR_URL)
-      classification = Classification.first(:id => classification_id)    
-      raise RuntimeError, "No classification with id #{classification_id}" unless classification
-      si = SolrIngest.new(classification, solr_url)
-      si.ingest
-    end
+    # def self.perform(solr_injest_id, solr_url = Gni::Config.solr_url)
+    #   classification = SolrIk.first(:id => classification_id)    
+    #   raise RuntimeError, "No classification with id #{classification_id}" unless classification
+    #   si = SolrIngest.new(classification, solr_url)
+    #   si.ingest
+    # end
 
     def initialize(core)
       @core = core
-      @solr_client = SolrClient.new(core.update_csv_params)
+      @solr_client = SolrClient.new(solr_url: core.solr_url, update_csv_params: core.update_csv_params)
       @temp_file = "solr_" + @core.name + "_"
     end
 
@@ -20,11 +20,11 @@ class Gni
       id_end = id_start + Gni::Config.batch_size
       while true
         rows = @core.get_rows(id_start, id_end)
-        break if res.blank?
-        @csv_file_name = File.join(Gni::Config.tmp_dir, (@temp_file + "%s_%s" % [id_start, id_end]))
+        break if rows.blank?
+        @csv_file_name = File.join(Gni::Config.temp_dir, (@temp_file + "%s_%s" % [id_start, id_end]))
         csv_file = create_csv_file
-        res.each do |row|
-          csv_file.write(row)
+        rows.each do |row|
+          csv_file << row
         end
         csv_file.close
         @solr_client.delete("name_string_id:[%s TO %s]" % [id_start, id_end])
@@ -39,46 +39,43 @@ class Gni
     
     def create_csv_file
       csv_file = CSV.open(@csv_file_name, "w:utf-8")
-      csv_file.write(@core.fields)
+      csv_file << @core.fields
       csv_file
     end
 
   end
 
   class SolrCoreCanonicalForm
-    attr :update_csv_params, :fields, :name
+    attr :update_csv_params, :fields, :name, :solr_url
 
     def initialize
       @atomizer = Taxamatch::Atomizer.new
       @name = "canonical_forms"
+      @solr_url = Gni::Config.solr_url + "/canonical_forms"
       @fields = %w(name_string_id canonical_form_id name_string canonical_form uninomial_auth uninomial_yr genus_auth genus_yr species_auth species_yr infraspecies_auth infraspecies_yr)
-      @update_csv_params = @fields[4..-1].map { |f| "f.%s.split=true" % f }.join("&")
+      @update_csv_params = "&" + @fields[4..-1].map { |f| "f.%s.split=true" % f }.join("&")
     end
 
     def get_rows(id_start, id_end)
-      rows = NameString.connection.select_rows("select ns.id, cf.id, ns.name, cf.name, pns.data from name_strings ns join parsed_name_strings pns on pns.id=ns.id join canonical_forms cf on cf.id = ns.canonical_form_id where ns.canonical_form_id is not null")
+      q = "select ns.id as name_string_id, cf.id as canonical_form_id, ns.name as name_string, cf.name as canonical_form, pns.data from name_strings ns join parsed_name_strings pns on pns.id=ns.id join canonical_forms cf on cf.id = ns.canonical_form_id where ns.canonical_form_id is not null and ns.id > %s and ns.id <= %s" % [id_start, id_end]
+      rows = NameString.connection.select_rows(q)
       rows.each do |row|
         data = JSON.parse(row.pop, :symbolize_names => true)[:scientificName]
         next unless data[:details]
         res = @atomizer.organize_results(data)
-        uninomial_auth = res[:uninomial][:authors]
-        row << uninomial_auth
-        uninomial_years = res[:uninomial][:years]
-        row << uninomial_years
-        genus_auth = res[:genus][:authors]
-        row << genus_auth
-        genus_years = res[:genus][:years]
-        row << genus_year
-        species_auth = res[:species][:authors]
-        row << species_auth
-        species_years = res[:species][:years]
-        row << species_year
-        infraspecies_auth = res[:infraspecies][0][:authors]
-        row << infraspecies_auth
-        infraspecies_years = res[:infraspecies][0][:years]
-        row << infraspecies_year
+        uninomial_auth = res[:uninomial] ? res[:uninomial][:normalized_authors] : []
+        uninomial_years = res[:uninomial] ? res[:uninomial][:years] : []
+        genus_auth = res[:genus] ? res[:genus][:normalized_authors] : []
+        genus_years = res[:genus] ? res[:genus][:years] : []
+        species_auth = res[:species] ? res[:species][:normalized_authors] : []
+        species_years = res[:species] ? res[:species][:years] : []
+        infraspecies_auth = res[:infraspecies] ? res[:infraspecies][0][:normalized_authors] : []
+        infraspecies_years = res[:infraspecies] ? res[:infraspecies][0][:years] : []
+        [uninomial_auth, uninomial_years, genus_auth, genus_years, species_auth, species_years, infraspecies_auth, infraspecies_years].each do |var|
+          row << var.join(",")
+        end
       end
-      get_rows
+      rows
     end
   end
 end

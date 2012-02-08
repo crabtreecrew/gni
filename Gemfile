@@ -15,6 +15,7 @@ gem "biodiversity19", ">=1.0.10"
 gem "dwc-archive", ">= 0.7.16"
 gem "taxamatch_rb", ">= 0.8.3"
 gem "composite_primary_keys", ">= 4.0.0"
+gem "rest-client"
 
 
 group :assets do

@@ -16,7 +16,6 @@ if defined?(Bundler)
   # If you want your assets lazily compiled in production, use this line
   # Bundler.require(:default, :assets, Rails.env)
 end
-
 module Gni
   class Application < Rails::Application
     # Settings in config/environments/* take precedence over those specified here.
@@ -64,6 +63,7 @@ module Gni
   end
 
   require Rails.root.join('vendor', 'lib', 'ruby-uuid', 'uuid')
+  require Rails.root.join('lib', 'gni')
   Config = OpenStruct.new(
     uuid_namespace: ::UUID.create_v5("globalnames.org", UUID::NameSpace_DNS),
     batch_size: 10_000,
@@ -71,8 +71,4 @@ module Gni
     solr_url: "http://localhost:8983/solr",
   )
 
-  begin
-      require File.join(File.dirname(__FILE__), "application_local")
-  rescue LoadError
-  end
 end

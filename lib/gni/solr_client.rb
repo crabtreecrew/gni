@@ -1,17 +1,14 @@
-require 'rest_client'
-require 'nokogiri'
-require 'uri'
-
-class Gni
+module Gni
   class SolrClient
 
     attr_reader :url
 
-    def initialize(update_csv_params = "", solr_url = Gni::Config.solr_url)
-      @url = solr_url
+    def initialize(opts) 
+      opts = { solr_url: Gni::Config.solr_url, update_csv_params: "" }.merge(opts)
+      @url = opts[:solr_url]
       @url_update = @url + "/update"
       # @url_update_csv = @url + "/update/csv?wt=json&f.common_name.split=true&f.scientific_name_synonym_exact.split=true&f.scientific_name_synonym.split=true&stream.contentType=text/plain;charset=utf-8&stream.file=%s&commit=%s"
-      @url_update_csv = @url + "/update/csv?wt=json&stream.contentType=text/plain;charset=utf-8&stream.file=%s&commit=%s" + update_csv_params
+      @url_update_csv = @url + "/update/csv?wt=json&stream.contentType=text/plain;charset=utf-8&stream.file=%s&commit=%s" + opts[:update_csv_params]
       @url_search = @url + '/select/?version=2.2&indent=on&wt=json&q='
     end
 
@@ -27,6 +24,7 @@ class Gni
 
     def update_with_csv(csv_file, to_commit = true)
       url = @url_update_csv % [csv_file, to_commit.to_s] 
+      require 'ruby-debug'; debugger
       get(url)
     end
 
