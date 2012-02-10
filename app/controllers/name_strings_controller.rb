@@ -62,7 +62,7 @@ class NameStringsController < ApplicationController
       if !request.xhr? && (params[:format] == 'html' || !params[:format] || params[:format] == '') && uuid_or_fixnum?(params[:id])
         redirect_to "/name_strings/#{URI.encode(@name_string.name.gsub(" ","_"))}"
       else
-        @show_records = (params[:all_records] && params[:all_records] != '0') ? true : false
+        @show_records = (params[:all_records] && ['0', 'false'].include?(params[:all_records]) ) ? false : true
         @parsed_name = Parser.new.parse(@name_string.name)
         @data_sources_data = @name_string.name_indices.map do |ni|
           res = {:name_index_id => ni.id, :data_source => ni.data_source, :records_number => ni.name_index_records.size}
@@ -72,8 +72,8 @@ class NameStringsController < ApplicationController
         data = {:data => @data_sources_data, :name_string => @name_string}
         respond_to do |format|
           format.html {render :layout => (request.xhr? ? nil : "application")}
-          format.xml {render :xml => data.to_xml(:except => [:uuid], :methods => [:uuid_hex, :lsid, :resource_uri])}
-          format.json {render :json => json_callback(data.to_json(:except => [:uuid], :methods => [:uuid_hex, :lsid, :resource_uri]), params[:callback])}
+          format.xml {render :xml => data.to_xml(:except => [:uuid, :logo_url], :methods => [:uuid_hex, :lsid, :resource_uri])}
+          format.json {render :json => json_callback(data.to_json(:except => [:uuid, :logo_url], :methods => [:uuid_hex, :lsid, :resource_uri]), params[:callback])}
           format.rdf
         end
       end
