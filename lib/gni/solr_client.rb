@@ -24,7 +24,6 @@ module Gni
 
     def update_with_csv(csv_file, to_commit = true)
       url = @url_update_csv % [csv_file, to_commit.to_s] 
-      require 'ruby-debug'; debugger
       get(url)
     end
 

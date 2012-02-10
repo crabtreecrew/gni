@@ -29,7 +29,7 @@ module Gni
         csv_file.close
         @solr_client.delete("name_string_id:[%s TO %s]" % [id_start, id_end])
         @solr_client.update_with_csv(@csv_file_name)
-        File.rm(@csv_file_name)
+        FileUtils.rm(@csv_file_name)
         id_start = id_end
         id_end += Gni::Config.batch_size
       end
