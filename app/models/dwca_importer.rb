@@ -83,35 +83,41 @@ class DwcaImporter < ActiveRecord::Base
     DarwinCore.logger_write(@dwc.object_id, "Populating local database")
     DarwinCore.logger_write(@dwc.object_id, "Processing scientific name strings")
     count = 0
-    @name_strings.keys.in_groups_of(NAME_BATCH_SIZE).each do |group|
-      count += NAME_BATCH_SIZE
-      now = time_string
-      group = group.compact.map do |name_string|
-        name = NameString.normalize_space(name_string)
-        uuid = get_uuid(name)
-        @name_strings[name_string] = { normalized: @db.quote(name) }
-        tm_normalized = @db.quote(NameString.normalize(name))
-        "%s, %s, %s, '%s','%s'" % [@name_strings[name_string][:normalized], uuid, tm_normalized, now, now]
-      end.join('), (')
-      @db.execute "INSERT IGNORE INTO name_strings (name, uuid, normalized, created_at, updated_at) VALUES (#{group})"
-      DarwinCore.logger_write(@dwc.object_id, "Traversed %s scientific name strings" % count)
+    NameString.transaction do
+      @name_strings.keys.in_groups_of(NAME_BATCH_SIZE).each do |group|
+        count += NAME_BATCH_SIZE
+        now = time_string
+        res = []
+        group.compact.each do |name_string|
+          name = NameString.normalize_space(name_string)
+          uuid = get_uuid(name)
+          @name_strings[name_string] = { normalized: @db.quote(name) }
+          tm_normalized = @db.quote(NameString.normalize(name))
+          res << "%s, %s, %s, '%s','%s'" % [@name_strings[name_string][:normalized], uuid, tm_normalized, now, now]
+        end
+        group = res.join('), (')
+        @db.execute "INSERT IGNORE INTO name_strings (name, uuid, normalized, created_at, updated_at) VALUES (#{group})"
+        DarwinCore.logger_write(@dwc.object_id, "Traversed %s scientific name strings" % count)
+      end
     end
   end
 
   def store_vernacular_strings
     DarwinCore.logger_write(@dwc.object_id, "Processing vernacular name strings")
     count = 0
-    @vernacular_strings.keys.in_groups_of(NAME_BATCH_SIZE).each do |group|
-      count += NAME_BATCH_SIZE
-      now = time_string
-      group = group.compact.map do |name_string|
-        name = NameString.normalize_space(name_string)
-        @vernacular_strings[name_string] = { normalized: @db.quote(name) }
-        uuid = get_uuid(name)
-        "%s, %s, '%s','%s'" % [@vernacular_strings[name_string][:normalized], uuid, now, now]
-      end.join('), (')
-      @db.execute "INSERT IGNORE INTO vernacular_strings (name, uuid, created_at, updated_at) VALUES (#{group})"
-      DarwinCore.logger_write(@dwc.object_id, "Traversed %s vernacular name strings" % count)
+    NameString.transaction do
+      @vernacular_strings.keys.in_groups_of(NAME_BATCH_SIZE).each do |group|
+        count += NAME_BATCH_SIZE
+        now = time_string
+        group = group.compact.map do |name_string|
+          name = NameString.normalize_space(name_string)
+          @vernacular_strings[name_string] = { normalized: @db.quote(name) }
+          uuid = get_uuid(name)
+          "%s, %s, '%s','%s'" % [@vernacular_strings[name_string][:normalized], uuid, now, now]
+        end.join('), (')
+        @db.execute "INSERT IGNORE INTO vernacular_strings (name, uuid, created_at, updated_at) VALUES (#{group})"
+        DarwinCore.logger_write(@dwc.object_id, "Traversed %s vernacular name strings" % count)
+      end
     end
   end
 
@@ -122,32 +128,34 @@ class DwcaImporter < ActiveRecord::Base
   def parse_name_strings
     DarwinCore.logger_write(@dwc.object_id, "Parsing incoming strings")
     count = 0
-    while true do
-      now = time_string
-      q = "SELECT id, name FROM name_strings WHERE has_words IS NULL LIMIT %s" % NAME_BATCH_SIZE
-      parser = ScientificNameParser.new
-      res = @db.select_rows(q)
-      set_size = res.size
-      break if set_size == 0
-      ids = []
-      names = []
-      res = res.map { |id, name| [id, (parser.parse(name) rescue parser_error(name))] }
-      words = []
-      sql_data = res.map do |id, data|
-        parsed = data[:scientificName][:parsed] ? 1 : 0
-        collect_words(words, id, data) if parsed == 1
-        parser_run = data[:scientificName][:parser_run].to_i
-        parser_version = data[:scientificName][:parser_version]
-        canonical = parsed == 1 ? @db.quote(data[:scientificName][:canonical]) : "NULL"
-        dump_data = @db.quote(data.to_json)
-        "%s, %s, '%s', %s, %s, %s, '%s', '%s'" % [id, parsed, parser_version, parser_run, canonical, dump_data, now, now]
-      end.join("),(")
-      @db.execute("INSERT IGNORE INTO parsed_name_strings (id, parsed, parser_version, pass_num, canonical_form, data, created_at, updated_at) VALUES (%s)" % sql_data)
-      @db.execute("UPDATE name_strings SET has_words = 1 WHERE id IN (#{res.map{|i| i[0]}.join(",")})")
-      insert_words(words) if words.size > 0
-      process_canonical_form(res)
-      count += set_size
-      DarwinCore.logger_write(@dwc.object_id, "Parsed %s names" % count)
+    NameString.transaction do
+      while true do
+        now = time_string
+        q = "SELECT id, name FROM name_strings WHERE has_words IS NULL LIMIT %s" % NAME_BATCH_SIZE
+        parser = ScientificNameParser.new
+        res = @db.select_rows(q)
+        set_size = res.size
+        break if set_size == 0
+        ids = []
+        names = []
+        res = res.map { |id, name| [id, (parser.parse(name) rescue parser_error(name))] }
+        words = []
+        sql_data = res.map do |id, data|
+          parsed = data[:scientificName][:parsed] ? 1 : 0
+          collect_words(words, id, data) if parsed == 1
+          parser_run = data[:scientificName][:parser_run].to_i
+          parser_version = data[:scientificName][:parser_version]
+          canonical = parsed == 1 ? @db.quote(data[:scientificName][:canonical]) : "NULL"
+          dump_data = @db.quote(data.to_json)
+          "%s, %s, '%s', %s, %s, %s, '%s', '%s'" % [id, parsed, parser_version, parser_run, canonical, dump_data, now, now]
+        end.join("),(")
+        @db.execute("INSERT IGNORE INTO parsed_name_strings (id, parsed, parser_version, pass_num, canonical_form, data, created_at, updated_at) VALUES (%s)" % sql_data)
+        @db.execute("UPDATE name_strings SET has_words = 1 WHERE id IN (#{res.map{|i| i[0]}.join(",")})")
+        insert_words(words) if words.size > 0
+        process_canonical_form(res)
+        count += set_size
+        DarwinCore.logger_write(@dwc.object_id, "Parsed %s names" % count)
+      end
     end
   end
 
@@ -217,60 +225,62 @@ class DwcaImporter < ActiveRecord::Base
     @db.execute("CREATE TEMPORARY TABLE `tmp_name_string_indices` LIKE `name_string_indices`")
     @db.execute("CREATE TEMPORARY TABLE `tmp_vernacular_string_indices` LIKE `vernacular_string_indices`")
     count = 0
-    @data.keys.in_groups_of(NAME_BATCH_SIZE) do |group|
-      count += NAME_BATCH_SIZE
-      names_index = []
-      vernacular_index = []
-      group.compact.each do |key|
-        now = @db.quote(time_string)
-        taxon = @data[key]
-        name_string_id = @db.quote(get_name_string_id(taxon.current_name))
-        taxon_id = @db.quote(key)
-        rank = taxon.rank.blank? ? "NULL" : @db.quote(taxon.rank)
-        source = taxon.source.blank? ? "NULL" : @db.quote(taxon.source)
-        classification_path_id =  taxon.classification_path_id.compact
-        classification_path = "''"
-        unless classification_path_id.blank?
-          classification_path = @db.quote(get_classification_path(taxon))
-        end
-        classification_path_id = @db.quote(classification_path_id.join("|"))
-        if name_string_id != "NULL"
-          names_index << [data_source_id, name_string_id, taxon_id, source, rank, taxon_id, "NULL", classification_path, classification_path_id, now, now].join(",")
-        else
-          puts "*" * 80
-          puts "Taxon with id %s was not created" % key
-        end
-        taxon.synonyms.each do |synonym|
-          count += 1
-          synonym_string_id = @db.quote(get_name_string_id(synonym.name))
-          synonym_taxon_id = synonym.id ? synonym.id : taxon_id
-          synonym_source = synonym.source.blank? ? source : @db.quote(synonym.source)
-          synonym_taxon_id = @db.quote(synonym_taxon_id)
-          if synonym_string_id != "NULL"
-            names_index << [data_source_id, synonym_string_id, synonym_taxon_id, synonym_source, rank, taxon_id, "'synonym'", classification_path, classification_path_id, now, now].join(",")
+    NameString.transaction do
+      @data.keys.in_groups_of(NAME_BATCH_SIZE) do |group|
+        count += NAME_BATCH_SIZE
+        names_index = []
+        vernacular_index = []
+        group.compact.each do |key|
+          now = @db.quote(time_string)
+          taxon = @data[key]
+          name_string_id = @db.quote(get_name_string_id(taxon.current_name))
+          taxon_id = @db.quote(key)
+          rank = taxon.rank.blank? ? "NULL" : @db.quote(taxon.rank)
+          source = taxon.source.blank? ? "NULL" : @db.quote(taxon.source)
+          classification_path_id =  taxon.classification_path_id.compact
+          classification_path = "''"
+          unless classification_path_id.blank?
+            classification_path = @db.quote(get_classification_path(taxon))
+          end
+          classification_path_id = @db.quote(classification_path_id.join("|"))
+          if name_string_id != "NULL"
+            names_index << [data_source_id, name_string_id, taxon_id, source, rank, taxon_id, "NULL", classification_path, classification_path_id, now, now].join(",")
+          else
+            puts "*" * 80
+            puts "Taxon with id %s was not created" % key
+          end
+          taxon.synonyms.each do |synonym|
+            count += 1
+            synonym_string_id = @db.quote(get_name_string_id(synonym.name))
+            synonym_taxon_id = synonym.id ? synonym.id : taxon_id
+            synonym_source = synonym.source.blank? ? source : @db.quote(synonym.source)
+            synonym_taxon_id = @db.quote(synonym_taxon_id)
+            if synonym_string_id != "NULL"
+              names_index << [data_source_id, synonym_string_id, synonym_taxon_id, synonym_source, rank, taxon_id, "'synonym'", classification_path, classification_path_id, now, now].join(",")
+            end
+          end
+          taxon.vernacular_names.each do |vernacular|
+            count += 1
+            vernacular_string_id = @db.quote(get_name_string_id(vernacular.name, true))
+            language = @db.quote(vernacular.language)
+            locality = @db.quote(vernacular.locality)
+            country_code = @db.quote(vernacular.country_code)
+            if vernacular_string_id != "NULL"
+              vernacular_index << [data_source_id, vernacular_string_id, taxon_id, language, locality, country_code, now, now].join(",")
+            end
           end
         end
-        taxon.vernacular_names.each do |vernacular|
-          count += 1
-          vernacular_string_id = @db.quote(get_name_string_id(vernacular.name, true))
-          language = @db.quote(vernacular.language)
-          locality = @db.quote(vernacular.locality)
-          country_code = @db.quote(vernacular.country_code)
-          if vernacular_string_id != "NULL"
-            vernacular_index << [data_source_id, vernacular_string_id, taxon_id, language, locality, country_code, now, now].join(",")
-          end
+        names_index = names_index.join("),(")
+        vernacular_index = vernacular_index.join("),(")
+        if names_index.size > 0
+          q = "INSERT IGNORE INTO tmp_name_string_indices (data_source_id, name_string_id, taxon_id, url, rank, accepted_taxon_id, synonym, classification_path, classification_path_ids, created_at, updated_at) VALUES (#{names_index})"
+          @db.execute(q)
         end
+        if vernacular_index.size > 0
+          @db.execute("INSERT IGNORE INTO tmp_vernacular_string_indices (data_source_id, vernacular_string_id, taxon_id, language, locality, country_code, created_at, updated_at) VALUES (#{vernacular_index})")
+        end
+        DarwinCore.logger_write(@dwc.object_id, "Processed %s indices" % count)
       end
-      names_index = names_index.join("),(")
-      vernacular_index = vernacular_index.join("),(")
-      if names_index.size > 0
-        q = "INSERT IGNORE INTO tmp_name_string_indices (data_source_id, name_string_id, taxon_id, url, rank, accepted_taxon_id, synonym, classification_path, classification_path_ids, created_at, updated_at) VALUES (#{names_index})"
-        @db.execute(q)
-      end
-      if vernacular_index.size > 0
-        @db.execute("INSERT IGNORE INTO tmp_vernacular_string_indices (data_source_id, vernacular_string_id, taxon_id, language, locality, country_code, created_at, updated_at) VALUES (#{vernacular_index})")
-      end
-      DarwinCore.logger_write(@dwc.object_id, "Processed %s indices" % count)
     end
   end
 
@@ -292,10 +302,10 @@ class DwcaImporter < ActiveRecord::Base
     table_name = vernacular ? "vernacular_strings" : "name_strings"
     string_hash = vernacular ? @vernacular_strings : @name_strings
     begin
-    unless string_hash[name_string][:id]
-      res = @db.select_rows("SELECT id FROM %s WHERE name = %s" % [table_name, string_hash[name_string][:normalized]])[0][0]
-      string_hash[name_string][:id] = res.blank? ? nil : res[0][0]
-    end
+      unless string_hash[name_string][:id]
+        res = @db.select_rows("SELECT id FROM %s WHERE name = %s" % [table_name, string_hash[name_string][:normalized]])
+        string_hash[name_string][:id] = res.blank? ? nil : res[0][0]
+      end
     rescue
       string_hash[name_string][:id] = nil
     end
