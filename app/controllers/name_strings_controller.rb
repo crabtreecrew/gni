@@ -47,9 +47,9 @@ class NameStringsController < ApplicationController
     result[:name_strings] = @name_strings_serialized
 
     respond_to do |format|
-        format.html # index.html.erb
-        format.xml {render :xml => result}
-        format.json {render :json => json_callback(result.to_json,params[:callback])}
+      format.html # index.html.erb
+      format.xml {render :xml => result}
+      format.json {render :json => json_callback(result.to_json,params[:callback])}
     end
   end
 
@@ -73,7 +73,7 @@ class NameStringsController < ApplicationController
         respond_to do |format|
           format.html {render :layout => (request.xhr? ? nil : "application")}
           format.xml {render :xml => data.to_xml(:except => [:uuid], :methods => [:uuid_hex, :lsid, :resource_uri])}
-          format.json {render :json => json_callback(data.to_json,params[:callback])}
+          format.json {render :json => json_callback(data.to_json(:except => [:uuid], :methods => [:uuid_hex, :lsid, :resource_uri]), params[:callback])}
           format.rdf
         end
       end
