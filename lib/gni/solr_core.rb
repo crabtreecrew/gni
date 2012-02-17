@@ -1,3 +1,4 @@
+# encoding: utf-8
 module Gni
   class SolrIngest
     # @queue = :solr_ingest
@@ -34,9 +35,9 @@ module Gni
         id_end += Gni::Config.batch_size
       end
     end
-    
+
     private
-    
+
     def create_csv_file
       csv_file = CSV.open(@csv_file_name, "w:utf-8")
       csv_file << @core.fields
@@ -51,8 +52,9 @@ module Gni
     def initialize
       @atomizer = Taxamatch::Atomizer.new
       @name = "canonical_forms"
+      @stemmer= Lingua::Stemmer.new(:language => "latin")
       @solr_url = Gni::Config.solr_url + "/" + @name
-      @fields = %w(name_string_id canonical_form_id name_string canonical_form uninomial_auth uninomial_yr genus_auth genus_yr species_auth species_yr infraspecies_auth infraspecies_yr)
+      @fields = %w(name_string_id canonical_form_id name_string canonical_form canonical_form_size canonical_word1 canonical_word2 canonical_word2_stem canonical_word3 canonical_word3_stem uninomial_auth uninomial_yr genus_auth genus_yr species_auth species_yr infraspecies_auth infraspecies_yr)
       @update_csv_params = "&" + @fields[4..-1].map { |f| "f.%s.split=true" % f }.join("&")
     end
 
@@ -61,7 +63,16 @@ module Gni
       rows = NameString.connection.select_rows(q)
       rows.each do |row|
         data = JSON.parse(row.pop, :symbolize_names => true)[:scientificName]
-        next unless data[:details]
+        # skipping hybrids and multy infraspecies for now
+        next unless data[:details] 
+        canonical_form = row[3]
+        word1 = word2 = word3 = stem2 = stem3 = nil
+        words =  canonical_form.split(' ')  
+        if words.size < 4 || !canonical_form.index('×')
+          word1, word2, word3 = words
+          word1 = word1.downcase
+          stem2, stem3 = [word2, word3].map {|w| @stemmer.stem(w)}
+        end
         res = @atomizer.organize_results(data)
         uninomial_auth = res[:uninomial] ? res[:uninomial][:normalized_authors] : []
         uninomial_years = res[:uninomial] ? res[:uninomial][:years] : []
@@ -71,6 +82,7 @@ module Gni
         species_years = res[:species] ? res[:species][:years] : []
         infraspecies_auth = res[:infraspecies] ? res[:infraspecies][0][:normalized_authors] : []
         infraspecies_years = res[:infraspecies] ? res[:infraspecies][0][:years] : []
+        [words.size, word1, word2, stem2,  word3, stem3].each { |var| row << var.to_s }
         [uninomial_auth, uninomial_years, genus_auth, genus_years, species_auth, species_years, infraspecies_auth, infraspecies_years].each do |var|
           row << var.join(",")
         end
@@ -78,14 +90,15 @@ module Gni
       rows
     end
   end
-  
+
   class SolrCoreCanonicalFormIndex < SolrCoreCanonicalForm
     def initialize
       super
       @name = "canonical_forms_data_sources"
       @solr_url = Gni::Config.solr_url + "/" + @name
       @fields += %w(data_source_id taxon_id classification_path classification_path_verbatim)
-      @update_params += "&f.classification_path.split=true"
+      @fields.unshift("name_string_index_id")
+      @update_csv_params += "&f.classification_path.split=true"
     end
 
     def get_rows(id_start, id_end)
@@ -94,11 +107,11 @@ module Gni
       rows.each do |row|
         q = "select data_source_id, taxon_id, classification_path from name_string_indices where name_string_id = %s" % row[0]
         indices_rows = NameString.connection.select_rows(q)
-        if indices_rows.blank? do
-          indices << row[0..-1] + ["", "", "", ""]
+        if indices_rows.blank? 
+          indices << ([row[0] + "__"] + row[0..-1] + ["", "", "", ""])
         else
           indices_rows.each do |index|
-            indices << row[0..-1] + index.map { |i| [i[0], i[1], i[2].gsub("|", ","), i[2]] }
+            indices << ["%s_%s_%s" % [row[0], index[0], index[1]]] + row[0..-1] + [index[0], index[1], index[2].gsub("|", ","), index[2]]
           end
         end
       end

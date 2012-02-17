@@ -62,8 +62,9 @@ module Gni
     end
   end
 
-  require Rails.root.join('vendor', 'lib', 'ruby-uuid', 'uuid')
-  require Rails.root.join('lib', 'gni')
+  require Rails.root.join('vendor', 'lib', 'ruby-uuid', 'uuid').to_s
+  require Rails.root.join('lib', 'gni').to_s
+
   Config = OpenStruct.new(
     uuid_namespace: ::UUID.create_v5("globalnames.org", UUID::NameSpace_DNS),
     batch_size: 10_000,

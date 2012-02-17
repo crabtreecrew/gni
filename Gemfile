@@ -16,6 +16,7 @@ gem "dwc-archive", ">= 0.7.16"
 gem "taxamatch_rb", ">= 0.8.4"
 gem "composite_primary_keys", ">= 4.0.0"
 gem "rest-client"
+gem "ruby-stemmer"
 
 
 group :assets do
