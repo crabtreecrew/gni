@@ -9,7 +9,7 @@ def load_csv(dir, file)
   puts "Adding data to table %s" % file[0...-4]
   NameString.connection.execute("truncate %s" % file[0...-4])
   NameString.connection.execute("
-    load data infile '%s'
+    load data local infile '%s'
     into table %s 
     set created_at = now(), updated_at = now()
     " % [File.join(dir, file), file[0...-4]])

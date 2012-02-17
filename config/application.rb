@@ -60,8 +60,12 @@ module Gni
       g.fixture_replacement :factory_girl, :dir => 'spec/factories'
       g.template_engine :haml
     end
+
+
   end
 
+  Mysql2::Client.default_query_options[:connect_flags] |= Mysql2::Client::LOCAL_FILES
+  
   require Rails.root.join('vendor', 'lib', 'ruby-uuid', 'uuid').to_s
   require Rails.root.join('lib', 'gni').to_s
 
