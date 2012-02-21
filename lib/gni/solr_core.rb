@@ -19,18 +19,20 @@ module Gni
     def ingest
       id_start = 0
       id_end = id_start + Gni::Config.batch_size
-      while true
+      while id_start <= NameString.maximum(:id)
         rows = @core.get_rows(id_start, id_end)
-        break if rows.blank?
-        @csv_file_name = File.join(Gni::Config.temp_dir, (@temp_file + "%s_%s" % [id_start, id_end]))
-        csv_file = create_csv_file
-        rows.each do |row|
-          csv_file << row
+        unless rows.blank? do
+          @csv_file_name = File.join(Gni::Config.temp_dir, (@temp_file + "%s_%s" % [id_start, id_end]))
+          csv_file = create_csv_file
+          rows.each do |row|
+            csv_file << row
+          end
+          csv_file.close
+          #@solr_client.delete("name_string_id:[%s TO %s]" % [id_start, id_end])
+          @solr_client.update_with_csv(@csv_file_name)
+          FileUtils.rm(@csv_file_name)
         end
-        csv_file.close
-        @solr_client.delete("name_string_id:[%s TO %s]" % [id_start, id_end])
-        @solr_client.update_with_csv(@csv_file_name)
-        FileUtils.rm(@csv_file_name)
+        end
         id_start = id_end
         id_end += Gni::Config.batch_size
       end
@@ -59,6 +61,7 @@ module Gni
     end
 
     def get_rows(id_start, id_end)
+      puts "data from %s to %s" % [id_start +1, id_end]
       q = "select ns.id as name_string_id, cf.id as canonical_form_id, ns.name as name_string, cf.name as canonical_form, pns.data from name_strings ns join parsed_name_strings pns on pns.id=ns.id join canonical_forms cf on cf.id = ns.canonical_form_id where ns.canonical_form_id is not null and ns.id > %s and ns.id <= %s" % [id_start, id_end]
       rows = NameString.connection.select_rows(q)
       rows.each do |row|
@@ -108,7 +111,8 @@ module Gni
         q = "select data_source_id, taxon_id, classification_path from name_string_indices where name_string_id = %s" % row[0]
         indices_rows = NameString.connection.select_rows(q)
         if indices_rows.blank? 
-          indices << ([row[0] + "__"] + row[0..-1] + ["", "", "", ""])
+          puts "not data for id %s" % row[0]
+          indices << ([row[0].to_s + "__"] + row[0..-1] + ["", "", "", ""])
         else
           indices_rows.each do |index|
             indices << ["%s_%s_%s" % [row[0], index[0], index[1]]] + row[0..-1] + [index[0], index[1], index[2].gsub("|", ","), index[2]]
