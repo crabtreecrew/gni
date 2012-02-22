@@ -17,7 +17,8 @@ module Gni
     end
 
     def ingest
-      id_start = 0
+      id_start = 4910000 #0
+      id_start = 7940001
       id_end = id_start + Gni::Config.batch_size
       while id_start <= NameString.maximum(:id) do
         rows = @core.get_rows(id_start, id_end)
@@ -89,6 +90,7 @@ module Gni
         end
         rows
       end
+
     end
 
     class SolrCoreCanonicalFormIndex < SolrCoreCanonicalForm
