@@ -30,6 +30,6 @@
   -->
   <cores adminPath="/admin/cores">
     <core name="canonical_forms" instanceDir="canonical_forms" />
-    <core name="canonical_forms_data_sources" instanceDir="canonical_forms_data_sources" />
+    <core name="name_string_indices" instanceDir="name_string_indices" />
   </cores>
 </solr>

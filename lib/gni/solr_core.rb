@@ -16,10 +16,14 @@ module Gni
       @temp_file = "solr_" + @core.name + "_"
     end
 
+    def delete_all
+      @solr_client.delete_all
+    end
+
     def ingest
       offset = 0
-      offset = 7500000
-      while offset <= NameString.count do
+      offset = 7000000
+      while offset <= @core.count do
         rows = @core.get_rows(offset)
         @csv_file_name = File.join(Gni::Config.temp_dir, (@temp_file + "%s_%s" % [offset, offset + Gni::Config.batch_size]))
         csv_file = create_csv_file
@@ -47,10 +51,47 @@ module Gni
     def initialize
       @atomizer = Taxamatch::Atomizer.new
       @name = "canonical_forms"
+      @solr_url = Gni::Config.solr_url + "/" + @name
+      @fields = %w(canonical_form_id canonical_form canonical_form_size)
+      @update_csv_params = ""
+    end
+
+    def count
+      @count ||= CanonicalForm.count
+    end
+    
+    def get_rows(offset)
+      puts "data from %s to %s" % [offset + 1, offset + Gni::Config.batch_size]
+      id_start = CanonicalForm.select(:id).order(:id).limit(1).offset(offset).first.id 
+      end_offset = [offset + Gni::Config.batch_size, count - 1].min
+      require 'ruby-debug'; debugger
+      id_end = CanonicalForm.select(:id).order(:id).limit(1).offset(end_offset).first.id 
+      q = "select id as canonical_form_id, name as canonical_form from canonical_forms where id > %s and id <= %s" % [id_start, id_end]
+      rows = CanonicalForm.connection.select_rows(q)
+      rows.each do |row|
+        canonical_form = row[1]
+        words =  canonical_form.split(' ')  
+        row << words.size.to_s
+      end
+      rows
+    end
+
+  end
+
+  class SolrCoreNameString
+    attr :update_csv_params, :fields, :name, :solr_url
+
+    def initialize
+      @atomizer = Taxamatch::Atomizer.new
+      @name = "canonical_forms"
       @stemmer= Lingua::Stemmer.new(:language => "latin")
       @solr_url = Gni::Config.solr_url + "/" + @name
       @fields = %w(name_string_id canonical_form_id name_string canonical_form canonical_form_size canonical_word1 canonical_word2 canonical_word2_stem canonical_word3 canonical_word3_stem uninomial_auth uninomial_yr genus_auth genus_yr species_auth species_yr infraspecies_auth infraspecies_yr)
       @update_csv_params = "&" + @fields[4..-1].map { |f| "f.%s.split=true" % f }.join("&")
+    end
+    
+    def count
+      @count ||= NameString.count
     end
 
     def get_rows(offset)
@@ -90,10 +131,10 @@ module Gni
 
   end
 
-  class SolrCoreCanonicalFormIndex < SolrCoreCanonicalForm
+  class SolrCoreNameStringIndex < SolrCoreNameString
     def initialize
       super
-      @name = "canonical_forms_data_sources"
+      @name = "name_string_indices"
       @solr_url = Gni::Config.solr_url + "/" + @name
       @fields += %w(data_source_id taxon_id classification_path classification_path_verbatim)
       @fields.unshift("name_string_index_id")

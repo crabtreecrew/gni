@@ -16,7 +16,7 @@
  limitations under the License.
 -->
 
-<schema name="Canonical Forms" version="1.1">
+<schema name="Canonical Forms with Data Sources" version="1.1">
   <types>
     <fieldtype name="string"  class="solr.StrField" sortMissingLast="true" omitNorms="true"/>
     <fieldType name="integer" class="solr.IntField" omitNorms="true"/>
@@ -75,18 +75,58 @@
        </analyzer>
      </fieldType>
    </types>
+   
+   <!--  
+    PERFORMANCE NOTE: this schema includes many optional features and should not
+ be used for benchmarking.  To improve performance one could
+  - set stored="false" for all fields possible (esp large fields) when you
+    only need to search on the field but don't need to return the original
+    value.
+  - set indexed="false" if you don't need to search on the field, but only
+    return the field as a result of searching on other indexed fields.
+  - remove all unneeded copyField statements
+  - for best index size and searching performance, set "index" to false
+    for all general text fields, use copyField to copy them to the
+    catchall "text" field, and use that for searching.
+  - For maximum indexing performance, use the StreamingUpdateSolrServer
+    java client.
+  - Remember to run the JVM in server mode, and use a higher logging level
+    that avoids logging every request
+    -->
 
    <fields>   
      <!-- general -->
+     <field name="name_string_index_id"     type="string"   indexed="true"  stored="true"  multiValued="false" required="true"/>
+     <field name="name_string_id"     type="int"   indexed="true"  stored="true"  multiValued="false" required="true"/>
      <field name="canonical_form_id"    type="int"   indexed="true"  stored="true"  multiValued="false" required="true"/> 
+     <field name="name_string"    type="text"   indexed="true"  stored="true"  multiValued="false"/> 
+     <field name="name_string_exact"    type="textExact"   indexed="true"  stored="true"  multiValued="false"/> 
+     <copyField source="name_string" dest="name_string_exact"/>
      <field name="canonical_form"   type="text"   indexed="true"  stored="true"  multiValued="false" /> 
      <field name="canonical_form_exact"   type="textExact"   indexed="true"  stored="true"  multiValued="false" /> 
      <copyField source="canonical_form" dest="canonical_form_exact"/>
      <field name="canonical_form_size" type="int" indexed="true" stored="true" multiValued="false" />
+     <field name="canonical_word1"   type="string"   indexed="true"  stored="true"  multiValued="false" /> 
+     <field name="canonical_word2"   type="string"   indexed="true"  stored="true"  multiValued="false" /> 
+     <field name="canonical_word2_stem"   type="string"   indexed="true"  stored="true"  multiValued="false" /> 
+     <field name="canonical_word3"   type="string"   indexed="true"  stored="true"  multiValued="false" /> 
+     <field name="canonical_word3_stem"   type="string"   indexed="true"  stored="true"  multiValued="false" /> 
+     <field name="uninomial_auth"   type="string"   indexed="true"  stored="true"  multiValued="true" /> 
+     <field name="uninomial_yr"   type="string"   indexed="true"  stored="true"  multiValued="true" /> 
+     <field name="genus_auth"   type="string"   indexed="true"  stored="true"  multiValued="true" /> 
+     <field name="genus_yr"   type="string"   indexed="true"  stored="true"  multiValued="true" /> 
+     <field name="species_auth"   type="string"   indexed="true"  stored="true"  multiValued="true" /> 
+     <field name="species_yr"   type="int"   indexed="true"  stored="true"  multiValued="true" /> 
+     <field name="infraspecies_auth"   type="string"   indexed="true"  stored="true"  multiValued="true" /> 
+     <field name="infraspecies_yr"   type="string"   indexed="true"  stored="true"  multiValued="true" /> 
+     <field name="data_source_id"     type="int"   indexed="true"  stored="true"  multiValued="false" required="false"/>
+     <field name="taxon_id"     type="string"   indexed="true"  stored="true"  multiValued="false" required="false"/>
+     <field name="classification_path" type="string" indexed="true" stored="true" multiValued="true" />
+     <field name="classification_path_verbatim" type="string" indexed="true" stored="true" multiValued="false" />
    </fields>
 
    <!-- field to use to determine and enforce document uniqueness. -->
-   <uniqueKey>canonical_form_id</uniqueKey>
+   <uniqueKey>name_string_index_id</uniqueKey>
 
    <!-- field for the QueryParser to use when an explicit fieldname is absent -->
    <defaultSearchField>canonical_form</defaultSearchField>
@@ -94,4 +134,5 @@
    <!-- SolrQueryParser configuration: defaultOperator="AND|OR" -->
    <solrQueryParser defaultOperator="OR"/>
  </schema>
+
 

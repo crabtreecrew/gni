@@ -15,3 +15,4 @@ vendor/gni_private
 vendor/gni_deploy
 restart.txt
 config/application_local.rb
+solr/multicore/**/data
