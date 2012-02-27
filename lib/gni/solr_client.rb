@@ -17,6 +17,10 @@ module Gni
       post('<commit />')
     end
 
+    def optimize
+      post('<optimize />')
+    end
+
     def update_with_xml(xml_data, to_commit = true)
       post(xml_data)
       commit if to_commit

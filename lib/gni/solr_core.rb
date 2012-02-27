@@ -20,9 +20,12 @@ module Gni
       @solr_client.delete_all
     end
 
+    def build_spellcheck_index
+      @solr_client.search("*:*&rows=0&spellcheck.build=true&spellcheck=true")
+    end
+
     def ingest
       offset = 0
-      offset = 7000000
       while offset <= @core.count do
         rows = @core.get_rows(offset)
         @csv_file_name = File.join(Gni::Config.temp_dir, (@temp_file + "%s_%s" % [offset, offset + Gni::Config.batch_size]))
@@ -32,6 +35,10 @@ module Gni
         @solr_client.update_with_csv(@csv_file_name)
         FileUtils.rm(@csv_file_name)
         offset += Gni::Config.batch_size
+      end
+      if core.spellcheck?
+        puts "Building spellcheck index"
+        build_spellcheck_index 
       end
     end
 
@@ -59,12 +66,16 @@ module Gni
     def count
       @count ||= CanonicalForm.count
     end
+
+    def spellcheck?
+      true
+    end
     
     def get_rows(offset)
       puts "data from %s to %s" % [offset + 1, offset + Gni::Config.batch_size]
       id_start = CanonicalForm.select(:id).order(:id).limit(1).offset(offset).first.id 
+      id_start = 0 if id_start == 1
       end_offset = [offset + Gni::Config.batch_size, count - 1].min
-      require 'ruby-debug'; debugger
       id_end = CanonicalForm.select(:id).order(:id).limit(1).offset(end_offset).first.id 
       q = "select id as canonical_form_id, name as canonical_form from canonical_forms where id > %s and id <= %s" % [id_start, id_end]
       rows = CanonicalForm.connection.select_rows(q)
@@ -92,6 +103,10 @@ module Gni
     
     def count
       @count ||= NameString.count
+    end
+    
+    def spellcheck?
+      false
     end
 
     def get_rows(offset)

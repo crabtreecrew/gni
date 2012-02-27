@@ -8,11 +8,12 @@
 def load_csv(dir, file)
   puts "Adding data to table %s" % file[0...-4]
   NameString.connection.execute("truncate %s" % file[0...-4])
+  local= !!(RUBY_PLATFORM =~ /darwin/) ? '' : 'local' #hack to get around a bug in mysql2 on os x
   NameString.connection.execute("
-    load data local infile '%s'
+    load data %s infile '%s'
     into table %s 
     set created_at = now(), updated_at = now()
-    " % [File.join(dir, file), file[0...-4]])
+    " % [local, File.join(dir, file), file[0...-4]])
 end
 
 puts "Preloading data..."
