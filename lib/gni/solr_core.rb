@@ -36,7 +36,7 @@ module Gni
         FileUtils.rm(@csv_file_name)
         offset += Gni::Config.batch_size
       end
-      if core.spellcheck?
+      if @core.spellcheck?
         puts "Building spellcheck index"
         build_spellcheck_index 
       end
