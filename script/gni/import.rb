@@ -9,7 +9,6 @@ def process_file(file)
   url = URI.encode("file://" + file)
   di = DwcaImporter.create(data_source:ds, url:url)
   di.import
-  # require 'ruby-debug'; debugger
   puts "*" * 80
 end
 

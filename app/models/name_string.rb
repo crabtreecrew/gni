@@ -13,9 +13,18 @@ class NameString < ActiveRecord::Base
     Taxamatch::Normalizer.normalize(nstring)[0...255]
   end
 
+  def self.in_data_sources(data_source_ids)
+    if data_source_ids.blank?
+      where("1 = 1")
+    else
+      data_source_ids = data_source_ids.select {|i| i.is_a? Fixnum}.join(",")
+      joins("join name_string_indices on name_strings.id = name_string_indices.name_string_id").where("data_source_id in (#{data_source_ids})")
+    end
+  end
+
   def uuid
     res = super
-    res ? res : UUID.create_v5(NameString.normalize_name_string(name), GNA_NAMESPACE).raw_bytes
+    res ? res : UUID.create_v5(NameString.normalize_name_string(name), Gni::Config.uuid_namespace).raw_bytes
   end
 
   def reconcile

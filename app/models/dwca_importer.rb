@@ -4,10 +4,6 @@ require 'ruby-prof'
 class DwcaImporter < ActiveRecord::Base
   belongs_to :data_source
 
-  unless defined? DWCA_IMPORTER_DEFINED
-    NAME_BATCH_SIZE = 10_000
-    DWCA_IMPORTER_DEFINED = true
-  end
   @queue = :dwca_importer
 
   def self.perform(dwca_importer_id)
@@ -84,8 +80,8 @@ class DwcaImporter < ActiveRecord::Base
     DarwinCore.logger_write(@dwc.object_id, "Processing scientific name strings")
     count = 0
     NameString.transaction do
-      @name_strings.keys.in_groups_of(NAME_BATCH_SIZE).each do |group|
-        count += NAME_BATCH_SIZE
+      @name_strings.keys.in_groups_of(Gni::Config.batch_size).each do |group|
+        count += Gni::Config.batch_size
         now = time_string
         res = []
         group.compact.each do |name_string|
@@ -106,8 +102,8 @@ class DwcaImporter < ActiveRecord::Base
     DarwinCore.logger_write(@dwc.object_id, "Processing vernacular name strings")
     count = 0
     NameString.transaction do
-      @vernacular_strings.keys.in_groups_of(NAME_BATCH_SIZE).each do |group|
-        count += NAME_BATCH_SIZE
+      @vernacular_strings.keys.in_groups_of(Gni::Config.batch_size).each do |group|
+        count += Gni::Config.batch_size
         now = time_string
         group = group.compact.map do |name_string|
           name = NameString.normalize_space(name_string)
@@ -142,8 +138,8 @@ class DwcaImporter < ActiveRecord::Base
     @db.execute("CREATE TEMPORARY TABLE `tmp_vernacular_string_indices` LIKE `vernacular_string_indices`")
     count = 0
     NameString.transaction do
-      @data.keys.in_groups_of(NAME_BATCH_SIZE) do |group|
-        count += NAME_BATCH_SIZE
+      @data.keys.in_groups_of(Gni::Config.batch_size) do |group|
+        count += Gni::Config.batch_size
         names_index = []
         vernacular_index = []
         group.compact.each do |key|

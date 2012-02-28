@@ -1,0 +1,50 @@
+8	Gecinulus
+9	Picathartes oreas Reichenow, 1899
+17	Toxostoma longirostre sennetti
+21	Leiothrix argentauris (Hodgson, 1838)
+22	Troglodytes tanneri Townsend, 1890
+23	Rollulus
+24	Capella gallinago faeroeensis (C. L. Brehm, 1831)
+25	Treron
+26	Larus occidentalis wymani
+27	Actitis Illiger, 1811
+28	Ceyx melanurus (Kaup, 1848)
+29	Dendropicos fuscescens hemprichii (Ehrenberg, 1833)
+31	Macropygia emiliana megala Siebers, 1929
+32	Burhinus oedicnemus saharae (Reichenow, 1894)
+46	Calidris cooperi (Baird, 1858)
+47	Callipepla gambelii (Gambel, 1843)
+58	Merops orientalis ferrugeiceps Anderson, 1879
+60	Chlamydera nuchalis orientalis (Gould, 1879)
+61	Knipolegus signatus signatus (Taczanowski, 1875)
+69	Thryothorus atrogularis Salvin, 1864
+70	Vireonidae
+71	Todirostrum poliocephalum (Wied-Neuwied, 1831)
+72	Vultur
+73	Phyllastrephus placidus (Shelley, 1889)
+74	Phyllastrephus flavostriatus (Sharpe, 1876)
+87	Pheucticus chrysopeplus dilutus Van Rossem, 1934
+88	Trichastoma bicolor (Lesson, 1839)
+91	Cardinalis cardinalis igneus S. F. Baird, 1860
+112	Chloroceryle amazona (Latham, 1790)
+135	Pinicola
+136	Contopus lugubris Lawrence, 1865
+137	Campylorhamphus trochilirostris thoracicus (P. L. Sclater, 1860)
+138	Phaenicophaeus viridirostris (Jerdon, 1840)
+139	Lichenostomus obscurus (De Vis, 1897)
+145	Caryothraustes poliogaster poliogaster (Du Bus de Gisignies, 1847)
+146	Cozlowia
+147	Saxicola torquata (Linnaeus, 1766)
+148	Myiotheretes striaticollis pallidus Berlepsch, 1906
+149	Wilsonia pusilla (A. Wilson, 1811)
+150	Andrena anthrisci Blüthgen, 1925
+151	Andrena antigana Pérez, 1895
+152	Andrena bellidis Pérez, 1895
+153	Cuntopus
+154	Prinornis
+155	Colibri coruscans rostratus W. H. Phelps & W. H. Phelps Jr, 1952
+156	Colibri delphinae
+157	Colibri thalassinus
+158	Anthracothorax prevostii
+159	Anthracothorax nigricollis
+160	Anthracothorax veraguensis
