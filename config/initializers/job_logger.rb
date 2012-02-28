@@ -1,1 +1,1 @@
-[DarwinCore].each { |klass| klass.logger = JobLogger.new }
+[Gni, DarwinCore].each { |klass| klass.logger = JobLogger.new }

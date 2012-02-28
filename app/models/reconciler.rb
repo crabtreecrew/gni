@@ -50,9 +50,9 @@ class Reconciler < ActiveRecord::Base
 
   def next_batch
     transaction do
-      batch = r.reconciler_batches.where(:status => ReconcilerBatch::STATUS_NULL).limit(1).to_sql
+      batch = r.reconciler_batches.where(:status => ProgressStatus.initial).limit(1).to_sql
       if batch
-        batch.status = ReconcilerBatch::STATE_PROGRESS
+        batch.status = ProgresStatus.started
         batch.save!
       end
     end
@@ -69,7 +69,7 @@ class Reconciler < ActiveRecord::Base
     end
     offset = 0
     while offset < count
-      ReconcilerBatch.create(:reconciler => self, :offset => offset, :status => ReconcilerBatch::STATUS_NULL)
+      ReconcilerBatch.create(:reconciler => self, :offset => offset, :status => ProgressStatus.initial)
       offset += batch_size
     end
   end

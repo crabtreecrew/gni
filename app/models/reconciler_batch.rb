@@ -1,6 +1,6 @@
 class ReconcilerBatch < ActiveRecord::Base
   belongs_to :reconciler
-  belongs to :progress_status
+  belongs_to :progress_status
 
   def name_strings
     data_source_ids = reconciler.data_sources.map(&:id).join(",")

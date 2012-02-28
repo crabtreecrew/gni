@@ -1,0 +1,563 @@
+1	Vireonidae	V	10	2012-02-28 12:58:56	2012-02-28 12:58:56
+2	Upupidae	U	8	2012-02-28 12:58:56	2012-02-28 12:58:56
+3	Anhingidae	A	10	2012-02-28 12:58:56	2012-02-28 12:58:56
+4	Treron	T	6	2012-02-28 12:58:56	2012-02-28 12:58:56
+5	Surniculus	S	10	2012-02-28 12:58:56	2012-02-28 12:58:56
+6	Lysurus	L	7	2012-02-28 12:58:56	2012-02-28 12:58:56
+7	Xiphorhynchus	X	13	2012-02-28 12:58:56	2012-02-28 12:58:56
+8	Premnornis	P	10	2012-02-28 12:58:56	2012-02-28 12:58:56
+9	Pinicola	P	8	2012-02-28 12:58:56	2012-02-28 12:58:56
+10	Calcarius	C	9	2012-02-28 12:58:56	2012-02-28 12:58:56
+11	Fringilla	F	9	2012-02-28 12:58:56	2012-02-28 12:58:56
+12	Chilia	C	6	2012-02-28 12:58:56	2012-02-28 12:58:56
+13	Linurgus	L	8	2012-02-28 12:58:56	2012-02-28 12:58:56
+14	Dromaius	D	8	2012-02-28 12:58:56	2012-02-28 12:58:56
+15	Diomedea	D	8	2012-02-28 12:58:56	2012-02-28 12:58:56
+16	Anastomus	A	9	2012-02-28 12:58:56	2012-02-28 12:58:56
+17	Eulabeornis	E	11	2012-02-28 12:58:56	2012-02-28 12:58:56
+18	Botaurus	B	8	2012-02-28 12:58:56	2012-02-28 12:58:56
+19	Hemicircus	H	10	2012-02-28 12:58:56	2012-02-28 12:58:56
+20	Gecinulus	G	9	2012-02-28 12:58:56	2012-02-28 12:58:56
+21	Rollulus	R	8	2012-02-28 12:58:56	2012-02-28 12:58:56
+22	Vultur	V	6	2012-02-28 12:58:56	2012-02-28 12:58:56
+23	Siphonorhis	S	11	2012-02-28 12:58:56	2012-02-28 12:58:56
+24	Oceanites	O	9	2012-02-28 12:58:56	2012-02-28 12:58:56
+25	Kozlowia	K	8	2012-02-28 12:58:56	2012-02-28 12:58:56
+26	Falco rupicoloides	F	18	2012-02-28 12:58:56	2012-02-28 12:58:56
+27	Falco vespertinus	F	17	2012-02-28 12:58:56	2012-02-28 12:58:56
+28	Phalcoboenus australis	P	22	2012-02-28 12:58:56	2012-02-28 12:58:56
+29	Milvago chimango	M	16	2012-02-28 12:58:56	2012-02-28 12:58:56
+30	Micrastur plumbeus	M	18	2012-02-28 12:58:56	2012-02-28 12:58:56
+31	Polihierax semitorquatus	P	24	2012-02-28 12:58:56	2012-02-28 12:58:56
+32	Microhierax latifrons	M	21	2012-02-28 12:58:56	2012-02-28 12:58:56
+33	Leipoa ocellata	L	15	2012-02-28 12:58:56	2012-02-28 12:58:56
+34	Aepypodius arfakianus	A	21	2012-02-28 12:58:56	2012-02-28 12:58:56
+35	Ortalis canicollis	O	18	2012-02-28 12:58:56	2012-02-28 12:58:56
+36	Ortalis ruficauda	O	17	2012-02-28 12:58:56	2012-02-28 12:58:56
+37	Penelope argyrotis	P	18	2012-02-28 12:58:56	2012-02-28 12:58:56
+38	Penelope marail	P	15	2012-02-28 12:58:56	2012-02-28 12:58:56
+39	Penelope ortoni	P	15	2012-02-28 12:58:56	2012-02-28 12:58:56
+40	Penelope superciliaris	P	22	2012-02-28 12:58:56	2012-02-28 12:58:56
+41	Chamaepetes goudotii	C	20	2012-02-28 12:58:56	2012-02-28 12:58:56
+42	Nothocrax urumutum	N	18	2012-02-28 12:58:56	2012-02-28 12:58:56
+43	Crax daubentoni	C	15	2012-02-28 12:58:56	2012-02-28 12:58:56
+44	Bonasa umbellus	B	15	2012-02-28 12:58:56	2012-02-28 12:58:56
+45	Tympanuchus phasianellus	T	24	2012-02-28 12:58:56	2012-02-28 12:58:56
+46	Colinus cristatus	C	17	2012-02-28 12:58:56	2012-02-28 12:58:56
+47	Callipepla gambelii	C	19	2012-02-28 12:58:56	2012-02-28 12:58:56
+48	Phasianus colchicus	P	19	2012-02-28 12:58:56	2012-02-28 12:58:56
+49	Alectoris graeca	A	16	2012-02-28 12:58:56	2012-02-28 12:58:56
+50	Perdix perdix	P	13	2012-02-28 12:58:56	2012-02-28 12:58:56
+51	Odontophorus atrifrons	O	22	2012-02-28 12:58:56	2012-02-28 12:58:56
+52	Odontophorus dialeucos	O	22	2012-02-28 12:58:56	2012-02-28 12:58:56
+53	Toxostoma longirostre	T	21	2012-02-28 12:58:56	2012-02-28 12:58:56
+54	Toxostoma redivivum	T	19	2012-02-28 12:58:56	2012-02-28 12:58:56
+55	Oreoscoptes montanus	O	20	2012-02-28 12:58:56	2012-02-28 12:58:56
+56	Muscicapa sibirica	M	18	2012-02-28 12:58:56	2012-02-28 12:58:56
+57	Cettia diphone	C	14	2012-02-28 12:58:56	2012-02-28 12:58:56
+58	Clytorhynchus vitiensis	C	23	2012-02-28 12:58:56	2012-02-28 12:58:56
+59	Myiagra erythrops	M	17	2012-02-28 12:58:56	2012-02-28 12:58:56
+60	Rhipidura lepida	R	16	2012-02-28 12:58:56	2012-02-28 12:58:56
+61	Auriparus flaviceps	A	19	2012-02-28 12:58:56	2012-02-28 12:58:56
+62	Sitta pusilla	S	13	2012-02-28 12:58:56	2012-02-28 12:58:56
+63	Chaetoptila angustipluma	C	24	2012-02-28 12:58:56	2012-02-28 12:58:56
+64	Moho bishopi	M	12	2012-02-28 12:58:56	2012-02-28 12:58:56
+65	Chamaea fasciata	C	16	2012-02-28 12:58:56	2012-02-28 12:58:56
+66	Basileuterus rufifrons	B	22	2012-02-28 12:58:56	2012-02-28 12:58:56
+67	Vermivora chrysoptera	V	21	2012-02-28 12:58:56	2012-02-28 12:58:56
+68	Vermivora celata	V	16	2012-02-28 12:58:56	2012-02-28 12:58:56
+69	Vermivora luciae	V	16	2012-02-28 12:58:56	2012-02-28 12:58:56
+70	Dendroica petechia	D	18	2012-02-28 12:58:56	2012-02-28 12:58:56
+71	Dendroica coronata	D	18	2012-02-28 12:58:56	2012-02-28 12:58:56
+72	Dendroica chrysoparia	D	21	2012-02-28 12:58:56	2012-02-28 12:58:56
+73	Dendroica dominica	D	18	2012-02-28 12:58:56	2012-02-28 12:58:56
+74	Dendroica striata	D	17	2012-02-28 12:58:56	2012-02-28 12:58:56
+75	Dendroica palmarum	D	18	2012-02-28 12:58:56	2012-02-28 12:58:56
+76	Seiurus motacilla	S	17	2012-02-28 12:58:56	2012-02-28 12:58:56
+77	Oporornis tolmiei	O	17	2012-02-28 12:58:56	2012-02-28 12:58:56
+78	Icteria virens	I	14	2012-02-28 12:58:56	2012-02-28 12:58:56
+79	Wilsonia pusilla	W	16	2012-02-28 12:58:56	2012-02-28 12:58:56
+80	Myioborus pictus	M	16	2012-02-28 12:58:56	2012-02-28 12:58:56
+81	Alcedo leucogaster	A	18	2012-02-28 12:58:56	2012-02-28 12:58:56
+82	Ceyx melanurus	C	14	2012-02-28 12:58:56	2012-02-28 12:58:56
+83	Dacelo novaeguineae	D	19	2012-02-28 12:58:56	2012-02-28 12:58:56
+84	Clytoceyx rex	C	13	2012-02-28 12:58:56	2012-02-28 12:58:56
+85	Pelargopsis melanorhyncha	P	25	2012-02-28 12:58:56	2012-02-28 12:58:56
+86	Halcyon pileata	H	15	2012-02-28 12:58:56	2012-02-28 12:58:56
+87	Halcyon chelicuti	H	17	2012-02-28 12:58:56	2012-02-28 12:58:56
+88	Actenoides bougainvillei	A	24	2012-02-28 12:58:56	2012-02-28 12:58:56
+89	Actenoides monachus	A	19	2012-02-28 12:58:56	2012-02-28 12:58:56
+90	Tanysiptera hydrocharis	T	23	2012-02-28 12:58:56	2012-02-28 12:58:56
+91	Tanysiptera sylvia	T	18	2012-02-28 12:58:56	2012-02-28 12:58:56
+92	Chloroceryle amazona	C	20	2012-02-28 12:58:56	2012-02-28 12:58:56
+93	Nyctyornis athertoni	N	20	2012-02-28 12:58:56	2012-02-28 12:58:56
+94	Merops bulocki	M	14	2012-02-28 12:58:56	2012-02-28 12:58:56
+95	Merops oreobates	M	16	2012-02-28 12:58:56	2012-02-28 12:58:56
+96	Merops revoilii	M	15	2012-02-28 12:58:56	2012-02-28 12:58:56
+97	Merops viridis	M	14	2012-02-28 12:58:56	2012-02-28 12:58:56
+98	Merops ornatus	M	14	2012-02-28 12:58:56	2012-02-28 12:58:56
+99	Merops nubicus	M	14	2012-02-28 12:58:56	2012-02-28 12:58:56
+100	Colius colius	C	13	2012-02-28 12:58:56	2012-02-28 12:58:56
+101	Clamator glandarius	C	19	2012-02-28 12:58:56	2012-02-28 12:58:56
+102	Cuculus varius	C	14	2012-02-28 12:58:56	2012-02-28 12:58:56
+103	Cuculus micropterus	C	19	2012-02-28 12:58:56	2012-02-28 12:58:56
+104	Cuculus pallidus	C	16	2012-02-28 12:58:56	2012-02-28 12:58:56
+105	Cnemarchus erythropygius	C	24	2012-02-28 12:58:56	2012-02-28 12:58:56
+106	Cnemotriccus fuscatus	C	21	2012-02-28 12:58:56	2012-02-28 12:58:56
+107	Cochoa beccarii	C	15	2012-02-28 12:58:56	2012-02-28 12:58:56
+108	Colluricincla boweri	C	20	2012-02-28 12:58:56	2012-02-28 12:58:56
+109	Colluricincla woodwardi	C	23	2012-02-28 12:58:56	2012-02-28 12:58:56
+110	Columbina buckleyi	C	18	2012-02-28 12:58:56	2012-02-28 12:58:56
+111	Conirostrum bicolor	C	19	2012-02-28 12:58:56	2012-02-28 12:58:56
+112	Conirostrum margaritae	C	22	2012-02-28 12:58:56	2012-02-28 12:58:56
+113	Conirostrum tamarugense	C	23	2012-02-28 12:58:56	2012-02-28 12:58:56
+114	Conopophaga castaneiceps	C	24	2012-02-28 12:58:56	2012-02-28 12:58:56
+115	Conopophaga peruviana	C	21	2012-02-28 12:58:56	2012-02-28 12:58:56
+116	Conopophila whitei	C	18	2012-02-28 12:58:56	2012-02-28 12:58:56
+117	Conothraupis speculigera	C	24	2012-02-28 12:58:56	2012-02-28 12:58:56
+118	Contopus lugubris	C	17	2012-02-28 12:58:56	2012-02-28 12:58:56
+119	Copsychus albospecularis	C	24	2012-02-28 12:58:56	2012-02-28 12:58:56
+120	Copsychus stricklandii	C	22	2012-02-28 12:58:56	2012-02-28 12:58:56
+121	Coracina azurea	C	15	2012-02-28 12:58:56	2012-02-28 12:58:56
+122	Coracina caesia	C	15	2012-02-28 12:58:56	2012-02-28 12:58:56
+123	Coracina coerulescens	C	21	2012-02-28 12:58:56	2012-02-28 12:58:56
+124	Coracina fortis	C	15	2012-02-28 12:58:56	2012-02-28 12:58:56
+125	Coracina incerta	C	16	2012-02-28 12:58:56	2012-02-28 12:58:56
+126	Coracina lineata	C	16	2012-02-28 12:58:56	2012-02-28 12:58:56
+127	Coracina mcgregori	C	18	2012-02-28 12:58:56	2012-02-28 12:58:56
+128	Coracina mindanensis	C	20	2012-02-28 12:58:56	2012-02-28 12:58:56
+129	Coracina ostenta	C	16	2012-02-28 12:58:56	2012-02-28 12:58:56
+130	Coracina personata	C	18	2012-02-28 12:58:56	2012-02-28 12:58:56
+131	Coracina striata	C	16	2012-02-28 12:58:56	2012-02-28 12:58:56
+132	Lanius collurioides	L	19	2012-02-28 12:58:56	2012-02-28 12:58:56
+133	Lanius isabellinus	L	18	2012-02-28 12:58:56	2012-02-28 12:58:56
+134	Lanius newtoni	L	14	2012-02-28 12:58:56	2012-02-28 12:58:56
+135	Lanius senator	L	14	2012-02-28 12:58:56	2012-02-28 12:58:56
+136	Lanius tephronotus	L	18	2012-02-28 12:58:56	2012-02-28 12:58:56
+137	Larus armenicus	L	15	2012-02-28 12:58:56	2012-02-28 12:58:56
+138	Laterallus albigularis	L	22	2012-02-28 12:58:56	2012-02-28 12:58:56
+139	Leiothrix argentauris	L	21	2012-02-28 12:58:56	2012-02-28 12:58:56
+140	Lepidocolaptes albolineatus	L	27	2012-02-28 12:58:56	2012-02-28 12:58:56
+141	Lepidocolaptes squamatus	L	24	2012-02-28 12:58:56	2012-02-28 12:58:56
+142	Leptasthenura striata	L	21	2012-02-28 12:58:56	2012-02-28 12:58:56
+143	Leptodon forbesi	L	16	2012-02-28 12:58:56	2012-02-28 12:58:56
+144	Leptopogon rufipectus	L	21	2012-02-28 12:58:56	2012-02-28 12:58:56
+145	Leptotila battyi	L	16	2012-02-28 12:58:56	2012-02-28 12:58:56
+146	Leucopsar rothschildi	L	21	2012-02-28 12:58:56	2012-02-28 12:58:56
+147	Leucosticte sillemi	L	19	2012-02-28 12:58:56	2012-02-28 12:58:56
+148	Lichenostomus cratitius	L	23	2012-02-28 12:58:56	2012-02-28 12:58:56
+149	Lichenostomus flavicollis	L	25	2012-02-28 12:58:56	2012-02-28 12:58:56
+150	Lichenostomus hindwoodi	L	23	2012-02-28 12:58:56	2012-02-28 12:58:56
+151	Lichenostomus obscurus	L	22	2012-02-28 12:58:56	2012-02-28 12:58:56
+152	Lichenostomus plumulus	L	22	2012-02-28 12:58:56	2012-02-28 12:58:56
+153	Lichenostomus virescens	L	23	2012-02-28 12:58:56	2012-02-28 12:58:56
+154	Lichmera flavicans	L	18	2012-02-28 12:58:56	2012-02-28 12:58:56
+155	Lichmera monticola	L	18	2012-02-28 12:58:56	2012-02-28 12:58:56
+156	Limnornis rectirostris	L	22	2012-02-28 12:58:56	2012-02-28 12:58:56
+157	Liocichla phoenicea	L	19	2012-02-28 12:58:56	2012-02-28 12:58:56
+158	Phyllastrephus flavostriatus	P	28	2012-02-28 12:58:56	2012-02-28 12:58:56
+159	Phyllastrephus icterinus	P	24	2012-02-28 12:58:56	2012-02-28 12:58:56
+160	Phyllastrephus placidus	P	23	2012-02-28 12:58:56	2012-02-28 12:58:56
+161	Phyllastrephus strepitans	P	25	2012-02-28 12:58:56	2012-02-28 12:58:56
+162	Phyllastrephus zosterops	P	24	2012-02-28 12:58:56	2012-02-28 12:58:56
+163	Phyllomyias fasciatus	P	21	2012-02-28 12:58:56	2012-02-28 12:58:56
+164	Phyllomyias nigrocapillus	P	25	2012-02-28 12:58:56	2012-02-28 12:58:56
+165	Phyllomyias uropygialis	P	23	2012-02-28 12:58:56	2012-02-28 12:58:56
+166	Phylloscartes difficilis	P	24	2012-02-28 12:58:56	2012-02-28 12:58:56
+167	Phylloscartes gualaquizae	P	25	2012-02-28 12:58:56	2012-02-28 12:58:56
+168	Phylloscartes ophthalmicus	P	26	2012-02-28 12:58:56	2012-02-28 12:58:56
+169	Phylloscartes parkeri	P	21	2012-02-28 12:58:56	2012-02-28 12:58:56
+170	Phylloscartes sylviolus	P	23	2012-02-28 12:58:56	2012-02-28 12:58:56
+171	Phylloscopus affinis	P	20	2012-02-28 12:58:56	2012-02-28 12:58:56
+172	Phylloscopus borealoides	P	24	2012-02-28 12:58:56	2012-02-28 12:58:56
+173	Phylloscopus chloronotus	P	24	2012-02-28 12:58:56	2012-02-28 12:58:56
+174	Phylloscopus davisoni	P	21	2012-02-28 12:58:56	2012-02-28 12:58:56
+175	Phylloscopus ijimae	P	19	2012-02-28 12:58:56	2012-02-28 12:58:56
+176	Phylloscopus lorenzii	P	21	2012-02-28 12:58:56	2012-02-28 12:58:56
+177	Phylloscopus neglectus	P	22	2012-02-28 12:58:56	2012-02-28 12:58:56
+178	Phylloscopus presbytes	P	22	2012-02-28 12:58:56	2012-02-28 12:58:56
+179	Phylloscopus reguloides	P	23	2012-02-28 12:58:56	2012-02-28 12:58:56
+180	Phylloscopus schwarzi	P	21	2012-02-28 12:58:56	2012-02-28 12:58:56
+181	Phylloscopus trivirgatus	P	24	2012-02-28 12:58:56	2012-02-28 12:58:56
+182	Phytotoma raimondii	P	19	2012-02-28 12:58:56	2012-02-28 12:58:56
+183	Picathartes oreas	P	17	2012-02-28 12:58:56	2012-02-28 12:58:56
+184	Pipilo ocai	P	11	2012-02-28 12:58:56	2012-02-28 12:58:56
+185	Thripophaga fusciceps	T	21	2012-02-28 12:58:56	2012-02-28 12:58:56
+186	Thryothorus atrogularis	T	23	2012-02-28 12:58:56	2012-02-28 12:58:56
+187	Thryothorus fasciatoventris	T	27	2012-02-28 12:58:56	2012-02-28 12:58:56
+188	Thryothorus guarayanus	T	22	2012-02-28 12:58:56	2012-02-28 12:58:56
+189	Thryothorus maculipectus	T	24	2012-02-28 12:58:56	2012-02-28 12:58:56
+190	Thryothorus nigricapillus	T	25	2012-02-28 12:58:56	2012-02-28 12:58:56
+191	Thryothorus rutilus	T	19	2012-02-28 12:58:56	2012-02-28 12:58:56
+192	Thryothorus spadix	T	18	2012-02-28 12:58:56	2012-02-28 12:58:56
+193	Tichodroma muraria	T	18	2012-02-28 12:58:56	2012-02-28 12:58:56
+194	Timalia pileata	T	15	2012-02-28 12:58:56	2012-02-28 12:58:56
+195	Tityra inquisitor	T	17	2012-02-28 12:58:56	2012-02-28 12:58:56
+196	Todirostrum maculatum	T	21	2012-02-28 12:58:56	2012-02-28 12:58:56
+197	Todirostrum poliocephalum	T	25	2012-02-28 12:58:56	2012-02-28 12:58:56
+198	Tolmomyias poliocephalus	T	24	2012-02-28 12:58:56	2012-02-28 12:58:56
+199	Torreornis inexpectata	T	22	2012-02-28 12:58:56	2012-02-28 12:58:56
+200	Toxostoma guttatum	T	18	2012-02-28 12:58:56	2012-02-28 12:58:56
+201	Trichastoma bicolor	T	19	2012-02-28 12:58:56	2012-02-28 12:58:56
+202	Trichixos pyrropyga	T	19	2012-02-28 12:58:56	2012-02-28 12:58:56
+203	Tricholestes criniger	T	21	2012-02-28 12:58:56	2012-02-28 12:58:56
+204	Trochocercus cyanomelas	T	23	2012-02-28 12:58:56	2012-02-28 12:58:56
+205	Troglodytes ochraceus	T	21	2012-02-28 12:58:56	2012-02-28 12:58:56
+206	Troglodytes tanneri	T	19	2012-02-28 12:58:56	2012-02-28 12:58:56
+207	Turdoides bicolor	T	17	2012-02-28 12:58:56	2012-02-28 12:58:56
+208	Turdoides fulvus	T	16	2012-02-28 12:58:56	2012-02-28 12:58:56
+209	Turdoides hindei	T	16	2012-02-28 12:58:56	2012-02-28 12:58:56
+210	Turdoides leucopygius	T	21	2012-02-28 12:58:56	2012-02-28 12:58:56
+211	Capito wallacei	C	15	2012-02-28 12:58:56	2012-02-28 12:58:56
+212	Picumnus nigropunctatus	P	23	2012-02-28 12:58:56	2012-02-28 12:58:56
+213	Celeus obrieni	C	14	2012-02-28 12:58:56	2012-02-28 12:58:56
+214	Otus senegalensis	O	17	2012-02-28 12:58:56	2012-02-28 12:58:56
+215	Otus alius	O	10	2012-02-28 12:58:56	2012-02-28 12:58:56
+216	Larus occidentalis wymani	L	25	2012-02-28 12:58:56	2012-02-28 12:58:56
+217	Larus argentatus smithsonianus	L	30	2012-02-28 12:58:56	2012-02-28 12:58:56
+218	Larus canus brachyrhynchus	L	26	2012-02-28 12:58:56	2012-02-28 12:58:56
+219	Larus tridactyla tridactyla	L	27	2012-02-28 12:58:56	2012-02-28 12:58:56
+220	Merops gularis gularis	M	22	2012-02-28 12:58:56	2012-02-28 12:58:56
+221	Merops hirundineus hirundineus	M	30	2012-02-28 12:58:56	2012-02-28 12:58:56
+222	Merops pusillus ocularis	M	24	2012-02-28 12:58:56	2012-02-28 12:58:56
+223	Merops variegatus loringi	M	25	2012-02-28 12:58:56	2012-02-28 12:58:56
+224	Merops orientalis beludschicus	M	30	2012-02-28 12:58:56	2012-02-28 12:58:56
+225	Merops orientalis ferrugeiceps	M	30	2012-02-28 12:58:56	2012-02-28 12:58:56
+226	Merops persicus chrysocercus	M	28	2012-02-28 12:58:56	2012-02-28 12:58:56
+227	Merops philippinus celebensis	M	29	2012-02-28 12:58:56	2012-02-28 12:58:56
+228	Merops viridis americanus	M	25	2012-02-28 12:58:56	2012-02-28 12:58:56
+229	Merops leschenaulti quinticolor	M	31	2012-02-28 12:58:56	2012-02-28 12:58:56
+230	Mimus polyglottos polyglottos	M	29	2012-02-28 12:58:56	2012-02-28 12:58:56
+231	Toxostoma longirostre sennetti	T	30	2012-02-28 12:58:56	2012-02-28 12:58:56
+232	Toxostoma curvirostre palmeri	T	29	2012-02-28 12:58:56	2012-02-28 12:58:56
+233	Toxostoma redivivum redivivum	T	29	2012-02-28 12:58:56	2012-02-28 12:58:56
+234	Toxostoma dorsale dorsale	T	25	2012-02-28 12:58:56	2012-02-28 12:58:56
+235	Eupodotis rueppellii fitzsimonsi	E	32	2012-02-28 12:58:56	2012-02-28 12:58:56
+236	Afrotis afraoides etoschae	A	26	2012-02-28 12:58:56	2012-02-28 12:58:56
+237	Houbaropsis bengalensis blandini	H	32	2012-02-28 12:58:56	2012-02-28 12:58:56
+238	Baeolophus wollweberi phillipsi	B	31	2012-02-28 12:58:56	2012-02-28 12:58:56
+239	Poecile atricapillus fortuita	P	29	2012-02-28 12:58:56	2012-02-28 12:58:56
+240	Poecile atricapillus garrina	P	28	2012-02-28 12:58:56	2012-02-28 12:58:56
+241	Baeolophus inornatus mohavensis	B	31	2012-02-28 12:58:56	2012-02-28 12:58:56
+242	Baeolophus bicolor bicolor	B	26	2012-02-28 12:58:56	2012-02-28 12:58:56
+243	Poecile sclateri sclateri	P	25	2012-02-28 12:58:56	2012-02-28 12:58:56
+244	Campethera abingoni suahelica	C	29	2012-02-28 12:58:56	2012-02-28 12:58:56
+245	Campethera cailliautii permista	C	31	2012-02-28 12:58:56	2012-02-28 12:58:56
+246	Campethera nivosa herberti	C	26	2012-02-28 12:58:56	2012-02-28 12:58:56
+247	Campethera caroli caroli	C	24	2012-02-28 12:58:56	2012-02-28 12:58:56
+248	Dendropicos fuscescens hemprichii	D	33	2012-02-28 12:58:56	2012-02-28 12:58:56
+249	Dendropicos fuscescens massaicus	D	32	2012-02-28 12:58:56	2012-02-28 12:58:56
+250	Dendropicos gabonensis reichenowi	D	33	2012-02-28 12:58:56	2012-02-28 12:58:56
+251	Dendropicos elliotii elliotii	D	29	2012-02-28 12:58:56	2012-02-28 12:58:56
+252	Dendropicos goertae abessinicus	D	31	2012-02-28 12:58:56	2012-02-28 12:58:56
+253	Dendropicos goertae rhodeogaster	D	32	2012-02-28 12:58:56	2012-02-28 12:58:56
+254	Dendropicos griseocephalus ruwenzori	D	36	2012-02-28 12:58:56	2012-02-28 12:58:56
+255	Dendropicos obsoletus obsoletus	D	31	2012-02-28 12:58:56	2012-02-28 12:58:56
+256	Hypopicus hyperythrus subrufinus	H	32	2012-02-28 12:58:56	2012-02-28 12:58:56
+257	Dendrocopos maculatus menagei	D	29	2012-02-28 12:58:56	2012-02-28 12:58:56
+258	Dendrocopos moluccensis cinereigula	D	35	2012-02-28 12:58:56	2012-02-28 12:58:56
+259	Dendrocopos moluccensis moluccensis	D	35	2012-02-28 12:58:56	2012-02-28 12:58:56
+260	Dendrocopos kizuki kotataki	D	27	2012-02-28 12:58:56	2012-02-28 12:58:56
+261	Dendrocopos kizuki orii	D	23	2012-02-28 12:58:56	2012-02-28 12:58:56
+262	Dendrocopos canicapillus aurantiiventris	D	40	2012-02-28 12:58:56	2012-02-28 12:58:56
+263	Dendrocopos canicapillus delacouri	D	34	2012-02-28 12:58:56	2012-02-28 12:58:56
+264	Dendrocopos canicapillus obscurus	D	33	2012-02-28 12:58:56	2012-02-28 12:58:56
+265	Dendrocopos canicapillus swinhoei	D	33	2012-02-28 12:58:56	2012-02-28 12:58:56
+266	Dendrocopos minor buturlini	D	27	2012-02-28 12:58:56	2012-02-28 12:58:56
+267	Dendrocopos	D	11	2012-02-28 12:58:56	2012-02-28 12:58:56
+268	Dendrocopos minor ledouci	D	25	2012-02-28 12:58:56	2012-02-28 12:58:56
+269	Dendrocopos macei analis	D	24	2012-02-28 12:58:56	2012-02-28 12:58:56
+270	Dendrocopos macei westermani	D	28	2012-02-28 12:58:56	2012-02-28 12:58:56
+271	Dendrocopos auriceps incognitus	D	31	2012-02-28 12:58:56	2012-02-28 12:58:56
+272	Amazona mercenaria mercenaria	A	29	2012-02-28 12:58:56	2012-02-28 12:58:56
+273	Deroptyus accipitrinus accipitrinus	D	35	2012-02-28 12:58:56	2012-02-28 12:58:56
+274	Cyclopsitta gulielmitertii gulielmitertii	C	41	2012-02-28 12:58:56	2012-02-28 12:58:56
+275	Cyclopsitta gulielmitertii suavissima	C	37	2012-02-28 12:58:56	2012-02-28 12:58:56
+276	Cyclopsitta diophthalma diophthalma	C	35	2012-02-28 12:58:56	2012-02-28 12:58:56
+277	Cyclopsitta diophthalma virago	C	30	2012-02-28 12:58:56	2012-02-28 12:58:56
+278	Psittaculirostris desmarestii godmani	P	37	2012-02-28 12:58:56	2012-02-28 12:58:56
+279	Bolbopsittacus lunulatus intermedius	B	36	2012-02-28 12:58:56	2012-02-28 12:58:56
+280	Psophia crepitans napensis	P	26	2012-02-28 12:58:56	2012-02-28 12:58:56
+281	Psophia viridis obscura	P	23	2012-02-28 12:58:56	2012-02-28 12:58:56
+282	Phainopepla nitens lepida	P	25	2012-02-28 12:58:56	2012-02-28 12:58:56
+283	Ailuroedus buccoides stonii	A	27	2012-02-28 12:58:56	2012-02-28 12:58:56
+284	Ailuroedus crassirostris facialis	A	33	2012-02-28 12:58:56	2012-02-28 12:58:56
+285	Ailuroedus crassirostris maculosus	A	34	2012-02-28 12:58:56	2012-02-28 12:58:56
+286	Archboldia papuensis papuensis	A	30	2012-02-28 12:58:56	2012-02-28 12:58:56
+287	Amblyornis macgregoriae kombok	A	30	2012-02-28 12:58:56	2012-02-28 12:58:56
+288	Amblyornis macgregoriae nubicola	A	32	2012-02-28 12:58:56	2012-02-28 12:58:56
+289	Ptilonorhynchus violaceus violaceus	P	35	2012-02-28 12:58:56	2012-02-28 12:58:56
+290	Chlamydera nuchalis orientalis	C	30	2012-02-28 12:58:56	2012-02-28 12:58:56
+291	Cardinalis cardinalis magnirostris	C	34	2012-02-28 12:58:56	2012-02-28 12:58:56
+292	Cardinalis cardinalis igneus	C	28	2012-02-28 12:58:56	2012-02-28 12:58:56
+293	Passerina versicolor dickeyae	P	29	2012-02-28 12:58:56	2012-02-28 12:58:56
+294	Passerina caerulea caerulea	P	27	2012-02-28 12:58:56	2012-02-28 12:58:56
+295	Cardinalis sinuatus fulvescens	C	30	2012-02-28 12:58:56	2012-02-28 12:58:56
+296	Pheucticus chrysopeplus dilutus	P	31	2012-02-28 12:58:56	2012-02-28 12:58:56
+297	Pheucticus aureoventris crissalis	P	33	2012-02-28 12:58:56	2012-02-28 12:58:56
+298	Cardinalis cardinalis affinis	C	29	2012-02-28 12:58:56	2012-02-28 12:58:56
+299	Cardinalis cardinalis flammiger	C	31	2012-02-28 12:58:56	2012-02-28 12:58:56
+300	Cardinalis cardinalis saturatus	C	31	2012-02-28 12:58:56	2012-02-28 12:58:56
+301	Caryothraustes poliogaster poliogaster	C	38	2012-02-28 12:58:56	2012-02-28 12:58:56
+302	Caryothraustes canadensis canadensis	C	36	2012-02-28 12:58:56	2012-02-28 12:58:56
+303	Saltator atriceps atriceps	S	26	2012-02-28 12:58:56	2012-02-28 12:58:56
+304	Saltator atriceps raptor	S	24	2012-02-28 12:58:56	2012-02-28 12:58:56
+305	Saltator maximus iungens	S	24	2012-02-28 12:58:56	2012-02-28 12:58:56
+306	Saltator atripennis caniceps	S	28	2012-02-28 12:58:56	2012-02-28 12:58:56
+307	Saltator coerulescens brevicaudus	S	33	2012-02-28 12:58:56	2012-02-28 12:58:56
+308	Saltator coerulescens hesperis	S	30	2012-02-28 12:58:56	2012-02-28 12:58:56
+309	Saltator coerulescens plumbiceps	S	32	2012-02-28 12:58:56	2012-02-28 12:58:56
+310	Saltator orenocensis orenocensis	S	32	2012-02-28 12:58:56	2012-02-28 12:58:56
+311	Saltator aurantiirostris hellmayri	S	34	2012-02-28 12:58:56	2012-02-28 12:58:56
+312	Saltator albicollis albicollis	S	30	2012-02-28 12:58:56	2012-02-28 12:58:56
+313	Saltator striatipectus immaculatus	S	34	2012-02-28 12:58:56	2012-02-28 12:58:56
+314	Saltator striatipectus peruvianus	S	33	2012-02-28 12:58:56	2012-02-28 12:58:56
+315	Campylopterus curvipennis pampa	C	31	2012-02-28 12:58:56	2012-02-28 12:58:56
+316	Campylopterus largipennis largipennis	C	37	2012-02-28 12:58:56	2012-02-28 12:58:56
+317	Campylopterus duidae duidae	C	27	2012-02-28 12:58:56	2012-02-28 12:58:56
+318	Eupetomena macroura hirundo	E	27	2012-02-28 12:58:56	2012-02-28 12:58:56
+319	Florisuga mellivora mellivora	F	29	2012-02-28 12:58:56	2012-02-28 12:58:56
+320	Colibri thalassinus kerdeli	C	27	2012-02-28 12:58:56	2012-02-28 12:58:56
+321	Colibri coruscans rostratus	C	27	2012-02-28 12:58:56	2012-02-28 12:58:56
+322	Anthracothorax prevostii prevostii	A	34	2012-02-28 12:58:56	2012-02-28 12:58:56
+323	Topaza pella microrhyncha	T	25	2012-02-28 12:58:56	2012-02-28 12:58:56
+324	Topaza pyra pyra	T	16	2012-02-28 12:58:56	2012-02-28 12:58:56
+325	Orthorhyncus cristatus emigrans	O	31	2012-02-28 12:58:56	2012-02-28 12:58:56
+326	Klais guimeti merrittii	K	23	2012-02-28 12:58:56	2012-02-28 12:58:56
+327	Abeillia abeillei abeillei	A	26	2012-02-28 12:58:56	2012-02-28 12:58:56
+328	Lophornis chalybeus chalybeus	L	29	2012-02-28 12:58:56	2012-02-28 12:58:56
+329	Lophornis pavoninus pavoninus	L	29	2012-02-28 12:58:56	2012-02-28 12:58:56
+330	Chlorostilbon notatus obsoletus	C	31	2012-02-28 12:58:56	2012-02-28 12:58:56
+331	Chlorostilbon canivetii salvini	C	31	2012-02-28 12:58:56	2012-02-28 12:58:56
+332	Chlorostilbon mellisugus mellisugus	C	35	2012-02-28 12:58:56	2012-02-28 12:58:56
+333	Chlorostilbon mellisugus subfurcatus	C	36	2012-02-28 12:58:56	2012-02-28 12:58:56
+334	Chlorostilbon stenurus ignotus	C	30	2012-02-28 12:58:56	2012-02-28 12:58:56
+335	Panterpe insignis eisenmanni	P	28	2012-02-28 12:58:56	2012-02-28 12:58:56
+336	Eupherusa eximia nelsoni	E	24	2012-02-28 12:58:56	2012-02-28 12:58:56
+337	Cynanthus latirostris toroi	C	27	2012-02-28 12:58:56	2012-02-28 12:58:56
+338	Thalurania colombica venusta	T	28	2012-02-28 12:58:56	2012-02-28 12:58:56
+339	Thalurania fannyi verticeps	T	27	2012-02-28 12:58:56	2012-02-28 12:58:56
+340	Thalurania furcata eriphile	T	27	2012-02-28 12:58:56	2012-02-28 12:58:56
+341	Thalurania furcata jelskii	T	26	2012-02-28 12:58:56	2012-02-28 12:58:56
+342	Empidonax flavescens salvini	E	28	2012-02-28 12:58:56	2012-02-28 12:58:56
+343	Empidonax fulvifrons rubicundus	E	31	2012-02-28 12:58:56	2012-02-28 12:58:56
+344	Pyrocephalus rubinus dubius	P	27	2012-02-28 12:58:56	2012-02-28 12:58:56
+345	Pyrocephalus rubinus pinicola	P	29	2012-02-28 12:58:56	2012-02-28 12:58:56
+346	Knipolegus signatus signatus	K	28	2012-02-28 12:58:56	2012-02-28 12:58:56
+347	Knipolegus poecilurus salvini	K	29	2012-02-28 12:58:56	2012-02-28 12:58:56
+348	Knipolegus orenocensis xinguensis	K	33	2012-02-28 12:58:56	2012-02-28 12:58:56
+349	Knipolegus aterrimus heterogyna	K	31	2012-02-28 12:58:56	2012-02-28 12:58:56
+350	Hymenops perspicillatus perspicillatus	H	38	2012-02-28 12:58:56	2012-02-28 12:58:56
+351	Muscisaxicola cinereus argentina	M	32	2012-02-28 12:58:56	2012-02-28 12:58:56
+352	Muscisaxicola rufivertex occipitalis	M	36	2012-02-28 12:58:56	2012-02-28 12:58:56
+353	Muscisaxicola maclovianus mentalis	M	34	2012-02-28 12:58:56	2012-02-28 12:58:56
+354	Agriornis montanus insolens	A	27	2012-02-28 12:58:56	2012-02-28 12:58:56
+355	Agriornis montanus montanus	A	27	2012-02-28 12:58:56	2012-02-28 12:58:56
+356	Agriornis lividus fortis	A	24	2012-02-28 12:58:56	2012-02-28 12:58:56
+357	Xolmis pyrope fortis	X	20	2012-02-28 12:58:56	2012-02-28 12:58:56
+358	Xolmis irupero irupero	X	22	2012-02-28 12:58:56	2012-02-28 12:58:56
+359	Myiotheretes striaticollis pallidus	M	35	2012-02-28 12:58:56	2012-02-28 12:58:56
+360	Myiotheretes fumigatus lugubris	M	31	2012-02-28 12:58:56	2012-02-28 12:58:56
+361	Polioxolmis rufipennis bolivianus	P	33	2012-02-28 12:58:56	2012-02-28 12:58:56
+362	Fluvicola nengeta atripennis	F	28	2012-02-28 12:58:56	2012-02-28 12:58:56
+363	Ochthoeca frontalis spodionota	O	30	2012-02-28 12:58:56	2012-02-28 12:58:56
+364	Ochthoeca diadema diadema	O	25	2012-02-28 12:58:56	2012-02-28 12:58:56
+365	Ochthoeca diadema rubellula	O	27	2012-02-28 12:58:56	2012-02-28 12:58:56
+366	Ochthoeca cinnamomeiventris nigrita	O	35	2012-02-28 12:58:56	2012-02-28 12:58:56
+367	Ochthoeca rufipectoralis poliogastra	O	36	2012-02-28 12:58:56	2012-02-28 12:58:56
+368	Ochthoeca rufipectoralis tectricialis	O	37	2012-02-28 12:58:56	2012-02-28 12:58:56
+369	Ochthoeca fumicolor fumicolor	O	29	2012-02-28 12:58:56	2012-02-28 12:58:56
+370	Geotrygon violacea albiventer	G	29	2012-02-28 12:58:56	2012-02-28 12:58:56
+371	Goura scheepmakeri scheepmakeri	G	31	2012-02-28 12:58:56	2012-02-28 12:58:56
+372	Gymnophaps albertisii exsul	G	27	2012-02-28 12:58:56	2012-02-28 12:58:56
+373	Hemiphaga novaeseelandiae spadicea	H	34	2012-02-28 12:58:56	2012-02-28 12:58:56
+374	Leptotila battyi malae	L	22	2012-02-28 12:58:56	2012-02-28 12:58:56
+375	Leptotila jamaicensis collaris	L	30	2012-02-28 12:58:56	2012-02-28 12:58:56
+376	Leptotila plumbeiceps plumbeiceps	L	33	2012-02-28 12:58:56	2012-02-28 12:58:56
+377	Leptotila rufaxilla reichenbachii	L	33	2012-02-28 12:58:56	2012-02-28 12:58:56
+378	Leptotila verreauxi approximans	L	31	2012-02-28 12:58:56	2012-02-28 12:58:56
+379	Leptotila verreauxi decolor	L	27	2012-02-28 12:58:56	2012-02-28 12:58:56
+380	Leptotila verreauxi capitalis	L	29	2012-02-28 12:58:56	2012-02-28 12:58:56
+381	Macropygia amboinensis phasianella	M	34	2012-02-28 12:58:56	2012-02-28 12:58:56
+382	Macropygia amboinensis albiceps	M	31	2012-02-28 12:58:56	2012-02-28 12:58:56
+383	Macropygia amboinensis hueskeri	M	31	2012-02-28 12:58:56	2012-02-28 12:58:56
+384	Macropygia amboinensis keyensis	M	31	2012-02-28 12:58:56	2012-02-28 12:58:56
+385	Macropygia amboinensis quinkan	M	30	2012-02-28 12:58:56	2012-02-28 12:58:56
+386	Macropygia emiliana elassa	M	26	2012-02-28 12:58:56	2012-02-28 12:58:56
+387	Macropygia emiliana megala	M	26	2012-02-28 12:58:56	2012-02-28 12:58:56
+388	Macropygia mackinlayi arossi	M	28	2012-02-28 12:58:56	2012-02-28 12:58:56
+389	Macropygia magna macassariensis	M	31	2012-02-28 12:58:56	2012-02-28 12:58:56
+390	Macropygia ruficeps orientalis	M	30	2012-02-28 12:58:56	2012-02-28 12:58:56
+391	Macropygia ruficeps nana	M	24	2012-02-28 12:58:56	2012-02-28 12:58:56
+392	Macropygia unchall unchall	M	26	2012-02-28 12:58:56	2012-02-28 12:58:56
+393	Metriopelia ceciliae zimmeri	M	28	2012-02-28 12:58:56	2012-02-28 12:58:56
+394	Ocyphaps lophotes whitlocki	O	27	2012-02-28 12:58:56	2012-02-28 12:58:56
+395	Otidiphaps nobilis nobilis	O	26	2012-02-28 12:58:56	2012-02-28 12:58:56
+396	Patagioenas cayennensis pallidicrissa	P	37	2012-02-28 12:58:56	2012-02-28 12:58:56
+397	Patagioenas cayennensis sylvestris	P	34	2012-02-28 12:58:56	2012-02-28 12:58:56
+398	Arremonops rufivirgatus rufivirgatus	A	36	2012-02-28 12:58:56	2012-02-28 12:58:56
+399	Pipilo erythrophthalmus canaster	P	32	2012-02-28 12:58:56	2012-02-28 12:58:56
+400	Pipilo fuscus fuscus	P	20	2012-02-28 12:58:56	2012-02-28 12:58:56
+401	Passerculus sandwichensis sandwichensis	P	39	2012-02-28 12:58:56	2012-02-28 12:58:56
+402	Passerculus sandwichensis rostratus	P	35	2012-02-28 12:58:56	2012-02-28 12:58:56
+403	Ammodramus savannarum ammolegus	A	31	2012-02-28 12:58:56	2012-02-28 12:58:56
+404	Pooecetes gramineus gramineus	P	29	2012-02-28 12:58:56	2012-02-28 12:58:56
+405	Chondestes grammacus strigatus	C	30	2012-02-28 12:58:56	2012-02-28 12:58:56
+406	Aimophila ruficeps ruficeps	A	27	2012-02-28 12:58:56	2012-02-28 12:58:56
+407	Aimophila ruficeps sororia	A	26	2012-02-28 12:58:56	2012-02-28 12:58:56
+408	Aimophila botterii botterii	A	27	2012-02-28 12:58:56	2012-02-28 12:58:56
+409	Amphispiza bilineata deserticola	A	32	2012-02-28 12:58:56	2012-02-28 12:58:56
+410	Amphispiza belli canescens	A	26	2012-02-28 12:58:56	2012-02-28 12:58:56
+411	Junco hyemalis aikeni	J	21	2012-02-28 12:58:56	2012-02-28 12:58:56
+412	Junco hyemalis montanus	J	23	2012-02-28 12:58:56	2012-02-28 12:58:56
+413	Junco hyemalis thurberi	J	23	2012-02-28 12:58:56	2012-02-28 12:58:56
+414	Junco hyemalis insularis	J	24	2012-02-28 12:58:56	2012-02-28 12:58:56
+415	Spizella arborea arborea	S	24	2012-02-28 12:58:56	2012-02-28 12:58:56
+416	Lepidocolaptes albolineatus layardi	L	35	2012-02-28 12:58:56	2012-02-28 12:58:56
+417	Campylorhamphus trochilirostris guttistriatus	C	45	2012-02-28 12:58:56	2012-02-28 12:58:56
+418	Campylorhamphus trochilirostris napensis	C	40	2012-02-28 12:58:56	2012-02-28 12:58:56
+419	Campylorhamphus trochilirostris thoracicus	C	42	2012-02-28 12:58:56	2012-02-28 12:58:56
+420	Campylorhamphus pusillus borealis	C	33	2012-02-28 12:58:56	2012-02-28 12:58:56
+421	Campylorhamphus pusillus tachirensis	C	36	2012-02-28 12:58:56	2012-02-28 12:58:56
+422	Campylorhamphus procurvoides sanus	C	34	2012-02-28 12:58:56	2012-02-28 12:58:56
+423	Brachygalba lugubris naumburgi	B	30	2012-02-28 12:58:56	2012-02-28 12:58:56
+424	Brachygalba lugubris obscuriceps	B	32	2012-02-28 12:58:56	2012-02-28 12:58:56
+425	Galbula dea amazonum	G	20	2012-02-28 12:58:56	2012-02-28 12:58:56
+426	Galbula leucogastra leucogastra	G	31	2012-02-28 12:58:56	2012-02-28 12:58:56
+427	Galbula ruficauda ruficauda	G	27	2012-02-28 12:58:56	2012-02-28 12:58:56
+428	Galbula tombacea mentalis	G	25	2012-02-28 12:58:56	2012-02-28 12:58:56
+429	Jacamerops aureus ridgwayi	J	26	2012-02-28 12:58:56	2012-02-28 12:58:56
+430	Halcyon sancta	H	14	2012-02-28 12:58:56	2012-02-28 12:58:56
+431	Ramphastos culminatus	R	21	2012-02-28 12:58:56	2012-02-28 12:58:56
+432	Bucco noanamae	B	14	2012-02-28 12:58:56	2012-02-28 12:58:56
+433	Tockus albocristatus	T	20	2012-02-28 12:58:56	2012-02-28 12:58:56
+434	Aceros undulatus	A	16	2012-02-28 12:58:56	2012-02-28 12:58:56
+435	Saxicola torquata	S	17	2012-02-28 12:58:56	2012-02-28 12:58:56
+436	Ceratogymna fistulator	C	22	2012-02-28 12:58:56	2012-02-28 12:58:56
+437	Ceratogymna albotibialis	C	24	2012-02-28 12:58:56	2012-02-28 12:58:56
+438	Coracias spatulata	C	18	2012-02-28 12:58:56	2012-02-28 12:58:56
+439	Alcedo thomensis	A	16	2012-02-28 12:58:56	2012-02-28 12:58:56
+440	Ispidina madagascariensis	I	25	2012-02-28 12:58:56	2012-02-28 12:58:56
+441	Todirhamphus nigrocyaneus	T	25	2012-02-28 12:58:56	2012-02-28 12:58:56
+442	Todirhamphus macleayii	T	22	2012-02-28 12:58:56	2012-02-28 12:58:56
+443	Todirhamphus pyrrhopygia	T	24	2012-02-28 12:58:56	2012-02-28 12:58:56
+444	Todirhamphus chloris	T	20	2012-02-28 12:58:56	2012-02-28 12:58:56
+445	Todirhamphus sanctus	T	20	2012-02-28 12:58:56	2012-02-28 12:58:56
+446	Todirhamphus godeffroyi	T	23	2012-02-28 12:58:56	2012-02-28 12:58:56
+447	Oxylophus levaillantii	O	22	2012-02-28 12:58:56	2012-02-28 12:58:56
+448	Chrysococcyx rufomerus	C	22	2012-02-28 12:58:56	2012-02-28 12:58:56
+449	Eudynamys taitensis	E	19	2012-02-28 12:58:56	2012-02-28 12:58:56
+450	Phaenicophaeus viridirostris	P	28	2012-02-28 12:58:56	2012-02-28 12:58:56
+451	Phaenicophaeus cumingi	P	22	2012-02-28 12:58:56	2012-02-28 12:58:56
+452	Lorius albidinuchus	L	19	2012-02-28 12:58:56	2012-02-28 12:58:56
+453	Prioniturus waterstradti	P	24	2012-02-28 12:58:56	2012-02-28 12:58:56
+454	Platycercus barnardi	P	20	2012-02-28 12:58:56	2012-02-28 12:58:56
+455	Aratinga leucophthalmus	A	23	2012-02-28 12:58:56	2012-02-28 12:58:56
+456	Aerodramus vulcanorum	A	21	2012-02-28 12:58:56	2012-02-28 12:58:56
+457	Tachymarptis melba melba	T	24	2012-02-28 12:58:56	2012-02-28 12:58:56
+458	Campylopterus cuvierii berlepschi	C	33	2012-02-28 12:58:56	2012-02-28 12:58:56
+459	Campylopterus cuvierii roberti	C	30	2012-02-28 12:58:56	2012-02-28 12:58:56
+460	Trichoglossus rubrigularis	T	26	2012-02-28 12:58:56	2012-02-28 12:58:56
+461	Branta minima	B	13	2012-02-28 12:58:56	2012-02-28 12:58:56
+462	Anas carolinensis	A	17	2012-02-28 12:58:56	2012-02-28 12:58:56
+463	Melanitta americana	M	19	2012-02-28 12:58:56	2012-02-28 12:58:56
+464	Aratinga brevipes	A	17	2012-02-28 12:58:56	2012-02-28 12:58:56
+465	Trichoglossus moluccanus	T	24	2012-02-28 12:58:56	2012-02-28 12:58:56
+466	Somateria faeroeensis	S	21	2012-02-28 12:58:56	2012-02-28 12:58:56
+467	Fuligula fischeri	F	17	2012-02-28 12:58:56	2012-02-28 12:58:56
+468	Forpus sclateri sclateri	F	24	2012-02-28 12:58:56	2012-02-28 12:58:56
+469	Melospiza melodia inexspectata	M	30	2012-02-28 12:58:56	2012-02-28 12:58:56
+470	Basileuterus culicivorus auricapillus	B	37	2012-02-28 12:58:56	2012-02-28 12:58:56
+471	Crypturellus	C	12	2012-02-28 12:58:56	2012-02-28 12:58:56
+472	Cnemotriccus	C	12	2012-02-28 12:58:56	2012-02-28 12:58:56
+473	Egretta sacra	E	13	2012-02-28 12:58:56	2012-02-28 12:58:56
+474	Casmerodius	C	11	2012-02-28 12:58:56	2012-02-28 12:58:56
+475	Phoenicopterus roseus	P	21	2012-02-28 12:58:56	2012-02-28 12:58:56
+476	Aulacorhynchus	A	14	2012-02-28 12:58:56	2012-02-28 12:58:56
+477	Jynx	J	4	2012-02-28 12:58:56	2012-02-28 12:58:56
+478	Teretistris	T	11	2012-02-28 12:58:56	2012-02-28 12:58:56
+479	Peucedramus	P	11	2012-02-28 12:58:56	2012-02-28 12:58:56
+480	Oedistoma	O	9	2012-02-28 12:58:56	2012-02-28 12:58:56
+481	Dinemellia	D	10	2012-02-28 12:58:56	2012-02-28 12:58:56
+482	Salpinctes	S	10	2012-02-28 12:58:56	2012-02-28 12:58:56
+483	Troglodytes	T	11	2012-02-28 12:58:56	2012-02-28 12:58:56
+484	Heleia	H	6	2012-02-28 12:58:56	2012-02-28 12:58:56
+485	Tephrozosterops	T	15	2012-02-28 12:58:56	2012-02-28 12:58:56
+486	Alophoixus	A	10	2012-02-28 12:58:56	2012-02-28 12:58:56
+487	Bleda	B	5	2012-02-28 12:58:56	2012-02-28 12:58:56
+488	Criniger	C	8	2012-02-28 12:58:56	2012-02-28 12:58:56
+489	Neolestes	N	9	2012-02-28 12:58:56	2012-02-28 12:58:56
+490	Setornis	S	8	2012-02-28 12:58:56	2012-02-28 12:58:56
+491	Hypocolius	H	10	2012-02-28 12:58:56	2012-02-28 12:58:56
+492	Calamonastes	C	12	2012-02-28 12:58:56	2012-02-28 12:58:56
+493	Euryptila	E	9	2012-02-28 12:58:56	2012-02-28 12:58:56
+494	Oreophilais	O	11	2012-02-28 12:58:56	2012-02-28 12:58:56
+495	Scotocerca	S	10	2012-02-28 12:58:56	2012-02-28 12:58:56
+496	Bebrornis	B	9	2012-02-28 12:58:56	2012-02-28 12:58:56
+497	Dromaeocercus	D	13	2012-02-28 12:58:56	2012-02-28 12:58:56
+498	Myrmochanes	M	11	2012-02-28 12:58:56	2012-02-28 12:58:56
+499	Percnostola	P	11	2012-02-28 12:58:56	2012-02-28 12:58:56
+500	Pithys	P	6	2012-02-28 12:58:56	2012-02-28 12:58:56
+501	Rhegmatorhina	R	13	2012-02-28 12:58:56	2012-02-28 12:58:56
+502	Sclateria	S	9	2012-02-28 12:58:56	2012-02-28 12:58:56
+503	Thamnomanes	T	11	2012-02-28 12:58:56	2012-02-28 12:58:56
+504	Rhodopis	R	8	2012-02-28 12:58:56	2012-02-28 12:58:56
+505	Eudyptes moseleyi	E	17	2012-02-28 12:58:56	2012-02-28 12:58:56
+506	Strigopinae	S	11	2012-02-28 12:58:56	2012-02-28 12:58:56
+507	Haematopus ostralegus occidentalis	H	34	2012-02-28 12:58:56	2012-02-28 12:58:56
+508	Charadrius melodus circumcinctus	C	32	2012-02-28 12:58:56	2012-02-28 12:58:56
+509	Charadrius wilsonia wilsonia	C	28	2012-02-28 12:58:56	2012-02-28 12:58:56
+510	Charadrius cucullatus	C	21	2012-02-28 12:58:56	2012-02-28 12:58:56
+511	Charadrius placidus	C	19	2012-02-28 12:58:56	2012-02-28 12:58:56
+512	Pluvianellus socialis	P	21	2012-02-28 12:58:56	2012-02-28 12:58:56
+513	Pluvialis apricaria altifrons	P	29	2012-02-28 12:58:56	2012-02-28 12:58:56
+514	Scolopacidae	S	12	2012-02-28 12:58:56	2012-02-28 12:58:56
+515	Capella gallinago faeroeensis	C	29	2012-02-28 12:58:56	2012-02-28 12:58:56
+516	Numenius phaeopus islandicus	N	28	2012-02-28 12:58:56	2012-02-28 12:58:56
+517	Actitis	A	7	2012-02-28 12:58:56	2012-02-28 12:58:56
+518	Tringa hypoleucos	T	17	2012-02-28 12:58:56	2012-02-28 12:58:56
+519	Tringa incana	T	13	2012-02-28 12:58:56	2012-02-28 12:58:56
+520	Catoptrophorus semipalmatus inornatus	C	37	2012-02-28 12:58:56	2012-02-28 12:58:56
+521	Calidris ptilocnemis couesi	C	27	2012-02-28 12:58:56	2012-02-28 12:58:56
+522	Calidris cooperi	C	16	2012-02-28 12:58:56	2012-02-28 12:58:56
+523	Limnodromus scolopaceus	L	23	2012-02-28 12:58:56	2012-02-28 12:58:56
+524	Gallinago hardwickii	G	20	2012-02-28 12:58:56	2012-02-28 12:58:56
+525	Coenocorypha	C	12	2012-02-28 12:58:56	2012-02-28 12:58:56
+526	Himantopus mexicanus	H	20	2012-02-28 12:58:56	2012-02-28 12:58:56
+527	Lobipes	L	7	2012-02-28 12:58:56	2012-02-28 12:58:56
+528	Cursorius africanus	C	19	2012-02-28 12:58:56	2012-02-28 12:58:56
+529	Peltohyas	P	9	2012-02-28 12:58:56	2012-02-28 12:58:56
+530	Glareola nuchalis	G	17	2012-02-28 12:58:56	2012-02-28 12:58:56
+531	Thinocorus orbignyianus	T	23	2012-02-28 12:58:56	2012-02-28 12:58:56
+532	Catharacta maccormicki	C	22	2012-02-28 12:58:56	2012-02-28 12:58:56
+533	Larus glaucescens	L	17	2012-02-28 12:58:56	2012-02-28 12:58:56
+534	Larus fuscus graellsii	L	22	2012-02-28 12:58:56	2012-02-28 12:58:56
+535	Mesitornithes	M	13	2012-02-28 12:58:56	2012-02-28 12:58:56
+536	Coquus newtoni	C	14	2012-02-28 12:58:56	2012-02-28 12:58:56
+537	Aviceda subcristata waigeuensis	A	31	2012-02-28 12:58:56	2012-02-28 12:58:56
+538	Bostrychia olivacea akeleyorum	B	30	2012-02-28 12:58:56	2012-02-28 12:58:56
+539	Botaurus pinnatus caribaeus	B	27	2012-02-28 12:58:56	2012-02-28 12:58:56
+540	Burhinus bistriatus bistriatus	B	30	2012-02-28 12:58:56	2012-02-28 12:58:56
+541	Burhinus capensis capensis	B	26	2012-02-28 12:58:56	2012-02-28 12:58:56
+542	Burhinus oedicnemus distinctus	B	30	2012-02-28 12:58:56	2012-02-28 12:58:56
+543	Burhinus oedicnemus saharae	B	27	2012-02-28 12:58:56	2012-02-28 12:58:56
+544	Busarellus nigricollis nigricollis	B	34	2012-02-28 12:58:56	2012-02-28 12:58:56
+545	Buteo buteo bannermani	B	22	2012-02-28 12:58:56	2012-02-28 12:58:56
+546	Buteo buteo menetriesi	B	22	2012-02-28 12:58:56	2012-02-28 12:58:56
+547	Buteo jamaicensis fumosus	B	25	2012-02-28 12:58:56	2012-02-28 12:58:56
+548	Buteo jamaicensis solitudinis	B	29	2012-02-28 12:58:56	2012-02-28 12:58:56
+549	Buteo japonicus toyoshimai	B	26	2012-02-28 12:58:56	2012-02-28 12:58:56
+550	Buteo nitidus plagiatus	B	23	2012-02-28 12:58:56	2012-02-28 12:58:56
+551	Buteo platypterus insulicola	B	28	2012-02-28 12:58:56	2012-02-28 12:58:56
+552	Buteo rufinus cirtensis	B	23	2012-02-28 12:58:56	2012-02-28 12:58:56
+553	Buteogallus anthracinus subtilis	B	32	2012-02-28 12:58:56	2012-02-28 12:58:56
+554	Butorides striata actophila	B	27	2012-02-28 12:58:56	2012-02-28 12:58:56
+555	Butorides striata brevipes	B	26	2012-02-28 12:58:56	2012-02-28 12:58:56
+556	Butorides striata idenburgi	B	27	2012-02-28 12:58:56	2012-02-28 12:58:56
+557	Butorides striata papuensis	B	27	2012-02-28 12:58:56	2012-02-28 12:58:56
+558	Butorides striata solomonensis	B	30	2012-02-28 12:58:56	2012-02-28 12:58:56
+559	Butorides virescens maculata	B	28	2012-02-28 12:58:56	2012-02-28 12:58:56
+560	Calidris alpina arcticola	C	25	2012-02-28 12:58:56	2012-02-28 12:58:56
+561	Calidris alpina sakhalina	C	25	2012-02-28 12:58:56	2012-02-28 12:58:56
+562	Calidris canutus roselaari	C	26	2012-02-28 12:58:56	2012-02-28 12:58:56
+563	Cathartes aura jota	C	19	2012-02-28 12:58:56	2012-02-28 12:58:56
