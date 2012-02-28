@@ -39,6 +39,18 @@ namespace :solr do
   desc 'stop solr instance'
   task :stop => :environment do
     puts "** Stopping Background Solr instance **"
-    system(Escape.shell_command([Rails.root.join('script', 'solr'), 'stop']))
+    system(Escape.shell_command([Rails.root.join('script', 'solr').to_s, 'stop']))
+  end
+
+  desc 'build solr data'
+  task :build => :environment do
+    puts "** Rebuilding solr indices **"
+    system(Escape.shell_command([Rails.root.join('script', 'gni', 'solr_import.rb').to_s]))
+  end
+  
+  desc 'clear solr data'
+  task :clear => :environment do
+    puts "** Deleting solr data **"
+    Gni::SolrIngest.new(Gni::SolrCoreCanonicalForm.new).delete_all
   end
 end
