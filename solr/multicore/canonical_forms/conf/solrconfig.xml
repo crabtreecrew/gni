@@ -40,8 +40,8 @@
       <int name="rows">10</int>
       <str name="spellcheck.dictionary">default</str>
       <str name="spellcheck.onlyMorePopular">false</str>
-      <str name="spellcheck.extendedResults">true</str>
-      <str name="spellcheck.count">10</str>
+      <str name="spellcheck.extendedResults">false</str>
+      <str name="spellcheck.count">1000</str>
     </lst>
     <arr name="last-components">
       <str>spellcheck</str>
