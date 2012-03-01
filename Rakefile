@@ -15,6 +15,24 @@ task :default => [:spec, :cucumber]
 task "resque:setup" => :environment do
 end
 
+namespace :db do
+  desc "dumps tables from the environment to csv files"
+  task :seedup => :environment do
+    ENV["RAILS_ENV"] ||= 'development'
+    csv_dir = Rails.root.join("db", "csv", ENV["RAILS_ENV"]).to_s
+    shared_tables = Rails.root.join("db", "csv").entries.map {|e| e.to_s}.select {|e| e.match /csv$/}.map {|e| e.gsub(/\.csv$/, '')}
+    shared_tables << "schema_migrations"
+    db = ActiveRecord::Base.connection
+    db.tables.each do |table|
+      count = db.select_value("select count(*) from #{table}")
+      if !shared_tables.include?(table) && count > 0 
+        file = "#{csv_dir}/#{table}.csv"
+        FileUtils.rm file if File.exists? file
+        db.execute("select * into outfile '#{file}' from #{table}")
+      end
+    end
+  end
+end
 
 namespace :solr do
   def run_command(command_type)
