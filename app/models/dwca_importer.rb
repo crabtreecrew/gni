@@ -89,7 +89,7 @@ class DwcaImporter < ActiveRecord::Base
           uuid = get_uuid(name)
           @name_strings[name_string] = { normalized: @db.quote(name) }
           tm_normalized = @db.quote(NameString.normalize(name))
-          res << "%s, %s, %s, '%s','%s'" % [@name_strings[name_string][:normalized], uuid, tm_normalized, now, now]
+          res << "%s, %s, %s, '%s', '%s'" % [@name_strings[name_string][:normalized], uuid, tm_normalized, now, now]
         end
         group = res.join('), (')
         @db.execute "INSERT IGNORE INTO name_strings (name, uuid, normalized, created_at, updated_at) VALUES (#{group})"

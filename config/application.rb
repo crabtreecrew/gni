@@ -74,6 +74,7 @@ module Gni
     batch_size: 10_000,
     temp_dir: "/tmp",
     solr_url: "http://localhost:8983/solr",
+    reference_data_source_id: nil
   )
 
 end

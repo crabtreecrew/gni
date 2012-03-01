@@ -40,7 +40,7 @@ describe ExternalListReconciler do
   end
 
   it "should be able to reconcile names against one data_source" do
-    elr = ExternalListReconciler.create(:options => {:data_sources => [1]}, :data => @test_names)
+    elr = ExternalListReconciler.create(:options => {:data_sources => [1,3]}, :data => @test_names)
     elr.reconcile 
   end
 
