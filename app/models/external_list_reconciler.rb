@@ -51,6 +51,7 @@ private
 
   def prepare_variables
     @atomizer = Taxamatch::Atomizer.new
+    @spellchecker = Gni::SolrSpellchecker.new
     @data_sources = options[:data_sources].select {|ds| ds.is_a? Fixnum}
     @with_context = options[:with_context]
     @names = {}
@@ -137,8 +138,10 @@ private
 
   def find_canonical_fuzzy
     @names.keys.each do |name|
-      canonical_forms = SolrSpellchecker.find(name)
-      require 'ruby-debug'; debugger
+      canonical_forms = @spellchecker.find(name)
+      unless canonical_forms.blank?
+        puts canonical_forms
+      end
     end
   end
 
