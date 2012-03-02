@@ -37,7 +37,12 @@ class ExternalListReconciler < ActiveRecord::Base
   def reconcile
     prepare_variables
     find_exact
+    find_lexical_groups
     find_canonical_exact
+    find_lexical_groups_canonical
+    find_canonical_fuzzy
+    adjust_score_by_context if @with_context
+    find_cotext_taxa if @with_context
     require 'ruby-debug'; debugger
     puts ''
   end
@@ -76,7 +81,7 @@ private
     res = DataSource.connection.select_rows(q)
 
     res.each do |row|
-      record = {:score => 1.0, :gni_id => row[0], :name_uuid => UUID.parse(row[1]).to_s, :name_normalized => row[2], :name => row[3], :data_source_id => row[4], :taxon_id => row[5], :global_id => row[6], :url => row[7], :classification_path => row[8], :classification_path_ids => row[9], :canonical_form => row[10] }
+      record = {:score => 1.0, :gni_id => row[0], :name_uuid => UUID.parse(row[1].to_s(16)).to_s, :name_normalized => row[2], :name => row[3], :data_source_id => row[4], :taxon_id => row[5], :global_id => row[6], :url => row[7], :classification_path => row[8], :classification_path_ids => row[9], :canonical_form => row[10] }
       update_found_words(record[:canonical_form])
       @names[record[:name_normalized]][:indices].each do |i|
         datum = data[i]
@@ -90,6 +95,36 @@ private
     @names.each do |key, value|
       @names.delete(key) if value.has_key?(:results)
     end
+  end
+
+  def find_lexical_group
+  end
+
+  def find_canonical_exact
+    parser = Taxamatch::Atomizer.new
+    @names.each do |key, value|
+      canonical_form = NameString.connection.select_value("
+        select cf.name 
+        from name_strings ns 
+        join canonical_forms cf 
+          on cf.id = ns.canonical_form_id
+        where ns.normalized = ?", key)
+
+      if canonical_form
+        value[:canonical_form] = canonical_form
+      else
+        value[:parsed] = parser.parse(value[:name_string])[:scientificName]
+        if value[:parsed][:parsed]
+          value[:canonical_form] = value[:parsed][:canonical_form]
+        end
+      end
+    end
+  end
+
+  def find_lexical_group_canonical
+  end
+
+  def find_canonical_fuzzy
   end
 
   def update_found_words(canonical_form)
@@ -127,11 +162,5 @@ private
     end
   end
 
-  def find_canonical_exact
-    parser = Taxamatch::Atomizer.new
-    @names.each do |key, value|
-      value[:parsed] = parser.parse(value[:name_string])
-    end
-  end
 
 end
