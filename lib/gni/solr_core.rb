@@ -1,5 +1,18 @@
 # encoding: utf-8
 module Gni
+  class SolrSpellchecker
+    def initialize
+      @core = SolrCoreCanonicalForm.new
+      @solr_client = SolrClient.new(solr_url: @core.solr_url, update_csv_params: @core.update_csv_params)
+    end
+
+    def find(name)
+      res = @solr_client.search("wt=json&*:*&rows=0&spellcheck=true&spellcheck.accuracy=0.75&spellcheck.q=#{name}&spellcheck.rows=1000")
+      require 'ruby-debug'; debugger
+      puts ''
+    end
+  end
+
   class SolrIngest
     # @queue = :solr_ingest
 

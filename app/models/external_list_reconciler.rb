@@ -41,8 +41,8 @@ class ExternalListReconciler < ActiveRecord::Base
     find_canonical_exact
     find_lexical_groups_canonical
     find_canonical_fuzzy
-    adjust_score_by_context if @with_context
-    find_cotext_taxa if @with_context
+    # adjust_score_by_context if @with_context
+    # find_cotext_taxa if @with_context
     require 'ruby-debug'; debugger
     puts ''
   end
@@ -50,6 +50,7 @@ class ExternalListReconciler < ActiveRecord::Base
 private
 
   def prepare_variables
+    @atomizer = Taxamatch::Atomizer.new
     @data_sources = options[:data_sources].select {|ds| ds.is_a? Fixnum}
     @with_context = options[:with_context]
     @names = {}
@@ -74,19 +75,20 @@ private
   end
 
   def find_exact
-    names = @names.keys.map {|name| NameString.connection.quote(name)}.join(",")
+    names = get_quoted_names(@names.keys)
     data_sources = @data_sources.join(",")
     q = "select ns.id, ns.uuid, ns.normalized, ns.name, nsi.data_source_id, nsi.taxon_id, nsi.global_id, nsi.url, nsi.classification_path, nsi.classification_path_ids, cf.name from name_string_indices nsi join name_strings ns on ns.id = nsi.name_string_id left outer join canonical_forms cf on cf.id = ns.canonical_form_id where ns.normalized in (#{names})"
     q += " and data_source_id in (#{data_sources})" unless @data_sources.blank?
     res = DataSource.connection.select_rows(q)
 
     res.each do |row|
-      record = {:score => 1.0, :gni_id => row[0], :name_uuid => UUID.parse(row[1].to_s(16)).to_s, :name_normalized => row[2], :name => row[3], :data_source_id => row[4], :taxon_id => row[5], :global_id => row[6], :url => row[7], :classification_path => row[8], :classification_path_ids => row[9], :canonical_form => row[10] }
+      record = {:score => 1.0, :auth_score => 1.0, :gni_id => row[0], :name_uuid => UUID.parse(row[1].to_s(16)).to_s, :name => row[3], :data_source_id => row[4], :taxon_id => row[5], :global_id => row[6], :url => row[7], :classification_path => row[8], :classification_path_ids => row[9], :canonical_form => row[10] }
       update_found_words(record[:canonical_form])
-      @names[record[:name_normalized]][:indices].each do |i|
+      name_normalized = row[2]
+      @names[name_normalized][:indices].each do |i|
         datum = data[i]
-        datum.has_key?(:results) ? datum[:results] << record : datum[:results] = [record]
-        @names[record[:name_normalized]].has_key?(:results) ? @names[record[:name_normalized]][:results] << record : @names[record[:name_normalized]][:results] = [record]
+        datum.has_key?(:results) ? datum[:results] << record : datum.merge!({ :results => [record], :success => true, :message => "Exact string match" })
+        @names[name_normalized].has_key?(:results) ? @names[name_normalized][:results] << record : @names[name_normalized][:results] = [record]
         update_context(record) if @with_context
       end
     end
@@ -97,34 +99,78 @@ private
     end
   end
 
-  def find_lexical_group
+  def find_lexical_groups
   end
 
   def find_canonical_exact
-    parser = Taxamatch::Atomizer.new
-    @names.each do |key, value|
-      canonical_form = NameString.connection.select_value("
-        select cf.name 
-        from name_strings ns 
-        join canonical_forms cf 
-          on cf.id = ns.canonical_form_id
-        where ns.normalized = ?", key)
-
-      if canonical_form
-        value[:canonical_form] = canonical_form
-      else
-        value[:parsed] = parser.parse(value[:name_string])[:scientificName]
-        if value[:parsed][:parsed]
-          value[:canonical_form] = value[:parsed][:canonical_form]
-        end
+    get_canonical_forms
+    get_rid_of_unparsed
+    
+    canonical_forms = @names.map { |key, value| value[:canonical_form] }
+    names = get_quoted_names(canonical_forms)
+    data_sources = @data_sources.join(",")
+    
+    q = "select ns.id, ns.uuid, null, ns.name, nsi.data_source_id, nsi.taxon_id, nsi.global_id, nsi.url, nsi.classification_path, nsi.classification_path_ids, cf.name, pns.data  from name_string_indices nsi join name_strings ns on ns.id = nsi.name_string_id join canonical_forms cf on cf.id = ns.canonical_form_id join parsed_name_strings pns on pns.id = ns.id where cf.name in (#{names})"
+    q += " and data_source_id in (#{data_sources})" unless @data_sources.blank?
+    res = DataSource.connection.select_rows(q)
+    res.each do |row|
+      record = {:score => 0.9, :gni_id => row[0], :name_uuid => UUID.parse(row[1].to_s(16)).to_s, :name => row[3], :data_source_id => row[4], :taxon_id => row[5], :global_id => row[6], :url => row[7], :classification_path => row[8], :classification_path_ids => row[9], :canonical_form => row[10] }
+      found_name_parsed = @atomizer.organize_results(JSON.parse(row[11], :symbolize_names => true)[:scientificName])
+      record[:auth_score] = get_authorship_score(@names[record[:canonical_form]][:parsed], found_name_parsed)
+      
+      update_found_words(record[:canonical_form])
+      @names[record[:canonical_form]][:indices].each do |i|
+        datum = data[i]
+        datum.has_key?(:results) ? datum[:results] << record : datum.merge!({ :results => [record], :success => true, :message => "Exact canonical match" })
+        @names[record[:canonical_form]].has_key?(:results) ? @names[record[:canonical_form]][:results] << record : @names[record[:canonical_form]][:results] = [record]
+        update_context(record) if @with_context
       end
+    end
+      #delete found words
+    @names.each do |key, value|
+      @names.delete(key) if value.has_key?(:results)
     end
   end
 
-  def find_lexical_group_canonical
+  def find_lexical_groups_canonical
   end
 
   def find_canonical_fuzzy
+    @names.keys.each do |name|
+      canonical_forms = SolrSpellchecker.find(name)
+      require 'ruby-debug'; debugger
+    end
+  end
+
+  def get_rid_of_unparsed
+    #delete found words
+    @names.each do |key, value|
+      if !value[:canonical_form]
+        value[:indices].each do |index|
+          d = data[index].merge!({ :success => false, :message => "Cannot be parsed" })
+        end
+        @names.delete(key)
+      end
+    end
+  end
+  
+  def get_canonical_forms
+    @names.keys.each do |key|
+      @names[key][:parsed] = @atomizer.parse(@names[key][:name_string])
+      if @names[key][:parsed]
+        @names[key][:canonical_form] = @names[key][:parsed][:canonical_form]
+      else
+        @names[key][:canonical_form] = nil
+      end
+    end
+
+    #switch names to canonical forms from normalized names
+    new_names = @names.values.inject({}) { |res, v| res[v[:canonical_form]] = v; res }
+    @names = new_names
+  end
+
+  def get_quoted_names(names_array)
+    names_array.map {|name| NameString.connection.quote(name)}.join(",")
   end
 
   def update_found_words(canonical_form)
@@ -160,6 +206,11 @@ private
     else
       counter[index] = { taxon => 1 }
     end
+  end
+
+  #TODO: make it work with taxamatch
+  def get_authorship_score(parsed1, parsed2)
+    1.0
   end
 
 

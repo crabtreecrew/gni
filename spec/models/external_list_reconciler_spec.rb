@@ -19,7 +19,7 @@ describe ExternalListReconciler do
   end
 
   it "should be able to open files with names in tab delimited list" do
-    @test_names[0].should == {:id=>"8", :name_string=>"Gecinulus"}
+    @test_names[0].should == {:id=>"7", :name_string=>"Chaetomorpha linum (O.F. Müller) Kützing"}
   end
 
   it "should be able to convert latin1 lines to utf-8 on the fly" do

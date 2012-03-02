@@ -27,7 +27,7 @@
 87	Pheucticus chrysopeplus dilutus Van Rossem, 1934
 88	Trichastoma bicolor (Lesson, 1839)
 91	Cardinalis cardinalis igneus S. F. Baird, 1860
-112	Chloroceryle amazona (Latham, 1790)
+112	Chloriceryle amazona (Latham 1790)
 135	Pinicola
 136	Contopus lugubris Lawrence, 1865
 137	Campylorhamphus trochilirostris thoracicus (P. L. Sclater, 1860)
@@ -49,3 +49,4 @@
 158	Anthracothorax prevostii
 159	Anthracothorax nigricollis
 160	Anthracothorax veraguensis
+161	1 non parseable name
