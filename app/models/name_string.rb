@@ -22,19 +22,14 @@ class NameString < ActiveRecord::Base
     end
   end
 
-  def self.get_uuid(name_string, as_decimal = true)
-    uuid = UUID.create_v5(name, Gni::Config.uuid_namespace)
+  def self.get_uuid(a_name_string, as_decimal = true)
+    uuid = ::UUID.create_v5(a_name_string, Gni::Config.uuid_namespace)
     as_decimal ? uuid.to_i : uuid.to_s
   end
 
   def uuid
     res = super
-    res ? UUID.parse(res.to_s(16)).to_s : nil
-  end
-
-  def uuid=(whatever)
-    # uuid should correpsond to name
-    super(NameString.get_uuid(name))
+    res ? ::UUID.parse(res.to_s(16)).to_s : nil
   end
 
 end

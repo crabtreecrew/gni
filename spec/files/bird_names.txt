@@ -1,3 +1,4 @@
+7	Chaetomorpha linum (O.F. Müller) Kützing
 8	Gecinulus
 9	Picathartes oreas Reichenow, 1899
 17	Toxostoma longirostre sennetti
@@ -7,8 +8,8 @@
 24	Capella gallinago faeroeensis (C. L. Brehm, 1831)
 25	Treron
 26	Larus occidentalis wymani
-27	Actitis Illiger, 1811
-28	Ceyx melanurus (Kaup, 1848)
+27	Actitis Illiger, 18122
+28	Ceyx melanurus (Linnaeus)
 29	Dendropicos fuscescens hemprichii (Ehrenberg, 1833)
 31	Macropygia emiliana megala Siebers, 1929
 32	Burhinus oedicnemus saharae (Reichenow, 1894)
