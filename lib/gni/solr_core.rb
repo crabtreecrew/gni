@@ -8,7 +8,11 @@ module Gni
 
     def find(name)
       res = @solr_client.search("wt=json&*:*&rows=0&spellcheck=true&spellcheck.accuracy=0.75&spellcheck.q=#{name}&spellcheck.rows=1000")
-      res[:spellcheck][:suggestions]
+      if res[:spellcheck][:suggestions].blank?
+        []
+      else
+        res[:spellcheck][:suggestions][1][:suggestion]
+      end
     end
   end
 

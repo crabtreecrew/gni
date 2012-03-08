@@ -140,7 +140,13 @@ private
     @names.keys.each do |name|
       canonical_forms = @spellchecker.find(name)
       unless canonical_forms.blank?
-        puts canonical_forms
+        names = NameStrings.connection.select_rows("select ns.id, ns.name, cf.name, pns.data from canonical_forms cf join name_strings ns on ns.canonical_from_id = ns.id join parsed_name_strings pns on psn.id = ns.id where cf.name in (%s)" % canonical_forms.map { |n| NameString.connection.quote(n) }.join(","))
+        fuzzy_data = {}
+        names.each do |row|
+          canonical_form = row[2]
+          name_data = {:id => row[0], :name => row[1], :parsed => JSON.parse(row[3], :symbolize_names => true)}
+          fuzzy_data.has_key?(canonical_form) ? fuzzy_data[canonical_form] << name_data : fuzzy_data[canonical_form] = [name_data]
+        end
       end
     end
   end
