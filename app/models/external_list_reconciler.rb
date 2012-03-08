@@ -11,9 +11,10 @@ class ExternalListReconciler < ActiveRecord::Base
   end
 
   def options
-    {:with_context => true, :data_sources => []}.merge(super)
+    {:with_context => true, :with_parsed => false, :data_sources => []}.merge(super)
   end
 
+  # read data for cases where it is supplied in a file.
   def self.read_file(file_path)
     conv = Iconv.new('UTF-8', 'ISO-8859-1')
     open(file_path).inject([]) do |res, line|
@@ -51,10 +52,12 @@ private
 
   def prepare_variables
     @atomizer = Taxamatch::Atomizer.new
+    @taxamatch = Taxamatch::Base.new
     @spellchecker = Gni::SolrSpellchecker.new
     @data_sources = options[:data_sources].select {|ds| ds.is_a? Fixnum}
     @with_context = options[:with_context]
     @names = {}
+    @matched_words = {}
     data.each_with_index do |datum, i|
       name_string = datum[:name_string]
       normalized_name_string = NameString.normalize(name_string)
@@ -83,7 +86,7 @@ private
     res = DataSource.connection.select_rows(q)
 
     res.each do |row|
-      record = {:score => 1.0, :auth_score => 1.0, :gni_id => row[0], :name_uuid => UUID.parse(row[1].to_s(16)).to_s, :name => row[3], :data_source_id => row[4], :taxon_id => row[5], :global_id => row[6], :url => row[7], :classification_path => row[8], :classification_path_ids => row[9], :canonical_form => row[10] }
+      record = {:auth_score => 0, :gni_id => row[0], :name_uuid => UUID.parse(row[1].to_s(16)).to_s, :name => row[3], :data_source_id => row[4], :taxon_id => row[5], :global_id => row[6], :url => row[7], :classification_path => row[8], :classification_path_ids => row[9], :canonical_form => row[10] }
       update_found_words(record[:canonical_form])
       name_normalized = row[2]
       @names[name_normalized][:indices].each do |i|
@@ -115,7 +118,7 @@ private
     q += " and data_source_id in (#{data_sources})" unless @data_sources.blank?
     res = DataSource.connection.select_rows(q)
     res.each do |row|
-      record = {:score => 0.9, :gni_id => row[0], :name_uuid => UUID.parse(row[1].to_s(16)).to_s, :name => row[3], :data_source_id => row[4], :taxon_id => row[5], :global_id => row[6], :url => row[7], :classification_path => row[8], :classification_path_ids => row[9], :canonical_form => row[10] }
+      record = {:gni_id => row[0], :name_uuid => UUID.parse(row[1].to_s(16)).to_s, :name => row[3], :data_source_id => row[4], :taxon_id => row[5], :global_id => row[6], :url => row[7], :classification_path => row[8], :classification_path_ids => row[9], :canonical_form => row[10] }
       found_name_parsed = @atomizer.organize_results(JSON.parse(row[11], :symbolize_names => true)[:scientificName])
       record[:auth_score] = get_authorship_score(@names[record[:canonical_form]][:parsed], found_name_parsed)
       
@@ -137,17 +140,33 @@ private
   end
 
   def find_canonical_fuzzy
+    data_sources = @data_sources.join(",")
     @names.keys.each do |name|
       canonical_forms = @spellchecker.find(name)
       unless canonical_forms.blank?
-        names = NameStrings.connection.select_rows("select ns.id, ns.name, cf.name, pns.data from canonical_forms cf join name_strings ns on ns.canonical_from_id = ns.id join parsed_name_strings pns on psn.id = ns.id where cf.name in (%s)" % canonical_forms.map { |n| NameString.connection.quote(n) }.join(","))
+        q = "select ns.id, ns.uuid, null, ns.name, nsi.data_source_id, nsi.taxon_id, nsi.global_id, nsi.url, nsi.classification_path, nsi.classification_path_ids, cf.name, pns.data from canonical_forms cf join name_strings ns on ns.canonical_form_id = cf.id join parsed_name_strings pns on pns.id = ns.id join name_string_indices nsi on nsi.name_string_id = ns.id where cf.name in (%s)" % canonical_forms.map { |n| NameString.connection.quote(n) }.join(",")
+        q += " and data_source_id in (#{data_sources})" unless @data_sources.blank?
+        res = NameString.connection.select_rows(q)
         fuzzy_data = {}
-        names.each do |row|
-          canonical_form = row[2]
-          name_data = {:id => row[0], :name => row[1], :parsed => JSON.parse(row[3], :symbolize_names => true)}
-          fuzzy_data.has_key?(canonical_form) ? fuzzy_data[canonical_form] << name_data : fuzzy_data[canonical_form] = [name_data]
+        res.each do |row|
+          canonical_form = row[10]
+          is_match = match_names(name, canonical_form) 
+          if is_match
+            record = {:gni_id => row[0], :name_uuid => UUID.parse(row[1].to_s(16)).to_s, :name => row[3], :data_source_id => row[4], :taxon_id => row[5], :global_id => row[6], :url => row[7], :classification_path => row[8], :classification_path_ids => row[9], :canonical_form => canonical_form }
+            found_name_parsed = @atomizer.organize_results(JSON.parse(row[11], :symbolize_names => true)[:scientificName])
+            record[:auth_score] = get_authorship_score(@names[name][:parsed], found_name_parsed)
+            @names[name][:indices].each do |i|
+              datum = data[i]
+              datum.has_key?(:results) ? datum[:results] << record : datum.merge!({ :results => [record], :success => true, :message => "Exact canonical match" })
+              @names[name].has_key?(:results) ? @names[name][:results] << record : @names[name][:results] = [record]
+              update_context(record) if @with_context
+            end
+          end
         end
       end
+    end
+    @names.each do |key, value|
+      @names.delete(key) if value.has_key?(:results)
     end
   end
 
@@ -217,10 +236,28 @@ private
     end
   end
 
-  #TODO: make it work with taxamatch
   def get_authorship_score(parsed1, parsed2)
-    1.0
+    @taxamatch.match_authors(parsed1, parsed2)  
   end
 
+  def match_names(name1, name2)
+    words = name1.split(" ").zip(name2.split(" "))
+    count = nil
+    words.each_with_index do |w, i|
+      return nil unless w[0] && w[1]
+      count = i
+      match = match_words(w[0], w[1], i)
+      return nil unless match
+    end
+    count
+  end
+
+  def match_words(word1, word2, index)
+    index = 1 if index > 0
+    return true if word1 == word2
+    words_concatenate = [index.to_s, word1, word2].sort.join("_") 
+    return @matched_words[words_concatenate] if @matched_words.has_key?(words_concatenate)
+    @matched_words[words_concatenate] = index == 0 ? @taxamatch.match_genera({normalized:word1}, {normalized:word2}, :with_phonetic_match => false) : @taxamatch.match_species({normalized:word1}, {normalized:word2}, :with_phonetic_match => false)
+  end
 
 end
