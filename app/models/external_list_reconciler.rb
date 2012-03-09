@@ -49,9 +49,7 @@ class ExternalListReconciler < ActiveRecord::Base
     find_lexical_groups_canonical
     find_canonical_fuzzy
     get_contexts if @with_context
-    calculate_score
-    require 'ruby-debug'; debugger
-    puts ''
+    calculate_scores
   end
 
 private
@@ -102,15 +100,15 @@ private
         datum = data[i]
         canonical_match = NameString.normalize(record[:canonical_form]) == NameString.normalize(record[:name])
         type = NAME_TYPES[record[:canonical_form].split(" ").size]
-        datum.has_key?(:results) ? datum[:results] << record : datum.merge!({ :results => [record], :match_type => EXACT_STRING, :name_type => type, :match_by_canonical => canonical_match })
+        record.merge!(:match_type => EXACT_STRING, :name_type => type, :match_by_canonical => canonical_match) 
+        datum.has_key?(:results) ? datum[:results] << record : datum[:results] = [record]
         @names[name_normalized].has_key?(:results) ? @names[name_normalized][:results] << record : @names[name_normalized][:results] = [record]
         update_context(record) if @with_context
       end
     end
 
-    #delete found words
-    @names.each do |key, value|
-      @names.delete(key) if value.has_key?(:results)
+    @names.keys.each do |key|
+      @names.delete(key) if @names[key].has_key?(:results)
     end
   end
 
@@ -119,9 +117,8 @@ private
 
   def find_canonical_exact
     get_canonical_forms
-    get_rid_of_unparsed
     
-    canonical_forms = @names.map { |key, value| value[:canonical_form] }
+    canonical_forms = @names.keys
     names = get_quoted_names(canonical_forms)
     data_sources = @data_sources.join(",")
     
@@ -131,21 +128,33 @@ private
     res.each do |row|
       record = {:gni_id => row[0], :name_uuid => UUID.parse(row[1].to_s(16)).to_s, :name => row[3], :data_source_id => row[4], :taxon_id => row[5], :global_id => row[6], :url => row[7], :classification_path => row[8], :classification_path_ids => row[9], :canonical_form => row[10] }
       found_name_parsed = @atomizer.organize_results(JSON.parse(row[11], :symbolize_names => true)[:scientificName])
+      require 'ruby-debug'; debugger
       record[:auth_score] = get_authorship_score(@names[record[:canonical_form]][:parsed], found_name_parsed)
       
       update_found_words(record[:canonical_form])
-      @names[record[:canonical_form]][:indices].each do |i|
-        datum = data[i]
-        canonical_match = NameString.normalize(record[:canonical_form]) == NameString.normalize(record[:name])
-        type = NAME_TYPES[record[:canonical_form].split(" ").size]
-        datum.has_key?(:results) ? datum[:results] << record : datum.merge!({ :results => [record], :match_type => EXACT_CANONICAL, :name_type => type, :match_by_canonical => canonical_match })
-        @names[record[:canonical_form]].has_key?(:results) ? @names[record[:canonical_form]][:results] << record : @names[record[:canonical_form]][:results] = [record]
-        update_context(record) if @with_context
+      @names[record[:canonical_form]].each do |val|
+        val[:indices].each do |i|
+          datum = data[i]
+          canonical_match = NameString.normalize(record[:canonical_form]) == NameString.normalize(record[:name])
+          type = NAME_TYPES[record[:canonical_form].split(" ").size]
+          record.merge!(:match_type => EXACT_CANONICAL, :name_type => type, :match_by_canonical => canonical_match) 
+          datum.has_key?(:results) ? datum[:results] << record : datum[:results] = [record]
+          val.has_key?(:results) ? val[:results] << record : val[:results] = [record]
+          update_context(record) if @with_context
+        end
       end
     end
-      #delete found words
+    delete_names_with_results
+  end
+
+  def delete_names_with_results
     @names.each do |key, value|
-      @names.delete(key) if value.has_key?(:results)
+      new_value = value.select {|r| !r.has_key?(:results)}
+      if new_value.empty?
+        @names.delete(key)
+      else
+        @names[key] = new_value
+      end
     end
   end
 
@@ -168,32 +177,39 @@ private
             record = {:gni_id => row[0], :name_uuid => UUID.parse(row[1].to_s(16)).to_s, :name => row[3], :data_source_id => row[4], :taxon_id => row[5], :global_id => row[6], :url => row[7], :classification_path => row[8], :classification_path_ids => row[9], :canonical_form => canonical_form }
             found_name_parsed = @atomizer.organize_results(JSON.parse(row[11], :symbolize_names => true)[:scientificName])
             record[:auth_score] = get_authorship_score(@names[name][:parsed], found_name_parsed)
-            @names[name][:indices].each do |i|
-              datum = data[i]
-              canonical_match = NameString.normalize(record[:canonical_form]) == NameString.normalize(record[:name])
-              type = NAME_TYPES[record[:canonical_form].split(" ").size]
-              datum.has_key?(:results) ? datum[:results] << record : datum.merge!({ :results => [record], :match_type => FUZZY_CANONICAL, :name_type => type, :match_by_canonical => canonical_match})
-              @names[name].has_key?(:results) ? @names[name][:results] << record : @names[name][:results] = [record]
-              update_context(record) if @with_context
+            @names[name].each do |val|
+              val[:indices].each do |i|
+                datum = data[i]
+                canonical_match = NameString.normalize(record[:canonical_form]) == NameString.normalize(record[:name])
+                type = NAME_TYPES[record[:canonical_form].split(" ").size]
+                record.merge!(:match_type => FUZZY_CANONICAL, :name_type => type, :match_by_canonical => canonical_match) 
+                datum.has_key?(:results) ? datum[:results] << record : datum[:results] = [record]
+                val.has_key?(:results) ? val[:results] << record : val[:results] = [record]
+                update_context(record) if @with_context
+              end
             end
           end
         end
       end
     end
-    @names.each do |key, value|
-      @names.delete(key) if value.has_key?(:results)
-    end
+    delete_names_with_results
   end
 
   def get_rid_of_unparsed
     #delete found words
-    @names.each do |key, value|
-      if !value[:canonical_form]
-        value[:indices].each do |index|
-          d = data[index].merge!({ :success => false, :message => "Cannot be parsed" })
-        end
+    @names.each do |key, values|
+      parsed, unparsed = values.partition {|value| value[:canonical_form]}
+      if parsed.empty?
         @names.delete(key)
+      else
+        @names[key] = parsed
       end
+      # 
+      # unparsed.each do |value|
+      #   value[:indices].each do |index|
+      #     data[index].merge!({ :match_type => UNPARSEABLE })
+      #   end
+      # end
     end
   end
   
@@ -206,9 +222,11 @@ private
         @names[key][:canonical_form] = nil
       end
     end
-
     #switch names to canonical forms from normalized names
-    new_names = @names.values.inject({}) { |res, v| res[v[:canonical_form]] = v; res }
+    new_names = {}
+    @names.values.each do |v|
+      new_names.has_key?(v[:canonical_form]) ? new_names[v[:canonical_form]] << v : new_names[v[:canonical_form]] = [v]
+    end
     @names = new_names
   end
 
@@ -289,13 +307,49 @@ private
     end
   end
 
-  def calculate_score
+  def calculate_scores
     data.each do |datum|
       next unless datum[:results]
       datum[:results].each do |result|
-        require 'ruby-debug'; debugger
-        puts ''
+        get_score(result)
       end
     end
+  end
+
+  def get_score(result)
+    name_type = result[:name_type]
+    auth_score = result[:auth_score] || 0
+    canonical_match = result[:match_by_canonical]
+    match_type = result[:match_type]
+    data_source_id = result[:data_source_id]
+    classification_path = result[:classification_path].split("|")
+    context = 0
+    unless classification_path.empty?
+      context = classification_path.include?(@contexts[data_source_id]) ? 1 : -1
+    end
+    prescore = 0
+    if name_type == "uninomial"
+      a = auth_score * 2
+      c = context * 2
+      s = 4
+      s = 1 if (canonical_match || match_type == EXACT_CANONICAL)
+      s = 0 if match_type == FUZZY_CANONICAL
+    elsif name_type == "binomial"
+      a = auth_score * 2
+      c = context * 4
+      s = 8
+      s = 3 if (canonical_match || match_type == EXACT_CANONICAL)
+      s = 1 if match_type == FUZZY_CANONICAL
+    elsif name_type == "trinomial"
+      a = auth_score * 2
+      c = context
+      s = 8
+      s = 7 if match_type == EXACT_CANONICAL
+      s = 1 if match_type == FUZZY_CANONICAL
+    end
+    prescore += (s + a + c)
+    result[:prescore] = "%s|%s|%s" % [s,a,c]
+    result[:score] = Gni.num_to_score(prescore)
+    result[:possible_cresonym] = auth_score < 0 && result[:score] > 0.9 ? true : false
   end
 end
