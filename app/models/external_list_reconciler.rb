@@ -102,7 +102,7 @@ private
         datum = data[i]
         canonical_match = NameString.normalize(record[:canonical_form]) == NameString.normalize(record[:name])
         type = NAME_TYPES[record[:canonical_form].split(" ").size]
-        datum.has_key?(:results) ? datum[:results] << record : datum.merge!({ :results => [record], :success => true, :match_type => EXACT_STRING, :name_type => type })
+        datum.has_key?(:results) ? datum[:results] << record : datum.merge!({ :results => [record], :match_type => EXACT_STRING, :name_type => type, :match_by_canonical => canonical_match })
         @names[name_normalized].has_key?(:results) ? @names[name_normalized][:results] << record : @names[name_normalized][:results] = [record]
         update_context(record) if @with_context
       end
@@ -136,7 +136,9 @@ private
       update_found_words(record[:canonical_form])
       @names[record[:canonical_form]][:indices].each do |i|
         datum = data[i]
-        datum.has_key?(:results) ? datum[:results] << record : datum.merge!({ :results => [record], :success => true, :message => "Exact canonical match" })
+        canonical_match = NameString.normalize(record[:canonical_form]) == NameString.normalize(record[:name])
+        type = NAME_TYPES[record[:canonical_form].split(" ").size]
+        datum.has_key?(:results) ? datum[:results] << record : datum.merge!({ :results => [record], :match_type => EXACT_CANONICAL, :name_type => type, :match_by_canonical => canonical_match })
         @names[record[:canonical_form]].has_key?(:results) ? @names[record[:canonical_form]][:results] << record : @names[record[:canonical_form]][:results] = [record]
         update_context(record) if @with_context
       end
@@ -168,7 +170,9 @@ private
             record[:auth_score] = get_authorship_score(@names[name][:parsed], found_name_parsed)
             @names[name][:indices].each do |i|
               datum = data[i]
-              datum.has_key?(:results) ? datum[:results] << record : datum.merge!({ :results => [record], :success => true, :message => "Exact canonical match" })
+              canonical_match = NameString.normalize(record[:canonical_form]) == NameString.normalize(record[:name])
+              type = NAME_TYPES[record[:canonical_form].split(" ").size]
+              datum.has_key?(:results) ? datum[:results] << record : datum.merge!({ :results => [record], :match_type => FUZZY_CANONICAL, :name_type => type, :match_by_canonical => canonical_match})
               @names[name].has_key?(:results) ? @names[name][:results] << record : @names[name][:results] = [record]
               update_context(record) if @with_context
             end
