@@ -4,6 +4,12 @@ class ExternalListReconciler < ActiveRecord::Base
 
   serialize :data, Array
   serialize :options, Hash
+
+  CONTEXT_THRESHOLD = 0.9
+  EXACT_STRING = 1
+  EXACT_CANONICAL = 2
+  FUZZY_CANONICAL = 3
+  NAME_TYPES = { 1 => "uninomial", 2 => "binomial", 3 => "trinomial" }
   
   def self.perform(reconciler_id)
     r = Reconciler.find(reconciler_id)
@@ -42,8 +48,8 @@ class ExternalListReconciler < ActiveRecord::Base
     find_canonical_exact
     find_lexical_groups_canonical
     find_canonical_fuzzy
-    # adjust_score_by_context if @with_context
-    # find_cotext_taxa if @with_context
+    get_contexts if @with_context
+    calculate_score
     require 'ruby-debug'; debugger
     puts ''
   end
@@ -67,12 +73,15 @@ private
     @found_words = {}
     if @with_context
       @tree_counter = {}
+      @contexts = {}
       if @data_sources.blank?
         raise "You have to define reference data source" unless Gni::Config.reference_data_source_id
         @tree_counter[Gni::Config.reference_data_source_id] = {}
+        @contexts[Gni::Config.reference_data_source_id] = nil
       else
         @data_sources.each do |i|
           @tree_counter[i] = {}
+          @contexts[i] = nil
         end
       end
     end
@@ -91,7 +100,9 @@ private
       name_normalized = row[2]
       @names[name_normalized][:indices].each do |i|
         datum = data[i]
-        datum.has_key?(:results) ? datum[:results] << record : datum.merge!({ :results => [record], :success => true, :message => "Exact string match" })
+        canonical_match = NameString.normalize(record[:canonical_form]) == NameString.normalize(record[:name])
+        type = NAME_TYPES[record[:canonical_form].split(" ").size]
+        datum.has_key?(:results) ? datum[:results] << record : datum.merge!({ :results => [record], :success => true, :match_type => EXACT_STRING, :name_type => type })
         @names[name_normalized].has_key?(:results) ? @names[name_normalized][:results] << record : @names[name_normalized][:results] = [record]
         update_context(record) if @with_context
       end
@@ -260,4 +271,27 @@ private
     @matched_words[words_concatenate] = index == 0 ? @taxamatch.match_genera({normalized:word1}, {normalized:word2}, :with_phonetic_match => false) : @taxamatch.match_species({normalized:word1}, {normalized:word2}, :with_phonetic_match => false)
   end
 
+  def get_contexts
+    @contexts.keys.each do |ds_id|
+      tree = @tree_counter[ds_id]
+      context = nil
+      tree.each do |k,v|
+        sum = v.inject(0) { |s, d| s += d[1]; s }
+        max = v.sort { |d| d[1] }.last
+        break if (max[1].to_f/sum.to_f) < CONTEXT_THRESHOLD
+        context = max[0]
+      end
+      @contexts[ds_id] = context
+    end
+  end
+
+  def calculate_score
+    data.each do |datum|
+      next unless datum[:results]
+      datum[:results].each do |result|
+        require 'ruby-debug'; debugger
+        puts ''
+      end
+    end
+  end
 end
