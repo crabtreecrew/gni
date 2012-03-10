@@ -128,19 +128,18 @@ private
     res.each do |row|
       record = {:gni_id => row[0], :name_uuid => UUID.parse(row[1].to_s(16)).to_s, :name => row[3], :data_source_id => row[4], :taxon_id => row[5], :global_id => row[6], :url => row[7], :classification_path => row[8], :classification_path_ids => row[9], :canonical_form => row[10] }
       found_name_parsed = @atomizer.organize_results(JSON.parse(row[11], :symbolize_names => true)[:scientificName])
-      require 'ruby-debug'; debugger
-      record[:auth_score] = get_authorship_score(@names[record[:canonical_form]][:parsed], found_name_parsed)
-      
       update_found_words(record[:canonical_form])
       @names[record[:canonical_form]].each do |val|
+        auth_score = get_authorship_score(val[:parsed], found_name_parsed)
+      
         val[:indices].each do |i|
           datum = data[i]
           canonical_match = NameString.normalize(record[:canonical_form]) == NameString.normalize(record[:name])
           type = NAME_TYPES[record[:canonical_form].split(" ").size]
-          record.merge!(:match_type => EXACT_CANONICAL, :name_type => type, :match_by_canonical => canonical_match) 
-          datum.has_key?(:results) ? datum[:results] << record : datum[:results] = [record]
-          val.has_key?(:results) ? val[:results] << record : val[:results] = [record]
-          update_context(record) if @with_context
+          res = record.merge(:match_type => EXACT_CANONICAL, :name_type => type, :match_by_canonical => canonical_match, :auth_score => auth_score) 
+          datum.has_key?(:results) ? datum[:results] << res : datum[:results] = [res]
+          val.has_key?(:results) ? val[:results] << res : val[:results] = [res]
+          update_context(res) if @with_context
         end
       end
     end
@@ -176,16 +175,16 @@ private
           if is_match
             record = {:gni_id => row[0], :name_uuid => UUID.parse(row[1].to_s(16)).to_s, :name => row[3], :data_source_id => row[4], :taxon_id => row[5], :global_id => row[6], :url => row[7], :classification_path => row[8], :classification_path_ids => row[9], :canonical_form => canonical_form }
             found_name_parsed = @atomizer.organize_results(JSON.parse(row[11], :symbolize_names => true)[:scientificName])
-            record[:auth_score] = get_authorship_score(@names[name][:parsed], found_name_parsed)
             @names[name].each do |val|
+              auth_score = get_authorship_score(val[:parsed], found_name_parsed)
               val[:indices].each do |i|
                 datum = data[i]
                 canonical_match = NameString.normalize(record[:canonical_form]) == NameString.normalize(record[:name])
                 type = NAME_TYPES[record[:canonical_form].split(" ").size]
-                record.merge!(:match_type => FUZZY_CANONICAL, :name_type => type, :match_by_canonical => canonical_match) 
-                datum.has_key?(:results) ? datum[:results] << record : datum[:results] = [record]
-                val.has_key?(:results) ? val[:results] << record : val[:results] = [record]
-                update_context(record) if @with_context
+                res = record.merge(:match_type => FUZZY_CANONICAL, :name_type => type, :match_by_canonical => canonical_match, :auth_score => auth_score) 
+                datum.has_key?(:results) ? datum[:results] << res : datum[:results] = [res]
+                val.has_key?(:results) ? val[:results] << res : val[:results] = [res]
+                update_context(res) if @with_context
               end
             end
           end
