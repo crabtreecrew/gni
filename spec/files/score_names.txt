@@ -5,3 +5,17 @@
 5	Cecinulus
 6	Sitornis
 7	Sitornes Lesson
+8	Colibri delphinae
+9	Aceros undulatus (Shaw, 1811)
+10	Colibri delphinae (Linnaeus) Shaw
+11	Aceros undulatus Shaw
+12	Colibri delfinae
+13	Aciris unulatis
+14	Aciros undulatis Shaw 1811
+15	Larus argentatus smithsonianus
+16	Ailuroedus crassirostris facialis Mayr, 1936
+17	Ailuroedus crassirostris facialis
+18	Ailuroedus crassirostris facialis Mayr
+19	Laris argentatis smithsonianis
+20	Laris argentatis smithsonianis Mayr
+21	Ailuroedis crassirostris facialis Mayr

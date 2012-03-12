@@ -338,13 +338,13 @@ private
       c = context * 4
       s = 8
       s = 3 if (canonical_match || match_type == EXACT_CANONICAL)
-      s = 1 if match_type == FUZZY_CANONICAL
+      s = 2 if match_type == FUZZY_CANONICAL
     elsif name_type == "trinomial"
       a = auth_score * 2
       c = context
       s = 8
       s = 7 if match_type == EXACT_CANONICAL
-      s = 1 if match_type == FUZZY_CANONICAL
+      s = 3 if match_type == FUZZY_CANONICAL
     end
     prescore += (s + a + c)
     result[:prescore] = "%s|%s|%s" % [s,a,c]

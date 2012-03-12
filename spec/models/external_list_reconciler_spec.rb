@@ -52,6 +52,7 @@ describe ExternalListReconciler do
     elr.reconcile 
     elr.data.select{|d| d.has_key?(:results)}.size.should > 0
     d = elr.data
+    #UNINOMIALS
     #uninomial exact string match of 2 canonicals
     d[0][:results][0][:prescore].should == "1|0|2"
     d[0][:results][0][:score].should == 0.9882161311296586
@@ -74,6 +75,51 @@ describe ExternalListReconciler do
     d[6][:results][0][:prescore].should == "0|2|2"
     d[6][:results][0][:score].should == 0.9950268127210495
     
+    #BINOMIALS
+    #binomial exact string match of 2 canonicals
+    d[7][:results][0][:prescore].should == "3|0|4"
+    d[7][:results][0][:score].should == 0.9990719854684394
+    #binomial exact string match with authorships
+    d[8][:results][0][:prescore].should == "8|0|4"
+    d[8][:results][0][:score].should == 0.9998157929105035
+    #binomial exact canonical match without authorship
+    d[9][:results][0][:prescore].should == "3|0|4"
+    d[9][:results][0][:score].should == 0.9990719854684394
+    #binomial exact canonical match with authorship
+    d[10][:results][0][:prescore].should == "3|2|4"
+    d[10][:results][0][:score].should == 0.9995633611981729
+    #binomial fuzzy canonical match both canonicals
+    d[11][:results][0][:prescore].should == "2|0|4"
+    d[11][:results][0][:score].should == 0.9985263536479112
+    #binomial fuzzy canonical match one with authorship
+    d[12][:results][0][:prescore].should == "2|0|4"
+    d[12][:results][0][:score].should == 0.9985263536479112
+    #binomial fuzzy canonical match with authorhsips
+    d[13][:results][0][:prescore].should == "2|2|4"
+    d[13][:results][0][:score].should == 0.9993783017940766
+
+    #TRINOMIALS
+    #trinomial exact string match of 2 canonicals
+    d[14][:results][0][:prescore].should == "8|0|1"
+    d[14][:results][0][:score].should == 0.9995633611981729
+    #trinomial exact string match with authorships
+    d[15][:results][0][:prescore].should == "8|0|1"
+    d[15][:results][0][:score].should == 0.9995633611981729
+    #trinomial exact canonical match without authorship
+    d[16][:results][0][:prescore].should == "7|0|1"
+    d[16][:results][0][:score].should == 0.9993783017940766
+    #trinomial exact canonical match with authorship
+    d[17][:results][0][:prescore].should == "7|2|1"
+    d[17][:results][0][:score].should == 0.9996816902199195
+    #trinomial fuzzy canonical match both canonicals
+    d[18][:results][0][:prescore].should == "3|0|1"
+    d[18][:results][0][:score].should == 0.9950268127210495
+    #trinomial fuzzy canonical match one with authorship
+    d[19][:results][0][:prescore].should == "3|0|1"
+    d[19][:results][0][:score].should == 0.9950268127210495
+    #trinomial fuzzy canonical match with authorhsips
+    d[20][:results][0][:prescore].should == "3|2|1"
+    d[20][:results][0][:score].should == 0.9985263536479112
 
 
   end
