@@ -1,0 +1,2 @@
+class NameResolversController < ApplicationController
+end
