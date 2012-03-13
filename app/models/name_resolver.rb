@@ -1,5 +1,6 @@
 require 'iconv'
 class NameResolver < ActiveRecord::Base
+  attr :contexts
   belongs_to :progress_status
 
   serialize :data, Array
@@ -293,7 +294,6 @@ private
   def match_names(name1, name2)
     words = name1.split(" ").zip(name2.split(" "))
     count = nil
-    require 'ruby-debug'; debugger
     words.each_with_index do |w, i|
       return nil unless w[0] && w[1] #should never happen
       count = i
