@@ -11,6 +11,16 @@ describe "name_resolver" do
     res = JSON.parse(body, :symbolize_names => true)
     res[:data].first[:results].first[:taxon_id].should == "6868221"
   end
+  
+  it "should parse options correctly" do
+    get("/name_resolvers.json", 
+        :names => "Leiothrix argentauris (Hodgson, 1838)|Treron|Larus occidentalis wymani|Plantago major L.",
+        :data_source_ids => "1|2",
+        :with_context => false)
+    body = last_response.body
+    res = JSON.parse(body, :symbolize_names => true)
+    res[:options][:with_context].should == false
+  end
 
   it "should be able to use POST for resolving names" do
     post("/name_resolvers.json", 

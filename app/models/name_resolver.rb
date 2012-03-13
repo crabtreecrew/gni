@@ -342,7 +342,7 @@ private
     data_source_id = result[:data_source_id]
     classification_path = result[:classification_path].split("|")
     context = 0
-    unless classification_path.empty?
+    if @with_context && !classification_path.empty?
       context = classification_path.include?(@contexts[data_source_id]) ? 1 : -1
     end
     prescore = 0
