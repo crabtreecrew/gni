@@ -188,6 +188,7 @@ private
         fuzzy_data = {}
         res.each do |row|
           canonical_form = row[10]
+          next if name.split(" ").size != canonical_form.split(" ").size
           is_match = match_names(name, canonical_form) 
           if is_match
             record = {:gni_id => row[0], :name_uuid => UUID.parse(row[1].to_s(16)).to_s, :name => row[3], :data_source_id => row[4], :taxon_id => row[5], :global_id => row[6], :url => row[7], :classification_path => row[8], :classification_path_ids => row[9], :canonical_form => canonical_form }
@@ -292,8 +293,9 @@ private
   def match_names(name1, name2)
     words = name1.split(" ").zip(name2.split(" "))
     count = nil
+    require 'ruby-debug'; debugger
     words.each_with_index do |w, i|
-      return nil unless w[0] && w[1]
+      return nil unless w[0] && w[1] #should never happen
       count = i
       match = match_words(w[0], w[1], i)
       return nil unless match
@@ -306,7 +308,7 @@ private
     return true if word1 == word2
     words_concatenate = [index.to_s, word1, word2].sort.join("_") 
     return @matched_words[words_concatenate] if @matched_words.has_key?(words_concatenate)
-    @matched_words[words_concatenate] = index == 0 ? @taxamatch.match_genera({normalized:word1}, {normalized:word2}, :with_phonetic_match => false) : @taxamatch.match_species({normalized:word1}, {normalized:word2}, :with_phonetic_match => false)
+    @matched_words[words_concatenate] = index == 0 ? @taxamatch.match_genera({normalized:word1}, {normalized:word2}, :with_phonetic_match => false)["match"] : @taxamatch.match_species({normalized:word1}, {normalized:word2}, :with_phonetic_match => false)["match"]
   end
 
   def get_contexts
