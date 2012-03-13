@@ -5,6 +5,8 @@ Gni::Application.routes.draw do
 
   resources :name_strings, :only => [:index, :show]
 
+  resources :name_resolvers
+
   # The priority is based upon order of creation:
   # first created -> highest priority.
 

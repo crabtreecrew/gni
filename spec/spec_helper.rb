@@ -30,3 +30,12 @@ RSpec.configure do |config|
   # rspec-rails.
   config.infer_base_class_for_anonymous_controllers = false
 end
+
+module ApiHelper
+  require 'rack/test'
+  include Rack::Test::Methods
+
+  def app
+    Rails.application
+  end
+end

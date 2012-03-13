@@ -38,7 +38,7 @@ describe NameResolver do
     elr.should == instance
     elr.data.class.should == Array
     elr.data[0].should == { :id => nil, :name_string => "Andrena anthrisci Blüthgen, 1925" }
-    elr.options.should == { :with_context => false, :with_parsed => false, :data_sources => [] }
+    elr.options.should == { :with_context => false, :data_sources => [] }
   end
 
   it "should be able to reconcile names against one data_source" do

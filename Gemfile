@@ -35,6 +35,7 @@ group :test do
   gem "rspec-rails"
   gem "factory_girl_rails"
   gem "cucumber-rails"
+  gem "rack-test", :require => "rack/test"
   gem "capybara"
   gem "mocha"
 end

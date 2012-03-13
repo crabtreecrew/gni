@@ -5,6 +5,8 @@ class NameResolver < ActiveRecord::Base
   serialize :data, Array
   serialize :options, Hash
 
+  before_create :add_default_options
+
   CONTEXT_THRESHOLD = 0.9
   EXACT_STRING = 1
   EXACT_CANONICAL = 2
@@ -16,14 +18,42 @@ class NameResolver < ActiveRecord::Base
     r.reconcile
   end
 
-  def options
-    {:with_context => true, :with_parsed => false, :data_sources => []}.merge(super)
-  end
-
   # read data for cases where it is supplied in a file.
   def self.read_file(file_path)
+    process_data(open(file_path))
+  end
+
+  def self.read_data(data)
+    process_data(data)
+  end
+
+  def self.read_names(names, ids=[])
+    data = []
+    names.each_with_index do |name, index|
+      if ids.empty?
+        data << "%s" % name
+      else
+        data << "%s|%s" % [ids[index], name]
+      end
+    end
+    read_data(data)
+  end
+
+  def reconcile
+    prepare_variables
+    find_exact
+    find_lexical_groups
+    find_canonical_exact
+    find_lexical_groups_canonical
+    find_canonical_fuzzy
+    get_contexts if @with_context
+    calculate_scores
+  end
+
+private
+  def self.process_data(new_data)
     conv = Iconv.new('UTF-8', 'ISO-8859-1')
-    open(file_path).inject([]) do |res, line|
+    new_data.inject([]) do |res, line|
       #for now we assume that non-utf8 charachters are in latin1, might need to add others
       line = conv.conv(line) unless line.valid_encoding?
       line = line.strip.gsub("\t", "|")
@@ -40,19 +70,6 @@ class NameResolver < ActiveRecord::Base
       res
     end
   end
-
-  def reconcile
-    prepare_variables
-    find_exact
-    find_lexical_groups
-    find_canonical_exact
-    find_lexical_groups_canonical
-    find_canonical_fuzzy
-    get_contexts if @with_context
-    calculate_scores
-  end
-
-private
 
   def prepare_variables
     @atomizer = Taxamatch::Atomizer.new
@@ -351,4 +368,9 @@ private
     result[:score] = Gni.num_to_score(prescore)
     result[:possible_cresonym] = auth_score < 0 && result[:score] > 0.9 ? true : false
   end
+  
+  def add_default_options
+    self.options = {:with_context => true, :data_sources => []}.merge(self.options)
+  end
+
 end
