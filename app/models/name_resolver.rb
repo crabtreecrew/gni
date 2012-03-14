@@ -1,5 +1,6 @@
 require 'iconv'
 class NameResolver < ActiveRecord::Base
+  @queue = :name_resolver
   attr :contexts
   belongs_to :progress_status
 
@@ -43,9 +44,7 @@ class NameResolver < ActiveRecord::Base
   def reconcile
     prepare_variables
     find_exact
-    find_lexical_groups
     find_canonical_exact
-    find_lexical_groups_canonical
     find_canonical_fuzzy
     get_contexts if @with_context
     calculate_scores
@@ -130,9 +129,6 @@ private
     end
   end
 
-  def find_lexical_groups
-  end
-
   def find_canonical_exact
     get_canonical_forms
     
@@ -173,9 +169,6 @@ private
         @names[key] = new_value
       end
     end
-  end
-
-  def find_lexical_groups_canonical
   end
 
   def find_canonical_fuzzy
