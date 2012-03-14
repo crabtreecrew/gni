@@ -6,6 +6,15 @@ class NameResolversController < ApplicationController
     end
   end
 
+  def show
+    resolver = NameResolver.find(params[:id])
+    respond_to do |format|
+      format.html {} 
+      format.json { render :json => resolver.to_json }
+      format.xml { render :xml => resolver.to_xml }
+    end
+  end
+
   def create
     new_data = get_data
     opts = get_opts
@@ -14,7 +23,7 @@ class NameResolversController < ApplicationController
     if new_data.size < 500
       resolver.reconcile
     else
-      resolver.progress_status = ProgressStatus.inque
+      resolver.progress_status = ProgressStatus.started
       resolver.progress_message = "Request put into a que for resolution"
       Resque.enqueue(NameResolver, resolver.id)
     end

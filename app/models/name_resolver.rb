@@ -15,8 +15,8 @@ class NameResolver < ActiveRecord::Base
   FUZZY_CANONICAL = 3
   NAME_TYPES = { 1 => "uninomial", 2 => "binomial", 3 => "trinomial" }
   
-  def self.perform(reconciler_id)
-    r = Reconciler.find(reconciler_id)
+  def self.perform(name_resolver_id)
+    r = NameResolver.find(name_resolver_id)
     r.reconcile
   end
 
@@ -66,7 +66,7 @@ private
         id = fields[0].strip
         name = fields[1].strip
       end
-      res << { :id => id, :name_string => name }    
+      res << { :id => id, :name_string => name }
       res
     end
   end
