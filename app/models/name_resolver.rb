@@ -56,6 +56,9 @@ private
     new_data.inject([]) do |res, line|
       #for now we assume that non-utf8 charachters are in latin1, might need to add others
       line = conv.conv(line) unless line.valid_encoding?
+      #skip the line if encoding is still wrong
+      puts line.encoding
+      require 'ruby-debug'; debugger unless line.valid_encoding?
       line = line.strip.gsub("\t", "|")
       fields = line.split("|")
       name = id = nil
@@ -344,19 +347,31 @@ private
       c = context * 2
       s = 4
       s = 1 if (canonical_match || match_type == EXACT_CANONICAL)
-      s = 0 if match_type == FUZZY_CANONICAL
+      if match_type == FUZZY_CANONICAL
+        s = 0
+        a = auth_score
+        c = context
+      end
     elsif name_type == "binomial"
       a = auth_score * 2
       c = context * 4
       s = 8
       s = 3 if (canonical_match || match_type == EXACT_CANONICAL)
-      s = 2 if match_type == FUZZY_CANONICAL
+      if match_type == FUZZY_CANONICAL
+        s = 0.5
+        a = auth_score
+        c = context
+      end
     elsif name_type == "trinomial"
       a = auth_score * 2
       c = context
       s = 8
       s = 7 if match_type == EXACT_CANONICAL
-      s = 3 if match_type == FUZZY_CANONICAL
+      if match_type == FUZZY_CANONICAL
+        s = 0.5
+        a = auth_score
+        c = context
+      end
     end
     prescore += (s + a + c)
     result[:prescore] = "%s|%s|%s" % [s,a,c]
