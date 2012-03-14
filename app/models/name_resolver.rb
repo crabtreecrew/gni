@@ -48,6 +48,7 @@ class NameResolver < ActiveRecord::Base
     find_canonical_fuzzy
     get_contexts if @with_context
     calculate_scores
+    save!
   end
 
 private
