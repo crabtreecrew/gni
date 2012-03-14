@@ -57,8 +57,7 @@ private
       #for now we assume that non-utf8 charachters are in latin1, might need to add others
       line = conv.conv(line) unless line.valid_encoding?
       #skip the line if encoding is still wrong
-      puts line.encoding
-      require 'ruby-debug'; debugger unless line.valid_encoding?
+      next unless line.valid_encoding?
       line = line.strip.gsub("\t", "|")
       fields = line.split("|")
       name = id = nil
