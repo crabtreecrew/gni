@@ -29,9 +29,9 @@ describe DataSourcesController do
 
   describe "GET index" do
     it "assigns all data_sources as @data_sources" do
-      data_source = DataSource.create! valid_attributes
+      data_sources = DataSource.all
       get :index
-      assigns(:data_sources).should eq([data_source])
+      assigns(:data_sources).should eq(data_sources)
     end
   end
 
