@@ -23,7 +23,7 @@ class NameResolversController < ApplicationController
     message = "Submitted"
     result = {
       :id => token, 
-      :url => "%s/name_resolver/%s" % [Gni::Config.base_url, token],
+      :url => "%s/name_resolvers/%s" % [Gni::Config.base_url, token],
       :status => status,
       :message => message,
       :parameters => opts}
