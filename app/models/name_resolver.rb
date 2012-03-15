@@ -134,6 +134,7 @@ private
   end
 
   def find_canonical_exact
+    return if @names.empty?
     get_canonical_forms
     
     canonical_forms = @names.keys
