@@ -8,6 +8,7 @@ module Gni
 
     def find(name)
       res = @solr_client.search("*:*&rows=0&spellcheck=true&spellcheck.accuracy=0.75&spellcheck.q=\"#{name}\"&spellcheck.rows=1000")
+      res = @solr_client.search("*:*&rows=0&spellcheck=true&spellcheck.accuracy=0.8&spellcheck.q=#{name}&spellcheck.rows=1000")
       
       if res[:spellcheck][:suggestions].blank?
         []
