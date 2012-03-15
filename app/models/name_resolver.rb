@@ -6,6 +6,7 @@ class NameResolver < ActiveRecord::Base
 
   serialize :data, Array
   serialize :options, Hash
+  serialize :response, Hash
 
   before_create :add_default_options
 

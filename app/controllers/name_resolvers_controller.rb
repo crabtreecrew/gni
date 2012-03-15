@@ -7,7 +7,7 @@ class NameResolversController < ApplicationController
   end
 
   def show
-    resolver = NameResolver.find(params[:id])
+    resolver = NameResolver.find_by_token(params[:id])
     respond_to do |format|
       format.html {} 
       format.json { render :json => resolver.to_json }
@@ -18,13 +18,14 @@ class NameResolversController < ApplicationController
   def create
     new_data = get_data
     opts = get_opts
-    resolver = NameResolver.create!(:data => new_data, :options => opts, :progress_status => ProgressStatus.initial, :progress_message => "Prepared name resolution request")
+    token = Base64.urlsafe_encode64(UUID.create_v4.raw_bytes)[0..-3]
+    resolver = NameResolver.create!(:data => new_data, :options => opts, :progress_status => ProgressStatus.working, :progress_message => "Request submitted", :token => token)
     
     if new_data.size < 500
       resolver.reconcile
     else
-      resolver.progress_status = ProgressStatus.started
-      resolver.progress_message = "Request put into a que for resolution"
+      resolver.progress_message = "In a que"
+      resolver.save!
       Resque.enqueue(NameResolver, resolver.id)
     end
 
