@@ -19,7 +19,15 @@ class NameResolversController < ApplicationController
     new_data = get_data
     opts = get_opts
     token = Base64.urlsafe_encode64(UUID.create_v4.raw_bytes)[0..-3]
-    resolver = NameResolver.create!(:data => new_data, :options => opts, :progress_status => ProgressStatus.working, :progress_message => "Request submitted", :token => token)
+    status = ProgressStatus.working
+    message = "Submitted"
+    result = {
+      :id => token, 
+      :url => "%s/name_resolver/%s" % [Gni::Config.domain, token],
+      :status => status,
+      :message => message,
+      :parameters => opts}
+    resolver = NameResolver.create!(:data => new_data, :result => result, :options => opts, :progress_status => status, :progress_message => message, :token => token)
     
     if new_data.size < 500
       resolver.reconcile
