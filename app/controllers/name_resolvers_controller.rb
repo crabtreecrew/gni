@@ -9,9 +9,10 @@ class NameResolversController < ApplicationController
   def show
     resolver = NameResolver.find_by_token(params[:id])
     respond_to do |format|
+      resolver.results[:url] = resolver.result[:url] + ".%s" % format if ['xml', 'json'].include?(format)
       format.html {} 
-      format.json { render :json => resolver.to_json }
-      format.xml { render :xml => resolver.to_xml }
+      format.json { render :json => json_callback(resolver.result.to_json, params[:callback]) }
+      format.xml  { render :xml => resolver.result.to_xml }
     end
   end
 
@@ -24,10 +25,16 @@ class NameResolversController < ApplicationController
     result = {
       :id => token, 
       :url => "%s/name_resolvers/%s" % [Gni::Config.base_url, token],
-      :status => status,
+      :status => status.id,
       :message => message,
       :parameters => opts}
-    resolver = NameResolver.create!(:data => new_data, :result => result, :options => opts, :progress_status => status, :progress_message => message, :token => token)
+    resolver = NameResolver.create!(
+      :data => new_data, 
+      :result => result, 
+      :options => opts, 
+      :progress_status => status, 
+      :progress_message => message, 
+      :token => token)
     
     if new_data.size < 500
       resolver.reconcile
@@ -38,9 +45,10 @@ class NameResolversController < ApplicationController
     end
 
     respond_to do |format|
+      resolver.results[:url] = resolver.result[:url] + ".%s" % format if ['xml', 'json'].include?(format)
       format.html { redirect_to name_resolver_path(resolver) }
-      format.json { render :json => json_callback(resolver.to_json, params[:callback]) }
-      format.xml  { render :xml => resolver.to_xml }
+      format.json { render :json => json_callback(resolver.result.to_json, params[:callback]) }
+      format.xml  { render :xml => resolver.result.to_xml }
     end
 
   end
@@ -65,6 +73,6 @@ class NameResolversController < ApplicationController
     opts = {}
     opts[:with_context] = !!params[:with_context] == "true" if params.has_key?(:with_context)
     opts[:data_sources] = params[:data_source_ids].split("|").map { |i| i.to_i } if params[:data_source_ids]
-    opts
+    {:with_context => true, :data_sources => []}.merge(opts)
   end
 end

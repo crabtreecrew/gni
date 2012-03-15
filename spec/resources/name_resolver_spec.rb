@@ -8,8 +8,17 @@ describe "name_resolver" do
         :names => "Leiothrix argentauris (Hodgson, 1838)|Treron|Larus occidentalis wymani|Plantago major L.",
         :data_source_ids => "1|2")
     body = last_response.body
+    require 'ruby-debug'; debugger
     res = JSON.parse(body, :symbolize_names => true)
     res[:data].first[:results].first[:taxon_id].should == "6868221"
+  end
+  
+  it "github #6: should be able to use GET for only uninomials" do
+    get("/name_resolvers.json", 
+        :names => "Rhizoclonium",
+        :data_source_ids => "1|2")
+    body = last_response.body
+    res = JSON.parse(body, :symbolize_names => true)
   end
   
   it "should parse options correctly" do
