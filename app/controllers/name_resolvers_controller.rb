@@ -50,7 +50,7 @@ class NameResolversController < ApplicationController
       res[:url] += ".%s" % params[:format] if ['xml', 'json'].include?(params[:format])
       format.html { redirect_to name_resolver_path(resolver) }
       format.json { render :json => json_callback(res.to_json, params[:callback]) }
-      format.xml  { render :xml => res.result.to_xml }
+      format.xml  { render :xml => res.to_xml }
     end
 
   end

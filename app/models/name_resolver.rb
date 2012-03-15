@@ -403,7 +403,7 @@ private
           match[:name_string] = dr[:name]
           match[:canonical_form] = dr[:canonical_form]
           match[:classification_path] = dr[:classification_path]
-          match[:classification_path_ids] = dr[:classificatioin_path_ids]
+          match[:classification_path_ids] = dr[:classification_path_ids]
           match[:taxon_id] = dr[:taxon_id]
           #placeholders for the future
           #match[:guid] = dr[:guid]
