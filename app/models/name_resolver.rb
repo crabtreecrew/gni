@@ -387,6 +387,44 @@ private
   end
 
   def format_result
+    r = result
+    if @with_context
+      r[:context] = @contexts
+    end
+    r[:data] = []
+    data.each do |d|
+      res = { :id => d[:id], :name_string => d[:name_string] } 
+      if d[:results]
+        res[:results] = []
+        d[:results].each do |dr|
+          match = {}
+          match[:data_source_id] = dr[:data_source_id]
+          match[:gni_uuid] = dr[:name_uuid]
+          match[:name_string] = dr[:name]
+          match[:canonical_form] = dr[:canonical_form]
+          match[:classification_path] = dr[:classification_path]
+          match[:classification_path_ids] = dr[:classificatioin_path_ids]
+          match[:taxon_id] = dr[:taxon_id]
+          #placeholders for the future
+          #match[:guid] = dr[:guid]
+          #match[:urls] = [] 
+          if dr[:classification_path_ids]
+            last_classification_id = dr[:classification_path_ids].split("|").last
+            if last_classification_id && last_classification_id != dr[:taxon_id]
+              ns = NameString.select(:name).joins('join name_string_indices on name_strings.id = name_string_indices.name_string_id').where('name_string_indices.data_source_id' => 1, 'name_string_indices.taxon_id' => 100).limit(1).first
+              match[:current_taxon_id] = last_classification_id
+              match[:current_name_string] = ns.name if ns
+            end
+          end
+          match[:match_type] = dr[:match_type]
+          match[:prescore] = dr[:prescore]
+          match[:score] = dr[:score]
+          res[:results] << match
+        end
+      end
+      r[:data] << res
+    end
+    save!
   end
 
 end
