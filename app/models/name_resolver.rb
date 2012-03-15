@@ -49,6 +49,7 @@ class NameResolver < ActiveRecord::Base
     find_canonical_fuzzy
     get_contexts if @with_context
     calculate_scores
+    format_result
     save!
   end
 
@@ -383,6 +384,9 @@ private
   
   def add_default_options
     self.options = {:with_context => true, :data_sources => []}.merge(self.options)
+  end
+
+  def format_result
   end
 
 end
