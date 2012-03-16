@@ -1,7 +1,7 @@
 require 'spec_helper'
 include ApiHelper
 
-describe "name_resolver" do
+describe "name_resolvers API" do
 
   it "should be able to use GET for resolving names" do
     get("/name_resolvers.json", 

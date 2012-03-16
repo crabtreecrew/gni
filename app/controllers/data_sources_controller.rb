@@ -2,11 +2,17 @@ class DataSourcesController < ApplicationController
   # GET /data_sources
   # GET /data_sources.json
   def index
-    @data_sources = DataSource.all
+    if params[:search_term]
+      search_term = "%%%s%%" % params[:search_term]
+      @data_sources = DataSource.where("title like ?", search_term)
+    else
+      @data_sources = DataSource.all
+    end
 
     respond_to do |format|
       format.html # index.html.erb
-      format.json { render json: @data_sources }
+      format.json { render :json => json_callback(@data_sources.to_json, params[:callback]) }
+      format.xml { render :xml => @data_sources }
     end
   end
 
@@ -17,7 +23,8 @@ class DataSourcesController < ApplicationController
 
     respond_to do |format|
       format.html # show.html.erb
-      format.json { render json: @data_source }
+      format.json { render :json => json_callback(@data_source.to_json, params[:callback]) }
+      format.xml { render :xml => @data_source }
     end
   end
 
@@ -80,4 +87,5 @@ class DataSourcesController < ApplicationController
       format.json { head :ok }
     end
   end
+
 end
