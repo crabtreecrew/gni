@@ -8,7 +8,6 @@ describe "name_resolvers API" do
         :names => "Leiothrix argentauris (Hodgson, 1838)|Treron|Larus occidentalis wymani|Plantago major L.",
         :data_source_ids => "1|2")
     body = last_response.body
-    require 'ruby-debug'; debugger
     res = JSON.parse(body, :symbolize_names => true)
     res[:data].first[:results].first[:taxon_id].should == "6868221"
   end
@@ -19,6 +18,7 @@ describe "name_resolvers API" do
         :data_source_ids => "1|2")
     body = last_response.body
     res = JSON.parse(body, :symbolize_names => true)
+    res.size.should > 0
   end
   
   it "should parse options correctly" do
@@ -28,7 +28,7 @@ describe "name_resolvers API" do
         :with_context => false)
     body = last_response.body
     res = JSON.parse(body, :symbolize_names => true)
-    res[:options][:with_context].should == false
+    res[:parameters][:with_context].should == false
   end
 
   it "should be able to use POST for resolving names" do

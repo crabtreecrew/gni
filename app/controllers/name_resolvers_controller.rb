@@ -2,7 +2,7 @@ class NameResolversController < ApplicationController
 
   def index
     if params[:names]
-      create
+      create(true)
     end
   end
 
@@ -17,7 +17,7 @@ class NameResolversController < ApplicationController
     end
   end
 
-  def create
+  def create(from_get = false)
     new_data = get_data
     opts = get_opts
     token = Base64.urlsafe_encode64(UUID.create_v4.raw_bytes)[0..-3]
@@ -37,7 +37,7 @@ class NameResolversController < ApplicationController
       :progress_message => message, 
       :token => token)
     
-    if new_data.size < 500
+    if new_data.size < 500 || from_get
       resolver.reconcile
     else
       resolver.progress_message = "In a que"
