@@ -411,7 +411,7 @@ private
           if dr[:classification_path_ids]
             last_classification_id = dr[:classification_path_ids].split("|").last
             if last_classification_id && last_classification_id != dr[:taxon_id]
-              ns = NameString.connection.select_value("select name from name_strings ns join name_string_indices nsi on nsi.name_string_id = ns.id where nsi.taxon_id = %s and data_source_id = %s limit 1" % [NameString.connection.quote(dr[:taxon_id]), NameString.connection.quote(dr[:data_source_id])])
+              ns = NameString.connection.select_value("select name from name_strings ns join name_string_indices nsi on nsi.name_string_id = ns.id where nsi.taxon_id = %s and data_source_id = %s limit 1" % [NameString.connection.quote(last_classification_id), NameString.connection.quote(dr[:data_source_id])])
               match[:current_taxon_id] = last_classification_id
               match[:current_name_string] = ns if ns
             end
