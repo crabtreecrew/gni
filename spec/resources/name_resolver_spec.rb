@@ -48,4 +48,14 @@ describe "name_resolvers API" do
     res = JSON.parse(body, :symbolize_names => true)
     res[:data][1][:results].first[:taxon_id].should == "2433879"
   end
+
+  it "should produce an error if there is no data source information" do
+    get("/name_resolvers.json", 
+        :names => "Leiothrix argentauris (Hodgson, 1838)|Treron|Larus occidentalis wymani|Plantago major L.",
+        :with_context => false)
+    body = last_response.body
+    res = JSON.parse(body, :symbolize_names => true)
+    res[:status].should == ProgressStatus.failed.id
+    res[:message].should == Gni::NameResolver::MESSAGES[:no_data_source]
+  end
 end

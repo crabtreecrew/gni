@@ -14,7 +14,16 @@ class NameResolver < ActiveRecord::Base
   EXACT_STRING = 1
   EXACT_CANONICAL = 2
   FUZZY_CANONICAL = 3
+  MAX_NAME_STRING = 10_000
+  MAX_DATA_SOURCES = 5
   NAME_TYPES = { 1 => "uninomial", 2 => "binomial", 3 => "trinomial" }
+  MESSAGES = {
+    :no_data_source => "No data sources found. Please provide from 1 to %s data source ids" % MAX_DATA_SOURCES,
+    :too_many_data_sources => "Too many data sources. Please provide from 1 to %s data source ids" % MAX_DATA_SOURCES,
+    :no_names => "No name strings found. Please provide from 1 to %s name strings" % MAX_NAME_STRING,
+    :too_many_names => "Too many name strings. Please provide from 1 to %s name strings" % MAX_NAME_STRING,
+    :success => "OK",
+  }
   
   def self.perform(name_resolver_id)
     r = NameResolver.find(name_resolver_id)
@@ -43,13 +52,18 @@ class NameResolver < ActiveRecord::Base
   end
 
   def reconcile
-    prepare_variables
-    find_exact
-    find_canonical_exact
-    find_canonical_fuzzy
-    get_contexts if @with_context
-    calculate_scores
-    format_result
+    begin
+      prepare_variables
+      find_exact
+      find_canonical_exact
+      find_canonical_fuzzy
+      get_contexts if @with_context
+      calculate_scores
+      format_result
+    rescue Gni::NameResolverError => e
+      progress_status_id = ProgressStatus.failed.id
+      progress_message = e.message
+    end
     save!
   end
 
@@ -81,6 +95,8 @@ private
     @taxamatch = Taxamatch::Base.new
     @spellchecker = Gni::SolrSpellchecker.new
     @data_sources = options[:data_sources].select {|ds| ds.is_a? Fixnum}
+    raise Gni::NameResolverError, MESSAGES[:no_data_source] if @data_sources.blank?
+    raise Gni::NameResolverError, MESSAGES[:too_many_data_sources] if @data_sources.size > 5
     @with_context = options[:with_context]
     @names = {}
     @matched_words = {}
@@ -94,15 +110,9 @@ private
     if @with_context
       @tree_counter = {}
       @contexts = {}
-      if @data_sources.blank?
-        raise "You have to define reference data source" unless Gni::Config.reference_data_source_id
-        @tree_counter[Gni::Config.reference_data_source_id] = {}
-        @contexts[Gni::Config.reference_data_source_id] = nil
-      else
-        @data_sources.each do |i|
-          @tree_counter[i] = {}
-          @contexts[i] = nil
-        end
+      @data_sources.each do |i|
+        @tree_counter[i] = {}
+        @contexts[i] = nil
       end
     end
   end
