@@ -61,8 +61,8 @@ class NameResolver < ActiveRecord::Base
       calculate_scores
       format_result
     rescue Gni::NameResolverError => e
-      progress_status_id = ProgressStatus.failed.id
-      progress_message = e.message
+      progress_status_id = result[:status] = ProgressStatus.failed.id
+      progress_message = result[:message] = e.message
     end
     save!
   end
@@ -393,7 +393,7 @@ private
   end
   
   def add_default_options
-    self.options = {:with_context => true, :data_sources => []}.merge(self.options)
+    self.options = {:with_context => false, :data_sources => []}.merge(self.options)
   end
 
   def format_result

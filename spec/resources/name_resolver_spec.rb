@@ -56,6 +56,17 @@ describe "name_resolvers API" do
     body = last_response.body
     res = JSON.parse(body, :symbolize_names => true)
     res[:status].should == ProgressStatus.failed.id
-    res[:message].should == Gni::NameResolver::MESSAGES[:no_data_source]
+    res[:message].should == NameResolver::MESSAGES[:no_data_source]
+  end
+  
+  it "should produce an error if there are too many data sources" do
+    get("/name_resolvers.json", 
+        :names => "Leiothrix argentauris (Hodgson, 1838)|Treron|Larus occidentalis wymani|Plantago major L.",
+        :with_context => false,
+        :data_source_ids => "1|2|3|4|5|6")
+    body = last_response.body
+    res = JSON.parse(body, :symbolize_names => true)
+    res[:status].should == ProgressStatus.failed.id
+    res[:message].should == NameResolver::MESSAGES[:too_many_data_sources]
   end
 end
