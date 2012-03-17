@@ -96,7 +96,9 @@ private
     @spellchecker = Gni::SolrSpellchecker.new
     @data_sources = options[:data_sources].select {|ds| ds.is_a? Fixnum}
     raise Gni::NameResolverError, MESSAGES[:no_data_source] if @data_sources.blank?
-    raise Gni::NameResolverError, MESSAGES[:too_many_data_sources] if @data_sources.size > 5
+    raise Gni::NameResolverError, MESSAGES[:too_many_data_sources] if @data_sources.size > MAX_DATA_SOURCES 
+    raise Gni::NameResolverError, MESSAGES[:no_names] if data.blank?
+    raise Gni::NameResolverError, MESSAGES[:too_many_names] if data.size > MAX_NAME_STRING
     @with_context = options[:with_context]
     @names = {}
     @matched_words = {}

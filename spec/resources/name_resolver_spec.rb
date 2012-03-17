@@ -70,4 +70,25 @@ describe "name_resolvers API" do
     res[:message].should == NameResolver::MESSAGES[:too_many_data_sources]
   end
 
+  it "should produce an error if there are no names" do
+    get("/name_resolvers.json", 
+        :names => "",
+        :data_source_ids => "1|2",
+        :with_context => false)
+    body = last_response.body
+    res = JSON.parse(body, :symbolize_names => true)
+    res[:status].should == ProgressStatus.failed.id
+    res[:message].should == NameResolver::MESSAGES[:no_names]
+  end
+  
+  it "should produce an error if there are too many names and make sure GET is executed without que" do
+    get("/name_resolvers.json", 
+        :names => (NameResolver::MAX_NAME_STRING + 1).times.inject([]) { |res| res << "Plantago major"; res }.join("|"),
+        :data_source_ids => "1")
+    body = last_response.body
+    res = JSON.parse(body, :symbolize_names => true)
+    res[:status].should == ProgressStatus.failed.id
+    res[:message].should == NameResolver::MESSAGES[:too_many_names]
+  end
+
 end
