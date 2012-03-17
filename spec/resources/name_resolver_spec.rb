@@ -69,4 +69,5 @@ describe "name_resolvers API" do
     res[:status].should == ProgressStatus.failed.id
     res[:message].should == NameResolver::MESSAGES[:too_many_data_sources]
   end
+
 end

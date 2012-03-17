@@ -60,7 +60,7 @@ class NameResolver < ActiveRecord::Base
       get_contexts if @with_context
       calculate_scores
       format_result
-    rescue Gni::NameResolverError => e
+    rescue Gni::Error => e
       progress_status_id = result[:status] = ProgressStatus.failed.id
       progress_message = result[:message] = e.message
     end

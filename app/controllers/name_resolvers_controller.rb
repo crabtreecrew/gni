@@ -40,7 +40,7 @@ class NameResolversController < ApplicationController
     if new_data.size < 500 || from_get
       resolver.reconcile
     else
-      resolver.progress_message = "In a que"
+      resolver.progress_message = result[:message] = "In a que" #TODO: handle it more elegant
       resolver.save!
       Resque.enqueue(NameResolver, resolver.id)
     end
