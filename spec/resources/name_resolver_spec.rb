@@ -11,6 +11,15 @@ describe "name_resolvers API" do
     res = JSON.parse(body, :symbolize_names => true)
     res[:data].first[:results].first[:taxon_id].should == "6868221"
   end
+
+  it "should not contain id field if user did not supply id" do
+    get("/name_resolvers.json", 
+        :names => "Leiothrix argentauris (Hodgson, 1838)|Treron|Larus occidentalis wymani|Plantago major L.",
+        :data_source_ids => "1|2")
+    body = last_response.body
+    res = JSON.parse(body, :symbolize_names => true)
+    res[:data].select { |r| r.has_key?(:id) }.size.should == 0
+  end
   
   it "github #6: should be able to use GET for only uninomials" do
     get("/name_resolvers.json", 
@@ -38,6 +47,7 @@ describe "name_resolvers API" do
     body = last_response.body
     res = JSON.parse(body, :symbolize_names => true)
     res[:data].first[:results].first[:taxon_id].should == "6868221"
+    res[:data].select { |r| r.has_key?(:id) }.size.should > 0
   end
 
   it "should be able to use uploaded file for resolving names" do
