@@ -1,11 +1,24 @@
 <% content_for :content_splash do %>
-  <p class="tagline">Global Names Index tools and services</p>
+  <p class="tagline">Global Names Index Resolver</p>
 <% end %>
 
 <%= form_tag("/name_resolvers", :method => "post") do -%>
-  <%= text_area_tag(:input, nil, :size => "24x12") -%>
+  <%= label_tag 'data', "Paste Scientific Names" %>
+  <%= text_area_tag(:data, nil, :size => "24x12") -%>
+  <%= field_set_tag "Data Sources" do -%>
+    <%= radio_button_tag 'data_source_ids', 1, true %>
+      <%= label_tag 'data_source_ids_1', 'Catalogue of Life' %>
+    <%= radio_button_tag 'data_source_ids', 3 %>
+      <%= label_tag 'data_sources_ids_3', 'ITIS' %>
+    <%= radio_button_tag 'data_source_ids', 5 %>
+      <%= label_tag 'data_sources_ids_15', 'Index Fungorum' %>
+    <%= radio_button_tag 'data_source_ids', 11 %>
+      <%= label_tag 'data_sources_ids_11', 'GBIF' %>
+    <%= radio_button_tag 'data_source_ids', 167 %>
+      <%= label_tag 'data_sources_ids_167', 'IPNI' %>
+  <%- end -%>
   <div>
-  <%= submit_tag("Find Names", :class => "form-button submit-button") -%>
+  <%= submit_tag("Resolve Names", :class => "form-button submit-button") -%>
   </div>
 <% end %>
 

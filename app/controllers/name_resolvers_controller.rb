@@ -28,19 +28,21 @@ class NameResolversController < ApplicationController
       :url => "%s/name_resolvers/%s" % [Gni::Config.base_url, token],
       :status => status.id,
       :message => message,
-      :parameters => opts}
+      :parameters => opts
+    }
     resolver = NameResolver.create!(
       :data => new_data, 
       :result => result, 
       :options => opts, 
       :progress_status => status, 
       :progress_message => message, 
-      :token => token)
-    
+      :token => token
+    )
+
     if new_data.size < 500 || from_get
       resolver.reconcile
     else
-      resolver.progress_message = result[:message] = "In a que" #TODO: handle it more elegant
+      resolver.progress_message = result[:message] = "In a queue" #TODO: handle it more elegantly
       resolver.save!
       Resque.enqueue(NameResolver, resolver.id)
     end
