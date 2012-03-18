@@ -23,13 +23,21 @@ class NameResolversController < ApplicationController
     token = Base64.urlsafe_encode64(UUID.create_v4.raw_bytes)[0..-3]
     status = ProgressStatus.working
     message = "Submitted"
+
+    data_sources = []
+    opts[:data_sources].map do |ds_id| 
+      ds_title = DataSource.find(ds_id).title.strip rescue nil
+      data_sources << { :id => ds_id, :title => ds_title } if ds_title
+    end
+
     result = {
       :id => token, 
       :url => "%s/name_resolvers/%s" % [Gni::Config.base_url, token],
       :status => status.id,
       :message => message,
-      :parameters => opts
-    }
+      :data_sources => data_sources, 
+      :parameters => opts}
+
     resolver = NameResolver.create!(
       :data => new_data, 
       :result => result, 
