@@ -8,8 +8,6 @@ class NameResolver < ActiveRecord::Base
   serialize :options, Hash
   serialize :result, Hash
 
-  before_create :add_default_options
-
   CONTEXT_THRESHOLD = 0.9
   EXACT_STRING = 1
   EXACT_CANONICAL = 2
@@ -18,8 +16,8 @@ class NameResolver < ActiveRecord::Base
   MAX_DATA_SOURCES = 5
   NAME_TYPES = { 1 => "uninomial", 2 => "binomial", 3 => "trinomial" }
   MESSAGES = {
-    :no_data_source => "No data sources found. Please provide from 1 to %s data source ids" % MAX_DATA_SOURCES,
-    :too_many_data_sources => "Too many data sources. Please provide from 1 to %s data source ids" % MAX_DATA_SOURCES,
+    :no_data_source => "No data sources found. Please provide from 1 to %s for data_source_ids parameter" % MAX_DATA_SOURCES,
+    :too_many_data_sources => "Too many data sources. Please provide from 1 to %s for data_source_ids parameter" % MAX_DATA_SOURCES,
     :no_names => "No name strings found. Please provide from 1 to %s name strings" % MAX_NAME_STRING,
     :too_many_names => "Too many name strings. Please provide from 1 to %s name strings" % MAX_NAME_STRING,
     :success => "OK",
@@ -394,10 +392,6 @@ private
     result[:possible_cresonym] = auth_score < 0 && result[:score] > 0.9 ? true : false
   end
   
-  def add_default_options
-    self.options = {:with_context => false, :data_sources => []}.merge(self.options)
-  end
-
   def format_result
     r = result
     if @with_context
