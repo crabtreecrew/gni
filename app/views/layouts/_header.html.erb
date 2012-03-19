@@ -11,11 +11,6 @@
       <%- else -%>
         <li><%= link_to "Home", root_path %></li>
       <%- end -%>
-      <%- if controller_name == "api" -%>
-        <li class="active"><%= link_to "API", api_index_path %></li>
-      <%- else -%>
-        <li><%= link_to "API", api_index_path %></li>
-      <%- end -%>
     </ul>
   </div>
 </div>
