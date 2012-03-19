@@ -13,7 +13,10 @@
 <% @res[:data].each do |result| %>
   <div class="section">
     <div class="searched-name">
-      <h4><%= result[:name_string] %></h4>
+      <h4><%= h result[:name_string] %></h4>
+      <% if !result[:results].nil? && result[:results].size > 0 %>
+        <span class="number-matches">Possible matches: <%= result[:results].size %></span>
+      <% end %>
     </div>
   <div class="results">
   <% if result[:results].nil? %>
@@ -21,10 +24,12 @@
   <% else %>
   <% result[:results].each do |source| %>
     <div class="source-match">
-      <span class="source-name-string"><%= source[:name_string] %></span>
-      <span class="score">[Score: <%= source[:score] %>]</span>
+      <div class="source-names-score">
+        <span class="source-name-string"><%= source[:name_string] %></span>
+        <span class="score">[Score: <%= source[:score] %>]</span>
+      </div>
+      <div class="source-classification-path"><%= source[:classification_path].gsub("|", " >> ") %></div>
     </div>
-    <div class="source-classification-path"><%= source[:classification_path] %></div>
   <% end %>
   </div>
   <% end %>
