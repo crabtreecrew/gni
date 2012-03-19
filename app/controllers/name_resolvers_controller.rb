@@ -9,11 +9,11 @@ class NameResolversController < ApplicationController
   def show
     resolver = NameResolver.find_by_token(params[:id])
     respond_to do |format|
-      res = resolver.result
-      res[:url] += ".%s" % params[:format] if ['xml', 'json'].include?(params[:format])
-      format.html { redirect_to name_resolver_path(resolver) }
-      format.json { render :json => json_callback(res.to_json, params[:callback]) }
-      format.xml  { render :xml => res.to_xml }
+      @res = resolver.result
+      @res[:url] += ".%s" % params[:format] if ['xml', 'json'].include?(params[:format])
+      format.html
+      format.json { render :json => json_callback(@res.to_json, params[:callback]) }
+      format.xml  { render :xml => @res.to_xml }
     end
   end
 
@@ -50,7 +50,7 @@ class NameResolversController < ApplicationController
     respond_to do |format|
       res = resolver.result
       res[:url] += ".%s" % params[:format] if ['xml', 'json'].include?(params[:format])
-      format.html { redirect_to name_resolver_path(resolver) }
+      format.html { redirect_to name_resolver_path(resolver.token) }
       format.json { render :json => json_callback(res.to_json, params[:callback]) }
       format.xml  { render :xml => res.to_xml }
     end
