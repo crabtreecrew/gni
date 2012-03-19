@@ -6,7 +6,7 @@
 
 <div class="parameters">
   <% @res[:parameters][:data_sources].each do |source| %>
-    <%= DataSource.find(source).title %>
+    <%= DataSource.find(source).title rescue nil %>
   <% end %>
 </div>
 
