@@ -36,4 +36,7 @@ module Gni
     Math.atan(num * num**2) * 0.5/(Math::PI*0.5) + 0.5
   end
 
+  def self.latin_chars?(a_string)
+    a_string.call('match', /^[\\p{Latin}|\\p{Common}]*$/)
+  end
 end
