@@ -190,6 +190,7 @@ private
   def find_canonical_fuzzy
     data_sources = @data_sources.join(",")
     @names.keys.each do |name|
+      next unless name
       canonical_forms = @spellchecker.find(name)
       unless canonical_forms.blank?
         q = "select ns.id, ns.uuid, null, ns.name, nsi.data_source_id, nsi.taxon_id, nsi.global_id, nsi.url, nsi.classification_path, nsi.classification_path_ids, cf.name, pns.data from canonical_forms cf join name_strings ns on ns.canonical_form_id = cf.id join parsed_name_strings pns on pns.id = ns.id join name_string_indices nsi on nsi.name_string_id = ns.id where cf.name in (%s)" % canonical_forms.map { |n| NameString.connection.quote(n) }.join(",")
