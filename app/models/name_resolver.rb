@@ -72,7 +72,7 @@ private
       #for now we assume that non-utf8 charachters are in latin1, might need to add others
       line = conv.conv(line) unless line.valid_encoding?
       #skip the line if encoding is still wrong
-      next unless line.valid_encoding?
+      next unless Gni.latin_chars?(line)
       line = line.strip.gsub("\t", "|")
       fields = line.split("|")
       name = id = nil
@@ -93,6 +93,7 @@ private
     @taxamatch = Taxamatch::Base.new
     @spellchecker = Gni::SolrSpellchecker.new
     @data_sources = options[:data_sources].select {|ds| ds.is_a? Fixnum}
+    @errors = []
     raise Gni::NameResolverError, MESSAGES[:no_data_source] if @data_sources.blank?
     raise Gni::NameResolverError, MESSAGES[:too_many_data_sources] if @data_sources.size > MAX_DATA_SOURCES 
     raise Gni::NameResolverError, MESSAGES[:no_names] if data.blank?
