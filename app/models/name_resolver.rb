@@ -401,7 +401,10 @@ private
   def format_result
     r = result
     if @with_context
-      r[:context] = @contexts
+      r[:context] = []
+      @contexts.each do |key, val|
+        r[:context] << { :data_source_id => key, :clade => val }
+      end
     end
     r[:data] = []
     data.each do |d|
