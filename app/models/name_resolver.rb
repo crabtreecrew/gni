@@ -8,6 +8,8 @@ class NameResolver < ActiveRecord::Base
   serialize :options, Hash
   serialize :result, Hash
 
+  before_create :add_default_options
+
   CONTEXT_THRESHOLD = 0.9
   EXACT_STRING = 1
   EXACT_CANONICAL = 2
@@ -401,6 +403,10 @@ private
     result[:prescore] = "%s|%s|%s" % [s,a,c]
     result[:score] = Gni.num_to_score(prescore)
   end
+
+  def add_default_options
+    self.options = {:with_context => false, :data_sources => []}.merge(self.options)
+  end  
   
   def format_result
     r = result

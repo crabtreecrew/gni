@@ -9,14 +9,17 @@ class NameResolversController < ApplicationController
   def show
     resolver = NameResolver.find_by_token(params[:id])
     respond_to do |format|
-      present_result(format, resolver)
+      present_result(format, resolver, true)
     end
   end
 
   def create(from_get = false)
     new_data = get_data
     opts = get_opts
-    token = Base64.urlsafe_encode64(UUID.create_v4.raw_bytes)[0..-3]
+    token = "_"
+    while token.match(/_/) 
+      token = Base64.urlsafe_encode64(UUID.create_v4.raw_bytes)[0..-3]
+    end
     status = ProgressStatus.working
     message = "Submitted"
 
@@ -29,6 +32,7 @@ class NameResolversController < ApplicationController
     result = {
       :id => token, 
       :url => "%s/name_resolvers/%s" % [Gni::Config.base_url, token],
+      :data_sources => data_sources,
       }
 
     resolver = NameResolver.create!(
@@ -55,15 +59,19 @@ class NameResolversController < ApplicationController
 
   private
 
-  def present_result(format, resolver)
-    res = resolver.result
-    res[:url] += ".%s" % params[:format] if ['xml', 'json'].include?(params[:format])
-    res[:status] = resolver.progress_status.name
-    res[:message] = resolver.progress_message
-    res[:parameters] = resolver.options
-    format.html { redirect_to name_resolver_path(resolver) }
-    format.json { render :json => json_callback(res.to_json, params[:callback]) }
-    format.xml  { render :xml => res.to_xml }
+  def present_result(format, resolver, is_show = false)
+    @res = resolver.result
+    @res[:url] += ".%s" % params[:format] if ['xml', 'json'].include?(params[:format])
+    @res[:status] = resolver.progress_status.name
+    @res[:message] = resolver.progress_message
+    @res[:parameters] = resolver.options
+    if is_show
+      format.html
+    else
+      format.html { redirect_to name_resolver_path(resolver.token) }
+    end
+    format.json { render :json => json_callback(@res.to_json, params[:callback]) }
+    format.xml  { render :xml => @res.to_xml }
   end
 
   def get_data
