@@ -6,7 +6,7 @@ describe "name_resolvers API" do
   it "should be able to use GET for resolving names" do
     get("/name_resolvers.json", 
         :names => "Leiothrix argentauris (Hodgson, 1838)|Treron|Larus occidentalis wymani|Plantago major L.",
-        :data_source_ids => "1|2")
+        :data_source_ids => "1|3")
     body = last_response.body
     res = JSON.parse(body, :symbolize_names => true)
     res[:data].first[:results].first[:taxon_id].should == "6868221"
@@ -15,7 +15,7 @@ describe "name_resolvers API" do
   it "should not contain id field if user did not supply id" do
     get("/name_resolvers.json", 
         :names => "Leiothrix argentauris (Hodgson, 1838)|Treron|Larus occidentalis wymani|Plantago major L.",
-        :data_source_ids => "1|2")
+        :data_source_ids => "1|3")
     body = last_response.body
     res = JSON.parse(body, :symbolize_names => true)
     res[:data].select { |r| r.has_key?(:id) }.size.should == 0
@@ -24,7 +24,7 @@ describe "name_resolvers API" do
   it "github #6: should be able to use GET for only uninomials" do
     get("/name_resolvers.json", 
         :names => "Rhizoclonium",
-        :data_source_ids => "1|2")
+        :data_source_ids => "1|3")
     body = last_response.body
     res = JSON.parse(body, :symbolize_names => true)
     res.size.should > 0
@@ -33,7 +33,7 @@ describe "name_resolvers API" do
   it "should parse options correctly" do
     get("/name_resolvers.json", 
         :names => "Leiothrix argentauris (Hodgson, 1838)|Treron|Larus occidentalis wymani|Plantago major L.",
-        :data_source_ids => "1|2",
+        :data_source_ids => "1|3",
         :with_context => false)
     body = last_response.body
     res = JSON.parse(body, :symbolize_names => true)
@@ -43,7 +43,7 @@ describe "name_resolvers API" do
   it "should be able to use POST for resolving names" do
     post("/name_resolvers.json", 
         :data => "1|Leiothrix argentauris (Hodgson, 1838)\n2|Treron\n3|Larus occidentalis wymani\n4|Plantago major L.",
-        :data_source_ids => "1|2")
+        :data_source_ids => "1|3")
     body = last_response.body
     res = JSON.parse(body, :symbolize_names => true)
     res[:data].first[:results].first[:taxon_id].should == "6868221"
@@ -65,7 +65,7 @@ describe "name_resolvers API" do
         :with_context => false)
     body = last_response.body
     res = JSON.parse(body, :symbolize_names => true)
-    res[:status].should == ProgressStatus.failed.id
+    res[:status].should == ProgressStatus.failed.name
     res[:message].should == NameResolver::MESSAGES[:no_data_source]
   end
   
@@ -76,18 +76,18 @@ describe "name_resolvers API" do
         :data_source_ids => "1|2|3|4|5|6")
     body = last_response.body
     res = JSON.parse(body, :symbolize_names => true)
-    res[:status].should == ProgressStatus.failed.id
+    res[:status].should == ProgressStatus.failed.name
     res[:message].should == NameResolver::MESSAGES[:too_many_data_sources]
   end
 
   it "should produce an error if there are no names" do
     get("/name_resolvers.json", 
         :names => "",
-        :data_source_ids => "1|2",
+        :data_source_ids => "1|3",
         :with_context => false)
     body = last_response.body
     res = JSON.parse(body, :symbolize_names => true)
-    res[:status].should == ProgressStatus.failed.id
+    res[:status].should == ProgressStatus.failed.name
     res[:message].should == NameResolver::MESSAGES[:no_names]
   end
   
@@ -97,7 +97,7 @@ describe "name_resolvers API" do
         :data_source_ids => "1")
     body = last_response.body
     res = JSON.parse(body, :symbolize_names => true)
-    res[:status].should == ProgressStatus.failed.id
+    res[:status].should == ProgressStatus.failed.name
     res[:message].should == NameResolver::MESSAGES[:too_many_names]
   end
 

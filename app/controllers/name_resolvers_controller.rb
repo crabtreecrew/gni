@@ -9,11 +9,7 @@ class NameResolversController < ApplicationController
   def show
     resolver = NameResolver.find_by_token(params[:id])
     respond_to do |format|
-      res = resolver.result
-      res[:url] += ".%s" % params[:format] if ['xml', 'json'].include?(params[:format])
-      format.html { redirect_to name_resolver_path(resolver) }
-      format.json { render :json => json_callback(res.to_json, params[:callback]) }
-      format.xml  { render :xml => res.to_xml }
+      present_result(format, resolver)
     end
   end
 
@@ -26,9 +22,8 @@ class NameResolversController < ApplicationController
     result = {
       :id => token, 
       :url => "%s/name_resolvers/%s" % [Gni::Config.base_url, token],
-      :status => status.id,
-      :message => message,
-      :parameters => opts}
+      }
+    
     resolver = NameResolver.create!(
       :data => new_data, 
       :result => result, 
@@ -40,22 +35,28 @@ class NameResolversController < ApplicationController
     if new_data.size < 500 || from_get
       resolver.reconcile
     else
-      resolver.progress_message = result[:message] = "In a que" #TODO: handle it more elegant
+      resolver.progress_message = "In a que" 
       resolver.save!
       Resque.enqueue(NameResolver, resolver.id)
     end
-
     respond_to do |format|
-      res = resolver.result
-      res[:url] += ".%s" % params[:format] if ['xml', 'json'].include?(params[:format])
-      format.html { redirect_to name_resolver_path(resolver) }
-      format.json { render :json => json_callback(res.to_json, params[:callback]) }
-      format.xml  { render :xml => res.to_xml }
+      present_result(format, resolver)
     end
 
   end
 
   private
+
+  def present_result(format, resolver)
+    res = resolver.result
+    res[:url] += ".%s" % params[:format] if ['xml', 'json'].include?(params[:format])
+    res[:status] = resolver.progress_status.name
+    res[:message] = resolver.progress_message
+    res[:parameters] = resolver.options
+    format.html { redirect_to name_resolver_path(resolver) }
+    format.json { render :json => json_callback(res.to_json, params[:callback]) }
+    format.xml  { render :xml => res.to_xml }
+  end
 
   def get_data
     new_data = nil

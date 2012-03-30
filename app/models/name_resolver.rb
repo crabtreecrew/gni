@@ -22,7 +22,12 @@ class NameResolver < ActiveRecord::Base
     :too_many_data_sources => "Too many data sources. Please provide from 1 to %s data source ids" % MAX_DATA_SOURCES,
     :no_names => "No name strings found. Please provide from 1 to %s name strings" % MAX_NAME_STRING,
     :too_many_names => "Too many name strings. Please provide from 1 to %s name strings" % MAX_NAME_STRING,
-    :success => "OK",
+    :resolving => "Starting names resolution",
+    :resolving_exact => "Collecting exact matches of name strings",
+    :parsing => "Parsing name strings",
+    :resolving_exact_canonical => "Resolving matches by canonical names",
+    :resolving_fuzzy_canonical => "Fuzzy matching of canonical_names",
+    :success => "Success",
   }
   
   def self.perform(name_resolver_id)
@@ -55,14 +60,15 @@ class NameResolver < ActiveRecord::Base
     begin
       prepare_variables
       find_exact
+      get_canonical_forms
       find_canonical_exact
       find_canonical_fuzzy
       get_contexts if @with_context
       calculate_scores
       format_result
     rescue Gni::Error => e
-      progress_status_id = result[:status] = ProgressStatus.failed.id
-      progress_message = result[:message] = e.message
+      self.progress_status = ProgressStatus.failed
+      self.progress_message = e.message
     end
     save!
   end
@@ -91,6 +97,7 @@ private
   end
 
   def prepare_variables
+    update_attributes(:progress_message => MESSAGES[:resolving])
     @atomizer = Taxamatch::Atomizer.new
     @taxamatch = Taxamatch::Base.new
     @spellchecker = Gni::SolrSpellchecker.new
@@ -120,6 +127,7 @@ private
   end
 
   def find_exact
+    update_attributes(:progress_message => MESSAGES[:resolving_exact])
     names = get_quoted_names(@names.keys)
     data_sources = @data_sources.join(",")
     q = "select ns.id, ns.uuid, ns.normalized, ns.name, nsi.data_source_id, nsi.taxon_id, nsi.global_id, nsi.url, nsi.classification_path, nsi.classification_path_ids, cf.name from name_string_indices nsi join name_strings ns on ns.id = nsi.name_string_id left outer join canonical_forms cf on cf.id = ns.canonical_form_id where ns.normalized in (#{names})"
@@ -148,8 +156,7 @@ private
 
   def find_canonical_exact
     return if @names.empty?
-    get_canonical_forms
-    
+    update_attributes(:progress_message => MESSAGES[:resolving_exact_canonical])
     canonical_forms = @names.keys
     names = get_quoted_names(canonical_forms)
     data_sources = @data_sources.join(",")
@@ -190,6 +197,7 @@ private
   end
 
   def find_canonical_fuzzy
+    update_attributes(:progress_message => MESSAGES[:resolving_fuzzy_canonical])
     data_sources = @data_sources.join(",")
     @names.keys.each do |name|
       canonical_forms = @spellchecker.find(name)
@@ -243,6 +251,8 @@ private
   end
   
   def get_canonical_forms
+    update_attributes(:progress_message => MESSAGES[:parsing])
+    return if @names.blank?
     @names.keys.each do |key|
       @names[key][:parsed] = @atomizer.parse(@names[key][:name_string])
       if @names[key][:parsed]
@@ -391,7 +401,6 @@ private
     prescore += (s + a + c)
     result[:prescore] = "%s|%s|%s" % [s,a,c]
     result[:score] = Gni.num_to_score(prescore)
-    result[:possible_cresonym] = auth_score < 0 && result[:score] > 0.9 ? true : false
   end
   
   def add_default_options
@@ -437,7 +446,8 @@ private
       end
       r[:data] << res
     end
-    save!
+    self.progress_status = ProgressStatus.success
+    self.progress_message = MESSAGES[:success]
   end
 
 end

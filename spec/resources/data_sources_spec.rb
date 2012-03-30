@@ -7,7 +7,7 @@ describe "data_sources API" do
     body = last_response.body
     res = JSON.parse(body, :symbolize_names => true)
     res.size.should > 1
-    res.select {|ds| ds[:title].match /ITIS/}.size.should > 0
+    res.select {|ds| ds[:title].to_s.match /ITIS/}.size.should > 0
   end
 
   it "should be able to return search results" do
@@ -15,7 +15,7 @@ describe "data_sources API" do
     body = last_response.body
     res = JSON.parse(body, :symbolize_names => true)
     res.size.should > 0
-    res.select {|ds| ds[:title].match /ITIS/}.size.should > 0
+    res.select {|ds| ds[:title].to_s.match /ITIS/}.size.should > 0
   end
 
   it "should work with callback parameter in json format" do
