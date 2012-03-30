@@ -2,7 +2,7 @@
   <div class="inner">
     <div id="Logo">
       <a href="/">
-        <h1>Global Name Index (Alpha)</h1>
+        <h1>Global Names Resolver (Alpha)</h1>
       </a>
     </div>
     <ul id="SiteNavigation">
@@ -10,11 +10,6 @@
         <li class="active"><%= link_to "Home", root_path %></li>
       <%- else -%>
         <li><%= link_to "Home", root_path %></li>
-      <%- end -%>
-      <%- if controller_name == "api" -%>
-        <li class="active"><%= link_to "API", api_index_path %></li>
-      <%- else -%>
-        <li><%= link_to "API", api_index_path %></li>
       <%- end -%>
     </ul>
   </div>

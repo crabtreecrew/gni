@@ -8,8 +8,6 @@ class NameResolver < ActiveRecord::Base
   serialize :options, Hash
   serialize :result, Hash
 
-  before_create :add_default_options
-
   CONTEXT_THRESHOLD = 0.9
   EXACT_STRING = 1
   EXACT_CANONICAL = 2
@@ -18,8 +16,8 @@ class NameResolver < ActiveRecord::Base
   MAX_DATA_SOURCES = 5
   NAME_TYPES = { 1 => "uninomial", 2 => "binomial", 3 => "trinomial" }
   MESSAGES = {
-    :no_data_source => "No data sources found. Please provide from 1 to %s data source ids" % MAX_DATA_SOURCES,
-    :too_many_data_sources => "Too many data sources. Please provide from 1 to %s data source ids" % MAX_DATA_SOURCES,
+    :no_data_source => "No data sources found. Please provide from 1 to %s for data_source_ids parameter" % MAX_DATA_SOURCES,
+    :too_many_data_sources => "Too many data sources. Please provide from 1 to %s for data_source_ids parameter" % MAX_DATA_SOURCES,
     :no_names => "No name strings found. Please provide from 1 to %s name strings" % MAX_NAME_STRING,
     :too_many_names => "Too many name strings. Please provide from 1 to %s name strings" % MAX_NAME_STRING,
     :resolving => "Starting names resolution",
@@ -200,6 +198,7 @@ private
     update_attributes(:progress_message => MESSAGES[:resolving_fuzzy_canonical])
     data_sources = @data_sources.join(",")
     @names.keys.each do |name|
+      next unless name
       canonical_forms = @spellchecker.find(name)
       unless canonical_forms.blank?
         q = "select ns.id, ns.uuid, null, ns.name, nsi.data_source_id, nsi.taxon_id, nsi.global_id, nsi.url, nsi.classification_path, nsi.classification_path_ids, cf.name, pns.data from canonical_forms cf join name_strings ns on ns.canonical_form_id = cf.id join parsed_name_strings pns on pns.id = ns.id join name_string_indices nsi on nsi.name_string_id = ns.id where cf.name in (%s)" % canonical_forms.map { |n| NameString.connection.quote(n) }.join(",")
@@ -403,14 +402,13 @@ private
     result[:score] = Gni.num_to_score(prescore)
   end
   
-  def add_default_options
-    self.options = {:with_context => false, :data_sources => []}.merge(self.options)
-  end
-
   def format_result
     r = result
     if @with_context
-      r[:context] = @contexts
+      r[:context] = []
+      @contexts.each do |key, val|
+        r[:context] << { :data_source_id => key, :clade => val }
+      end
     end
     r[:data] = []
     data.each do |d|

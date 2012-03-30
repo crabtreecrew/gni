@@ -1,3 +1,16 @@
 // Place all the styles related to the name_resolvers controller here.
 // They will automatically be included in application.css.
 // You can use Sass (SCSS) here: http://sass-lang.com/
+.section{margin-bottom:1.5em;}
+.results{margin-left:1em;}
+
+.searched-name{border-bottom:1px solid #aaa;width:100%;margin-top:20px;position:relative;}
+.searched-name h4{border-bottom:2px solid #bbb;margin:0px;padding:3px 0px;width:30em;font-size:1em;}
+.number-matches{position:absolute; right:0px;top:25%;font-size:0.8em;}
+.results {margin-top:0.5em;}
+.nothing{font-style:italic;font-size:0.9em;}
+.source-match{margin-bottom:1.5em;}
+.source-names-score{margin-bottom:0.5em;}
+.source-name-string{color:#45704D;}
+.source-classification-path{line-height:1.5em;}
+.score{font-size:0.8em;}

@@ -19,28 +19,48 @@ class NameResolversController < ApplicationController
     token = Base64.urlsafe_encode64(UUID.create_v4.raw_bytes)[0..-3]
     status = ProgressStatus.working
     message = "Submitted"
+
+    data_sources = []
+    opts[:data_sources].map do |ds_id| 
+      ds_title = DataSource.find(ds_id).title.strip rescue nil
+      data_sources << { :id => ds_id, :title => ds_title } if ds_title
+    end
+
     result = {
       :id => token, 
       :url => "%s/name_resolvers/%s" % [Gni::Config.base_url, token],
       }
-    
+
     resolver = NameResolver.create!(
       :data => new_data, 
       :result => result, 
       :options => opts, 
       :progress_status => status, 
       :progress_message => message, 
-      :token => token)
-    
+      :token => token
+    )
+
     if new_data.size < 500 || from_get
       resolver.reconcile
     else
+<<<<<<< HEAD
       resolver.progress_message = "In a que" 
+=======
+      resolver.progress_message = result[:message] = "In a queue" #TODO: handle it more elegantly
+>>>>>>> 901d27b20f4cc1d3a3b1522f812e68e51e99b65c
       resolver.save!
       Resque.enqueue(NameResolver, resolver.id)
     end
     respond_to do |format|
+<<<<<<< HEAD
       present_result(format, resolver)
+=======
+      res = resolver.result
+      res[:url] += ".%s" % params[:format] if ['xml', 'json'].include?(params[:format])
+      format.html { redirect_to name_resolver_path(resolver.token) }
+      format.json { render :json => json_callback(res.to_json, params[:callback]) }
+      format.xml  { render :xml => res.to_xml }
+>>>>>>> 901d27b20f4cc1d3a3b1522f812e68e51e99b65c
     end
 
   end
