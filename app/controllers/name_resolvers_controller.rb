@@ -33,10 +33,7 @@ class NameResolversController < ApplicationController
       :id => token, 
       :url => "%s/name_resolvers/%s" % [Gni::Config.base_url, token],
       :data_sources => data_sources,
-      :status => nil,
-      :message => nil,
-      :parameters => nil,
-    }
+      }
 
     resolver = NameResolver.create!(
       :data => new_data, 

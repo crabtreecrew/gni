@@ -255,11 +255,11 @@ private
     update_attributes(:progress_message => MESSAGES[:parsing])
     return if @names.blank?
     @names.keys.each do |key|
-      name = NameString.connection.quote(@names[key][:name_string])
-      @names[key][:canonical_form] = NameString.connection.select_value("select cf.name from canonical_forms cf join name_strings ns on ns.canonical_form_id = cf.id where cf.name = %s or ns.name = %s" % [name, name])
-      unless @names[key][:canonical_form]
-        @names[key][:parsed] = @atomizer.parse(@names[key][:name_string])
-        @names[key][:canonical_form] = @names[key][:parsed][:canonical_form] if @names[key][:parsed]
+      @names[key][:parsed] = @atomizer.parse(@names[key][:name_string])
+      if @names[key][:parsed]
+        @names[key][:canonical_form] = @names[key][:parsed][:canonical_form]
+      else
+        @names[key][:canonical_form] = nil
       end
     end
     #switch names to canonical forms from normalized names
