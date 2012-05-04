@@ -149,6 +149,8 @@ class DwcaImporter < ActiveRecord::Base
           taxon_id = @db.quote(key)
           rank = taxon.rank.blank? ? "NULL" : @db.quote(taxon.rank)
           source = taxon.source.blank? ? "NULL" : @db.quote(taxon.source)
+          local_id = taxon.local_id.blank? ? "NULL" : @db.quote(taxon.local_id)
+          global_id = taxon.global_id.blank? ? "NULL" : @db.quote(taxon.global_id)
           classification_path_id =  taxon.classification_path_id.compact
           classification_path = "''"
           unless classification_path_id.blank?
@@ -156,7 +158,7 @@ class DwcaImporter < ActiveRecord::Base
           end
           classification_path_id = @db.quote(classification_path_id.join("|"))
           if name_string_id != "NULL"
-            names_index << [data_source_id, name_string_id, taxon_id, source, rank, taxon_id, "NULL", classification_path, classification_path_id, now, now].join(",")
+            names_index << [data_source_id, name_string_id, taxon_id, source, local_id, global_id, rank, taxon_id, "NULL", classification_path, classification_path_id, now, now].join(",")
           else
             puts "*" * 80
             puts "Taxon with id %s was not created" % key
@@ -166,9 +168,11 @@ class DwcaImporter < ActiveRecord::Base
             synonym_string_id = @db.quote(get_name_string_id(synonym.name))
             synonym_taxon_id = synonym.id ? synonym.id : taxon_id
             synonym_source = synonym.source.blank? ? source : @db.quote(synonym.source)
+            synonym_local_id = synonym.local_id.blank? ? local_id : @db.quote(synonym.local_id)
+            synonym_global_id = synonym.global_id.blank? ? global_id : @db.quote(synonym.global_id)
             synonym_taxon_id = @db.quote(synonym_taxon_id)
             if synonym_string_id != "NULL"
-              names_index << [data_source_id, synonym_string_id, synonym_taxon_id, synonym_source, rank, taxon_id, "'synonym'", classification_path, classification_path_id, now, now].join(",")
+              names_index << [data_source_id, synonym_string_id, synonym_taxon_id, synonym_source, synonym_local_id, synonym_global_id, rank, taxon_id, "'synonym'", classification_path, classification_path_id, now, now].join(",")
             end
           end
           taxon.vernacular_names.each do |vernacular|
@@ -185,7 +189,7 @@ class DwcaImporter < ActiveRecord::Base
         names_index = names_index.join("),(")
         vernacular_index = vernacular_index.join("),(")
         if names_index.size > 0
-          q = "INSERT IGNORE INTO tmp_name_string_indices (data_source_id, name_string_id, taxon_id, url, rank, accepted_taxon_id, synonym, classification_path, classification_path_ids, created_at, updated_at) VALUES (#{names_index})"
+          q = "INSERT IGNORE INTO tmp_name_string_indices (data_source_id, name_string_id, taxon_id, url, local_id, global_id, rank, accepted_taxon_id, synonym, classification_path, classification_path_ids, created_at, updated_at) VALUES (#{names_index})"
           @db.execute(q)
         end
         if vernacular_index.size > 0

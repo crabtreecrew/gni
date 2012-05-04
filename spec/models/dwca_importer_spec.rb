@@ -12,6 +12,7 @@ describe DwcaImporter do
     cf_count = CanonicalForm.count
     di = DwcaImporter.create(data_source: @ds, url: @url)
     di.import.should be_true
+    require 'ruby-debug'; debugger
     (JobLog.count - jl_count).should > 0
     (CanonicalForm.count - cf_count).should > 0
   end
