@@ -1,0 +1,3 @@
+data_source_id,name_string_id,taxon_id,classification_path,classification_path_ids,global_id,local_id,url,rank,accepted_taxon_id,synonym
+1,Leiothrix argentauris,5678,,,,,,,,
+2,Calidris cooperi,5679,,,,,,,,

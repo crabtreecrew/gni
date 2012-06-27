@@ -2,6 +2,8 @@ class NameString < ActiveRecord::Base
   belongs_to :canonical_form
   has_many :name_string_indices, :foreign_key => [:data_source_id, :name_string_id, :taxon_id]
   belongs_to :parsed_name_string, :foreign_key => :id
+  before_create :pre_process_name_string
+  after_create :post_process_name_string
 
   scope :data_source, joins("join name_string_indices on name_string.id = name_string_indices.name_string_id").where("name_string_indices.data_source_id" => [1,2])
 
@@ -30,6 +32,17 @@ class NameString < ActiveRecord::Base
   def uuid
     res = super
     res ? ::UUID.parse(res.to_s(16)).to_s : nil
+  end
+  private
+
+  def pre_process_name_string
+    self.name = NameString.normalize_space(self.name)
+    self.uuid = NameString.get_uuid(self.name)
+    self.normalized = NameString.normalize(self.name)
+  end
+  
+  def post_process_name_string
+    ParsedNameString.update
   end
 
 end

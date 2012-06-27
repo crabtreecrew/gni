@@ -12,6 +12,17 @@
     rake solr:build
     rspec
 
+== Workind with seed data
+
+Use rake "db:seed RAILS_ENV=your_env" to populate tables in development, test and production environments.
+Different environments differ in how and which tables are populated.
+To add more data for testing/development purposes use
+    
+    rake db:addnames
+
+the command reads data from spec/files/addnames.csv to add more records to the system.
+
+
 == Resolver worker
   RAILS_ENV=production RAKE_ENV=production QUEUE=name_resolver rake resque:work
 

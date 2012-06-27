@@ -50,6 +50,23 @@ describe "name_resolvers API" do
     res[:data].select { |r| r.has_key?(:id) }.size.should > 0
   end
 
+  it "should be able to continue with canonical form search if resolve_once option is false" do
+    post("/name_resolvers.json", 
+        :data => "2|Calidris cooperi\n1|Leiothrix argentauris\n4|Plantago major L.",
+        :data_source_ids => "1|3", :resolve_once => true)
+    body = last_response.body
+    res = JSON.parse(body, :symbolize_names => true)
+    res[:data][1][:results].size.should == 1
+    res[:data][1][:results][0][:name_string].should == 'Leiothrix argentauris'
+    post("/name_resolvers.json", 
+        :data => "2|Calidris cooperi\n1|Leiothrix argentauris\n4|Plantago major L.",
+        :data_source_ids => "1|3", :resolve_once => false)
+    body = last_response.body
+    res = JSON.parse(body, :symbolize_names => true)
+    res[:data][1][:results].size.should == 3
+    res[:data][1][:results].map {|r| r[:data_source_id]}.should == [1,1,3]
+  end
+
   it "should be able to use uploaded file for resolving names" do
     file_test_names = File.join(File.dirname(__FILE__), '..', 'files', 'bird_names.txt')
     file = Rack::Test::UploadedFile.new(file_test_names, 'text/plain')

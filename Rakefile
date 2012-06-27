@@ -32,6 +32,19 @@ namespace :db do
       end
     end
   end
+  
+  desc "adds records to a data_source from a file"
+  task :addnames => :environment do
+    ENV["RAILS_ENV"] ||= 'development'
+    puts "Data are read from spec/files/addnames.csv, already saved data will not be overriden"
+    CSV.open(Rails.root.join("spec", "files", "addnames.csv").to_s).each_with_index do |row, i|
+      #assume order of 'data_source, name_string, taxon_id'
+      next if i == 0
+      name_string = NameString.find_or_create_by_name(row[1])
+      index = NameStringIndex.where(:name_string_id => name_string.id, :data_source_id => row[0], :taxon_id => row[2])
+      NameStringIndex.create(:name_string_id => name_string.id, :data_source_id => row[0], :taxon_id => row[2]) if index.empty?
+    end
+  end
 end
 
 namespace :solr do

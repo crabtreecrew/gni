@@ -143,15 +143,20 @@ private
         canonical_match = NameString.normalize(record[:canonical_form]) == NameString.normalize(record[:name])
         type = NAME_TYPES[record[:canonical_form].split(" ").size]
         record.merge!(:match_type => EXACT_STRING, :name_type => type, :match_by_canonical => canonical_match) 
-        datum.has_key?(:results) ? datum[:results] << record : datum[:results] = [record]
-        @names[name_normalized].has_key?(:results) ? @names[name_normalized][:results] << record : @names[name_normalized][:results] = [record]
+        record_id = get_record_id(record)
+        datum.has_key?(:results) ? datum[:results][record_id] = record : datum[:results] = {record_id => record}
+        @names[name_normalized][:results] = true unless @names[name_normalized][:results]
         update_context(record) if @with_context
       end
     end
 
-    @names.keys.each do |key|
-      @names.delete(key) if @names[key].has_key?(:results)
+    if options[:resolve_once]
+      @names.keys.each { |key| @names.delete(key) if @names[key].has_key?(:results) }
     end
+  end
+
+  def get_record_id(record)
+   ("%s_%s" % [record[:data_source_id], record[:gni_id]]).to_sym
   end
 
   def find_canonical_exact
@@ -176,8 +181,13 @@ private
           canonical_match = NameString.normalize(record[:canonical_form]) == NameString.normalize(record[:name])
           type = NAME_TYPES[record[:canonical_form].split(" ").size]
           res = record.merge(:match_type => EXACT_CANONICAL, :name_type => type, :match_by_canonical => canonical_match, :auth_score => auth_score) 
-          datum.has_key?(:results) ? datum[:results] << res : datum[:results] = [res]
-          val.has_key?(:results) ? val[:results] << res : val[:results] = [res]
+          record_id = get_record_id(record)
+          if datum.has_key?(:results) 
+            datum[:results][record_id] = res unless datum[:results].has_key?(record_id)
+          else
+            datum[:results] = { record_id => res }
+          end
+          val[:results] = true unless val.has_key?(:results)
           update_context(res) if @with_context
         end
       end
@@ -221,8 +231,13 @@ private
                 canonical_match = NameString.normalize(record[:canonical_form]) == NameString.normalize(record[:name])
                 type = NAME_TYPES[record[:canonical_form].split(" ").size]
                 res = record.merge(:match_type => FUZZY_CANONICAL, :name_type => type, :match_by_canonical => canonical_match, :auth_score => auth_score) 
-                datum.has_key?(:results) ? datum[:results] << res : datum[:results] = [res]
-                val.has_key?(:results) ? val[:results] << res : val[:results] = [res]
+                record_id = get_record_id(record)
+                if datum.has_key?(:results) 
+                  datum[:results][record_id] = res unless datum[:results].has_key?(record_id)
+                else
+                  datum[:results] = { record_id => res }
+                end
+                val[:results] = true unless val.has_key?(:results)
                 update_context(res) if @with_context
               end
             end
@@ -350,7 +365,7 @@ private
   def calculate_scores
     data.each do |datum|
       next unless datum[:results]
-      datum[:results].each do |result|
+      datum[:results].values.each do |result|
         get_score(result)
       end
     end
@@ -362,7 +377,7 @@ private
     canonical_match = result[:match_by_canonical]
     match_type = result[:match_type]
     data_source_id = result[:data_source_id]
-    classification_path = result[:classification_path].split("|")
+    classification_path = result[:classification_path] ? result[:classification_path].split("|") : []
     context = 0
     if @with_context && !classification_path.empty?
       context = classification_path.include?(@contexts[data_source_id]) ? 1 : -1
@@ -405,7 +420,7 @@ private
   end
 
   def add_default_options
-    self.options = {:with_context => false, :data_sources => []}.merge(self.options)
+    self.options = {:with_context => false, :data_sources => [], :resolve_once => true}.merge(self.options)
   end  
   
   def format_result
@@ -422,7 +437,7 @@ private
       res[:id] = d[:id] if d[:id]
       if d[:results]
         res[:results] = []
-        d[:results].each do |dr|
+        d[:results].values.each do |dr|
           match = {}
           match[:data_source_id] = dr[:data_source_id]
           match[:gni_uuid] = dr[:name_uuid]

@@ -90,8 +90,9 @@ class NameResolversController < ApplicationController
 
   def get_opts
     opts = {}
-    opts[:with_context] = !!params[:with_context] == "true" if params.has_key?(:with_context)
+    opts[:with_context] = !!(params[:with_context]) == "true" if params.has_key?(:with_context)
     opts[:data_sources] = params[:data_source_ids].split("|").map { |i| i.to_i } if params[:data_source_ids]
-    {:with_context => true, :data_sources => []}.merge(opts)
+    opts[:resolve_once] = !(params[:resolve_once] == "false") if params.has_key?(:resolve_once)
+    {:with_context => true, :data_sources => [], :resolve_once => true}.merge(opts)
   end
 end
