@@ -76,14 +76,15 @@ describe "name_resolvers API" do
     res[:data][1][:results].first[:taxon_id].should == "2433879"
   end
 
-  it "should produce an error if there is no data source information" do
+  it "should search whole GNI if there is no data source information" do
     get("/name_resolvers.json", 
-        :names => "Leiothrix argentauris (Hodgson, 1838)|Treron|Larus occidentalis wymani|Plantago major L.",
-        :with_context => false)
+        :names => "Calidris cooperi|Liothrix argentauris|Leiothrix argentauris (Hodgson, 1838)|Treron|Larus occidentalis wymani|Plantago major L.",
+        :with_context => false, :resolve_once => false)
     body = last_response.body
+    
     res = JSON.parse(body, :symbolize_names => true)
-    res[:status].should == ProgressStatus.failed.name
-    res[:message].should == NameResolver::MESSAGES[:no_data_source]
+    res[:data][0][:results].first.should == {:data_source_id=>2, :gni_uuid=>"01435442-3983-5234-9623-022468658894", :name_string=>"Calidris cooperi", :canonical_form=>"Calidris cooperi", :classification_path=>nil, :classification_path_ids=>nil, :taxon_id=>"5679", :match_type=>1, :prescore=>"3|0|0", :score=>0.9882161311296586}
+    res[:data][1][:results].first.should == {:data_source_id=>1, :gni_uuid=>"01052127-9074-3279-3448-709966846776", :name_string=>"Leiothrix argentauris (Hodgson, 1838)", :canonical_form=>"Leiothrix argentauris", :classification_path=>"Animalia|Chordata|Aves|Passeriformes|Sylviidae|Leiothrix|Leiothrix argentauris", :classification_path_ids=>"2362377|2362754|2363138|2363139|2363166|2417185|6868221", :taxon_id=>"6868221", :match_type=>3, :prescore=>"0.5|0|0", :score=>0.5395834241605656}
   end
   
   it "should produce an error if there are too many data sources" do

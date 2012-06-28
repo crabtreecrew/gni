@@ -14,11 +14,14 @@ class NameResolver < ActiveRecord::Base
   EXACT_STRING = 1
   EXACT_CANONICAL = 2
   FUZZY_CANONICAL = 3
+  EXACT_CANONICAL_SPECIES_LEVEL = 4
+  FUZZY_CANONICAL_SPECIES_LEVEL = 5
+  EXACT_CANONICAL_GENUS_LEVEL = 6
+  FUZZY_CANONICAL_GENUS_LEVEL = 5
   MAX_NAME_STRING = 10_000
   MAX_DATA_SOURCES = 5
   NAME_TYPES = { 1 => "uninomial", 2 => "binomial", 3 => "trinomial" }
   MESSAGES = {
-    :no_data_source => "No data sources found. Please provide from 1 to %s for data_source_ids parameter" % MAX_DATA_SOURCES,
     :too_many_data_sources => "Too many data sources. Please provide from 1 to %s for data_source_ids parameter" % MAX_DATA_SOURCES,
     :no_names => "No name strings found. Please provide from 1 to %s name strings" % MAX_NAME_STRING,
     :too_many_names => "Too many name strings. Please provide from 1 to %s name strings" % MAX_NAME_STRING,
@@ -63,6 +66,12 @@ class NameResolver < ActiveRecord::Base
       get_canonical_forms
       find_canonical_exact
       find_canonical_fuzzy
+      # get_partial_binomials
+      # find_canonical_exact
+      # find_canonical_fuzzy
+      # get_partial_uninomials
+      # find_canonical_exact
+      # find_canonical_fuzzy
       get_contexts if @with_context
       calculate_scores
       format_result
@@ -102,7 +111,6 @@ private
     @taxamatch = Taxamatch::Base.new
     @spellchecker = Gni::SolrSpellchecker.new
     @data_sources = options[:data_sources].select {|ds| ds.is_a? Fixnum}
-    raise Gni::NameResolverError, MESSAGES[:no_data_source] if @data_sources.blank?
     raise Gni::NameResolverError, MESSAGES[:too_many_data_sources] if @data_sources.size > MAX_DATA_SOURCES 
     raise Gni::NameResolverError, MESSAGES[:no_names] if data.blank?
     raise Gni::NameResolverError, MESSAGES[:too_many_names] if data.size > MAX_NAME_STRING
