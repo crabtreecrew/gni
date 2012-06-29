@@ -75,6 +75,7 @@ module Gni
     temp_dir: "/tmp",
     solr_url: "http://localhost:8983/solr",
     base_url: "http://localhost:3000",
+    reference_data_source_id: "1",
   )
 
 end

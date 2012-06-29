@@ -69,12 +69,20 @@ describe "name_resolvers API" do
 
   it "should be able to find partial binomial and partial uninomial forms" do
     post("/name_resolvers.json", 
-        :data => "2|Calidris cooperi alba\n1|Liothrix something something\n4|Plantago major L.\n5|Trerox somthing",
+        :data => "2|Calidris cooperi alba\n1|Liothrix argentauris something something\n4|Plantago major L.\n5|Treron somthing",
         :resolve_once => false)
     body = last_response.body
     res = JSON.parse(body, :symbolize_names => true)
-    require 'ruby-debug'; debugger
-    puts ''
+    res[:data][-1].should == {:name_string=>"Treron somthing", :id=>"5", :results=>[{:data_source_id=>1, :gni_uuid=>"02450740-2179-4891-4420-116063658828", :name_string=>"Treron", :canonical_form=>"Treron", :classification_path=>"Animalia|Chordata|Aves|Columbiformes|Columbidae|Treron", :classification_path_ids=>"2362377|2362754|2363138|2363188|2363295|2378348", :taxon_id=>"2378348", :match_type=>6, :prescore=>"1|0|0", :score=>0.75}]}
+    res[:data][-3][:results].map {|r| r[:match_type]}.should == [5,5,5]
+  end
+
+  it "should create default options" do
+    post("/name_resolvers.json", 
+        :data => "2|Calidris cooperi\n1|Leiothrix argentauris\n4|Plantago major L.")
+    body = last_response.body
+    res = JSON.parse(body, :symbolize_names => true)
+    res[:parameters].should == {:with_context => false, :data_sources => [], :resolve_once => true}
   end
 
   it "should be able to use uploaded file for resolving names" do

@@ -126,9 +126,14 @@ private
     if @with_context
       @tree_counter = {}
       @contexts = {}
-      @data_sources.each do |i|
-        @tree_counter[i] = {}
-        @contexts[i] = nil
+      if @data_sources.empty?
+        @tree_counter[Gni::Config.reference_data_source_id] = {}
+        @contexts[Gni::Config.reference_data_source_id] = nil
+      else
+        @data_sources.each do |i|
+          @tree_counter[i] = {}
+          @contexts[i] = nil
+        end
       end
     end
     @match_type = 0
@@ -263,6 +268,7 @@ private
     @not_found = @names
     @names = {}
     @not_found.each do |key, value|
+      next unless key
       canonical_ary = key.split(" ")
       @not_found.delete(key) if canonical_ary.size < 2
       if canonical_ary.size > 2
@@ -277,6 +283,7 @@ private
     @not_found.merge!(@names)
     @names = {}
     @not_found.each do |key, value|
+      next unless key
       canonical_form = key.gsub(/ .*$/, '')
       @names.has_key?(canonical_form) ? @names[canonical_form] += value : @names[canonical_form] = value
     end
@@ -343,7 +350,7 @@ private
       if @data_sources.blank?
         update_tree_counter(@tree_counter[Gni::Config.reference_data_source_id], taxon, i)
       else
-          update_tree_counter(@tree_counter[data_source_id], taxon, i)
+        update_tree_counter(@tree_counter[data_source_id], taxon, i)
       end
     end
   end
