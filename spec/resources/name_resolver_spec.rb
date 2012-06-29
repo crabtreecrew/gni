@@ -67,6 +67,16 @@ describe "name_resolvers API" do
     res[:data][1][:results].map {|r| r[:data_source_id]}.should == [1,1,3]
   end
 
+  it "should be able to find partial binomial and partial uninomial forms" do
+    post("/name_resolvers.json", 
+        :data => "2|Calidris cooperi alba\n1|Liothrix something something\n4|Plantago major L.\n5|Trerox somthing",
+        :resolve_once => false)
+    body = last_response.body
+    res = JSON.parse(body, :symbolize_names => true)
+    require 'ruby-debug'; debugger
+    puts ''
+  end
+
   it "should be able to use uploaded file for resolving names" do
     file_test_names = File.join(File.dirname(__FILE__), '..', 'files', 'bird_names.txt')
     file = Rack::Test::UploadedFile.new(file_test_names, 'text/plain')
