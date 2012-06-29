@@ -104,6 +104,29 @@ describe "name_resolvers API" do
     res[:data][0][:results].first.should == {:data_source_id=>2, :gni_uuid=>"01435442-3983-5234-9623-022468658894", :name_string=>"Calidris cooperi", :canonical_form=>"Calidris cooperi", :classification_path=>nil, :classification_path_ids=>nil, :taxon_id=>"5679", :match_type=>1, :prescore=>"3|0|0", :score=>0.9882161311296586}
     res[:data][1][:results].first.should == {:data_source_id=>1, :gni_uuid=>"01052127-9074-3279-3448-709966846776", :name_string=>"Leiothrix argentauris (Hodgson, 1838)", :canonical_form=>"Leiothrix argentauris", :classification_path=>"Animalia|Chordata|Aves|Passeriformes|Sylviidae|Leiothrix|Leiothrix argentauris", :classification_path_ids=>"2362377|2362754|2363138|2363139|2363166|2417185|6868221", :taxon_id=>"6868221", :match_type=>3, :prescore=>"0.5|0|0", :score=>0.5395834241605656}
   end
+
+  it "should be able to find as best as it can species with lost epithets, with cf or aff qualifiers" do
+    get("/name_resolvers.json", 
+        :names => "Calidris cooperi var|Liothrix argentauris ssp.|Treron aff. argentauris (Hodgson, 1838)|Treron spp.|Larus occidentalis cf. wymani",
+        :resolve_once => false)
+    body = last_response.body
+    res = JSON.parse(body, :symbolize_names => true)
+    res0 = res[:data][0]
+    res0[:name_string].should == "Calidris cooperi var"
+    res0[:results].map {|r| r[:name_string]}.uniq.should == ["Calidris cooperi (Baird, 1858)", "Calidris cooperi"]
+    res1 = res[:data][1]
+    res1[:name_string].should == "Liothrix argentauris ssp."
+    res1[:results].map {|r| r[:name_string]}.uniq.should == ["Leiothrix argentauris (Hodgson, 1838)", "Leiothrix argentauris"] 
+    res2 = res[:data][2]
+    res2[:name_string].should == "Treron aff. argentauris (Hodgson, 1838)"
+    res2[:results].map {|r| r[:name_string]}.uniq.should == ["Treron"] 
+    res3 = res[:data][3]
+    res3[:name_string].should == "Treron spp."
+    res3[:results].map {|r| r[:name_string]}.uniq.should == ["Treron"] 
+    res4 = res[:data][4]
+    res4[:name_string].should == "Larus occidentalis cf. wymani"
+    res4[:results].map {|r| r[:name_string]}.uniq.should == ["Larus occidentalis wymani"] 
+  end
   
   it "should produce an error if there are too many data sources" do
     get("/name_resolvers.json", 
