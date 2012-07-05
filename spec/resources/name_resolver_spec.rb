@@ -127,6 +127,17 @@ describe "name_resolvers API" do
     res4[:name_string].should == "Larus occidentalis cf. wymani"
     res4[:results].map {|r| r[:name_string]}.uniq.should == ["Larus occidentalis wymani"] 
   end
+
+  it "should be able to deal with some abbreviations" do 
+    get("/name_resolvers.json", 
+        :names => "Z. coeruleum|Liothrix argentauris (Hodgson, 1838)|L. argentauris|Trichastoma bicolor (Lesson, 1839)|T. bicolor",
+        :resolve_once => false)
+    body = last_response.body
+    res = JSON.parse(body, :symbolize_names => true)
+    require 'ruby-debug'; debugger
+    puts ''
+    #get("/name_resolvers.json", :names => "T. bicolor", :resolve_once => false)
+  end
   
   it "should produce an error if there are too many data sources" do
     get("/name_resolvers.json", 

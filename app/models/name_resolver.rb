@@ -70,6 +70,7 @@ class NameResolver < ActiveRecord::Base
       find_canonical_fuzzy
       get_partial_uninomials
       find_canonical_exact
+      resolve_abbrs
       get_contexts if @with_context
       calculate_scores
       format_result
@@ -81,6 +82,15 @@ class NameResolver < ActiveRecord::Base
   end
 
 private
+
+  def resolve_abbrs
+    return if @abbr_names.empty?
+    @abbr_names.each do |key, value|
+      ocurances = []
+
+    end
+
+  end
 
   def self.process_data(new_data)
     conv = Iconv.new('UTF-8', 'ISO-8859-1')
@@ -137,6 +147,7 @@ private
       end
     end
     @match_type = 0
+    @abbr_names = {}
   end
 
   def find_exact
@@ -311,6 +322,13 @@ private
     update_attributes(:progress_message => MESSAGES[:parsing])
     return if @names.blank?
     @names.keys.each do |key|
+      if @names[key][:name_string].match(/^[A-Z][a-z]?\./)
+        abbr_name = @names[key][:name_string].split(" ")
+        if abbr_name.size > 1
+          abbr_name = abbr_name[0..1].join(" ")
+          @abbr_names.has_key?(abbr_name) ? @abbr_names[abbr_name] << @names[key] : @abbr_names[abbr_name] = [@names[key]]
+        end
+      end
       @names[key][:parsed] = @atomizer.parse(@names[key][:name_string])
       if @names[key][:parsed]
         @names[key][:canonical_form] = @names[key][:parsed][:canonical_form]
@@ -321,7 +339,15 @@ private
     #switch names to canonical forms from normalized names
     new_names = {}
     @names.values.each do |v|
+      next if v[:canonical_form] == nil
       new_names.has_key?(v[:canonical_form]) ? new_names[v[:canonical_form]] << v : new_names[v[:canonical_form]] = [v]
+      cf_ary = v[:canonical_form].split(" ")
+      if cf_ary.size == 2
+        abbr_cf = "%s. %s" % [cf_ary[0][0], cf_ary[1]]
+        abbr_cf2 = "%s. %s" % [cf_ary[0][0..1], cf_ary[1]]
+        @abbr_names[abbr_cf] << v if @abbr_names.has_key?(abbr_cf)
+        @abbr_names[abbr_cf2] << v if @abbr_names.has_key?(abbr_cf2)
+      end
     end
     @names = new_names
   end
