@@ -22,7 +22,7 @@ class NameResolver < ActiveRecord::Base
   NAME_TYPES = { 1 => "uninomial", 2 => "binomial", 3 => "trinomial" }
   MESSAGES = {
     :too_many_data_sources => "Too many data sources. Please provide from 1 to %s for data_source_ids parameter" % MAX_DATA_SOURCES,
-    :no_names => "No name strings found. Please provide from 1 to %s name strings" % MAX_NAME_STRING,
+    :no_names => "No name strings found in your data. Please provide from 1 to %s name strings" % MAX_NAME_STRING,
     :too_many_names => "Too many name strings. Please provide from 1 to %s name strings" % MAX_NAME_STRING,
     :resolving => "Starting names resolution",
     :resolving_exact => "Collecting exact matches of name strings",
@@ -144,12 +144,12 @@ private
     update_attributes(:progress_message => MESSAGES[:resolving_exact])
     names = get_quoted_names(@names.keys)
     data_sources = @data_sources.join(",")
-    q = "select ns.id, ns.uuid, ns.normalized, ns.name, nsi.data_source_id, nsi.taxon_id, nsi.global_id, nsi.url, nsi.classification_path, nsi.classification_path_ids, cf.name from name_string_indices nsi join name_strings ns on ns.id = nsi.name_string_id left outer join canonical_forms cf on cf.id = ns.canonical_form_id where ns.normalized in (#{names})"
+    q = "select ns.id, ns.uuid, ns.normalized, ns.name, nsi.data_source_id, nsi.taxon_id, nsi.global_id, nsi.url, nsi.classification_path, nsi.classification_path_ids, cf.name, nsi.local_id from name_string_indices nsi join name_strings ns on ns.id = nsi.name_string_id left outer join canonical_forms cf on cf.id = ns.canonical_form_id where ns.normalized in (#{names})"
     q += " and data_source_id in (#{data_sources})" unless @data_sources.blank?
     res = DataSource.connection.select_rows(q)
 
     res.each do |row|
-      record = {:auth_score => 0, :gni_id => row[0], :name_uuid => UUID.parse(row[1].to_s(16)).to_s, :name => row[3], :data_source_id => row[4], :taxon_id => row[5], :global_id => row[6], :url => row[7], :classification_path => row[8], :classification_path_ids => row[9], :canonical_form => row[10] }
+      record = {:auth_score => 0, :gni_id => row[0], :name_uuid => UUID.parse(row[1].to_s(16)).to_s, :name => row[3], :data_source_id => row[4], :taxon_id => row[5], :global_id => row[6], :url => row[7], :classification_path => row[8], :classification_path_ids => row[9], :canonical_form => row[10], :local_id => row[11] }
       update_found_words(record[:canonical_form])
       name_normalized = row[2]
       @names[name_normalized][:indices].each do |i|
@@ -181,11 +181,11 @@ private
     names = get_quoted_names(canonical_forms)
     data_sources = @data_sources.join(",")
     
-    q = "select ns.id, ns.uuid, null, ns.name, nsi.data_source_id, nsi.taxon_id, nsi.global_id, nsi.url, nsi.classification_path, nsi.classification_path_ids, cf.name, pns.data  from name_string_indices nsi join name_strings ns on ns.id = nsi.name_string_id join canonical_forms cf on cf.id = ns.canonical_form_id join parsed_name_strings pns on pns.id = ns.id where cf.name in (#{names})"
+    q = "select ns.id, ns.uuid, null, ns.name, nsi.data_source_id, nsi.taxon_id, nsi.global_id, nsi.url, nsi.classification_path, nsi.classification_path_ids, cf.name, pns.data, nsi.local_id from name_string_indices nsi join name_strings ns on ns.id = nsi.name_string_id join canonical_forms cf on cf.id = ns.canonical_form_id join parsed_name_strings pns on pns.id = ns.id where cf.name in (#{names})"
     q += " and data_source_id in (#{data_sources})" unless @data_sources.blank?
     res = DataSource.connection.select_rows(q)
     res.each do |row|
-      record = {:gni_id => row[0], :name_uuid => UUID.parse(row[1].to_s(16)).to_s, :name => row[3], :data_source_id => row[4], :taxon_id => row[5], :global_id => row[6], :url => row[7], :classification_path => row[8], :classification_path_ids => row[9], :canonical_form => row[10] }
+      record = {:gni_id => row[0], :name_uuid => UUID.parse(row[1].to_s(16)).to_s, :name => row[3], :data_source_id => row[4], :taxon_id => row[5], :global_id => row[6], :url => row[7], :classification_path => row[8], :classification_path_ids => row[9], :canonical_form => row[10], :local_id => row[12] }
       found_name_parsed = @atomizer.organize_results(JSON.parse(row[11], :symbolize_names => true)[:scientificName])
       update_found_words(record[:canonical_form])
       @names[record[:canonical_form]].each do |val|
@@ -230,7 +230,7 @@ private
       canonical_form = key
       canonical_forms = @spellchecker.find(canonical_form)
       unless canonical_forms.blank?
-        q = "select ns.id, ns.uuid, null, ns.name, nsi.data_source_id, nsi.taxon_id, nsi.global_id, nsi.url, nsi.classification_path, nsi.classification_path_ids, cf.name, pns.data from canonical_forms cf join name_strings ns on ns.canonical_form_id = cf.id join parsed_name_strings pns on pns.id = ns.id join name_string_indices nsi on nsi.name_string_id = ns.id where cf.name in (%s)" % canonical_forms.map { |n| NameString.connection.quote(n) }.join(",")
+        q = "select ns.id, ns.uuid, null, ns.name, nsi.data_source_id, nsi.taxon_id, nsi.global_id, nsi.url, nsi.classification_path, nsi.classification_path_ids, cf.name, pns.data, nsi.local_id from canonical_forms cf join name_strings ns on ns.canonical_form_id = cf.id join parsed_name_strings pns on pns.id = ns.id join name_string_indices nsi on nsi.name_string_id = ns.id where cf.name in (%s)" % canonical_forms.map { |n| NameString.connection.quote(n) }.join(",")
         q += " and data_source_id in (#{data_sources})" unless @data_sources.blank?
         res = NameString.connection.select_rows(q)
         fuzzy_data = {}
@@ -239,7 +239,7 @@ private
           next if canonical_form.split(" ").size != found_canonical_form.split(" ").size
           is_match = match_names(canonical_form, found_canonical_form) 
           if is_match
-            record = {:gni_id => row[0], :name_uuid => UUID.parse(row[1].to_s(16)).to_s, :name => row[3], :data_source_id => row[4], :taxon_id => row[5], :global_id => row[6], :url => row[7], :classification_path => row[8], :classification_path_ids => row[9], :canonical_form => found_canonical_form }
+            record = {:gni_id => row[0], :name_uuid => UUID.parse(row[1].to_s(16)).to_s, :name => row[3], :data_source_id => row[4], :taxon_id => row[5], :global_id => row[6], :url => row[7], :classification_path => row[8], :classification_path_ids => row[9], :canonical_form => found_canonical_form, :local_id => row[12] }
             found_name_parsed = @atomizer.organize_results(JSON.parse(row[11], :symbolize_names => true)[:scientificName])
             @names[canonical_form].each do |val|
               auth_score = get_authorship_score(val[:parsed], found_name_parsed)
@@ -470,6 +470,7 @@ private
           match[:classification_path] = dr[:classification_path]
           match[:classification_path_ids] = dr[:classification_path_ids]
           match[:taxon_id] = dr[:taxon_id]
+          match[:local_id] = dr[:local_id]
           #placeholders for the future
           #match[:guid] = dr[:guid]
           #match[:urls] = [] 
