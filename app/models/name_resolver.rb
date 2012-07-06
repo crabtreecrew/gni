@@ -29,7 +29,11 @@ class NameResolver < ActiveRecord::Base
     :parsing => "Parsing name strings",
     :resolving_exact_canonical => "Resolving matches by canonical names",
     :resolving_fuzzy_canonical => "Fuzzy matching of canonical_names",
+    :resolving_partial_binomials => "Exact matching of binomials made from reduced unmatched strings",
+    :resolving_partial_binomials_fuzzy => "Fuzzy matching of binomials made from reduced unmatched strings",
+    :resolving_partial_uninomials => "Exact matching of uninomials made from reduced unmatched strings",
     :success => "Success",
+    :preparing_results => "Preparing results",
   }
   
   def self.perform(name_resolver_id)
@@ -60,17 +64,25 @@ class NameResolver < ActiveRecord::Base
 
   def reconcile
     begin
+      update_attributes(:progress_message => MESSAGES[:resolving])
       prepare_variables
+      update_attributes(:progress_message => MESSAGES[:resolving_exact])
       find_exact
       get_canonical_forms
+      update_attributes(:progress_message => MESSAGES[:resolving_exact_canonical]) unless @names.empty?
       find_canonical_exact
+      update_attributes(:progress_message => MESSAGES[:resolving_fuzzy_canonical]) unless @names.empty?
       find_canonical_fuzzy
       get_partial_binomials
+      update_attributes(:progress_message => MESSAGES[:resolving_partial_binomials]) unless @names.empty?
       find_canonical_exact
       find_canonical_fuzzy
+      update_attributes(:progress_message => MESSAGES[:resolving_partial_binomials_fuzzy]) unless @names.empty?
       get_partial_uninomials
+      update_attributes(:progress_message => MESSAGES[:resolving_partial_uninomials]) unless @names.empty?
       find_canonical_exact
       get_contexts if @with_context
+      update_attributes(:progress_message => MESSAGES[:preparing_results])
       calculate_scores
       format_result
     rescue Gni::Error => e
@@ -105,7 +117,6 @@ private
   end
 
   def prepare_variables
-    update_attributes(:progress_message => MESSAGES[:resolving])
     @atomizer = Taxamatch::Atomizer.new
     @taxamatch = Taxamatch::Base.new
     @spellchecker = Gni::SolrSpellchecker.new
@@ -141,7 +152,6 @@ private
 
   def find_exact
     @match_type += 1
-    update_attributes(:progress_message => MESSAGES[:resolving_exact])
     names = get_quoted_names(@names.keys)
     data_sources = @data_sources.join(",")
     q = "select ns.id, ns.uuid, ns.normalized, ns.name, nsi.data_source_id, nsi.taxon_id, nsi.global_id, nsi.url, nsi.classification_path, nsi.classification_path_ids, cf.name, nsi.local_id from name_string_indices nsi join name_strings ns on ns.id = nsi.name_string_id left outer join canonical_forms cf on cf.id = ns.canonical_form_id where ns.normalized in (#{names})"
@@ -176,7 +186,6 @@ private
   def find_canonical_exact
     @match_type += 1
     return if @names.empty?
-    update_attributes(:progress_message => MESSAGES[:resolving_exact_canonical])
     canonical_forms = @names.keys
     names = get_quoted_names(canonical_forms)
     data_sources = @data_sources.join(",")
@@ -223,7 +232,6 @@ private
 
   def find_canonical_fuzzy
     @match_type += 1
-    update_attributes(:progress_message => MESSAGES[:resolving_fuzzy_canonical])
     data_sources = @data_sources.join(",")
     @names.keys.each do |key|
       next unless key
