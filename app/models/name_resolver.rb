@@ -17,7 +17,7 @@ class NameResolver < ActiveRecord::Base
   EXACT_CANONICAL_SPECIES_LEVEL = 4
   FUZZY_CANONICAL_SPECIES_LEVEL = 5
   EXACT_CANONICAL_GENUS_LEVEL = 6
-  MAX_NAME_STRING = 1000
+  MAX_NAME_STRING = 10_000
   MAX_DATA_SOURCES = 5
   NAME_TYPES = { 1 => "uninomial", 2 => "binomial", 3 => "trinomial" }
   MESSAGES = {
