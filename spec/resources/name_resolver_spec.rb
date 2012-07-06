@@ -102,7 +102,7 @@ describe "name_resolvers API" do
     
     res = JSON.parse(body, :symbolize_names => true)
     res[:data][0][:results].first.should == {:data_source_id=>2, :gni_uuid=>"01435442-3983-5234-9623-022468658894", :name_string=>"Calidris cooperi", :canonical_form=>"Calidris cooperi", :classification_path=>nil, :classification_path_ids=>nil, :taxon_id=>"5679", :match_type=>1, :prescore=>"3|0|0", :score=>0.9882161311296586}
-    res[:data][1][:results].first.should == {:data_source_id=>1, :gni_uuid=>"01052127-9074-3279-3448-709966846776", :name_string=>"Leiothrix argentauris (Hodgson, 1838)", :canonical_form=>"Leiothrix argentauris", :classification_path=>"Animalia|Chordata|Aves|Passeriformes|Sylviidae|Leiothrix|Leiothrix argentauris", :classification_path_ids=>"2362377|2362754|2363138|2363139|2363166|2417185|6868221", :taxon_id=>"6868221", :match_type=>3, :prescore=>"0.5|0|0", :score=>0.5395834241605656}
+    res[:data][1][:results].first.should == {:data_source_id=>1, :gni_uuid=>"01052127-9074-3279-3448-709966846776", :name_string=>"Leiothrix argentauris (Hodgson, 1838)", :canonical_form=>"Leiothrix argentauris", :classification_path=>"Animalia|Chordata|Aves|Passeriformes|Sylviidae|Leiothrix|Leiothrix argentauris", :classification_path_ids=>"2362377|2362754|2363138|2363139|2363166|2417185|6868221", :taxon_id=>"6868221", :match_type=>3, :prescore=>"1|0|0", :score=>0.75}
   end
 
   it "should be able to find as best as it can species with lost epithets, with cf or aff qualifiers" do
@@ -128,16 +128,17 @@ describe "name_resolvers API" do
     res4[:results].map {|r| r[:name_string]}.uniq.should == ["Larus occidentalis wymani"] 
   end
   
-  it "should produce an error if there are too many data sources" do
-    get("/name_resolvers.json", 
-        :names => "Leiothrix argentauris (Hodgson, 1838)|Treron|Larus occidentalis wymani|Plantago major L.",
-        :with_context => false,
-        :data_source_ids => "1|2|3|4|5|6")
-    body = last_response.body
-    res = JSON.parse(body, :symbolize_names => true)
-    res[:status].should == ProgressStatus.failed.name
-    res[:message].should == NameResolver::MESSAGES[:too_many_data_sources]
-  end
+  # REMOVED this CONSTRAIN FOR NOW
+  # it "should produce an error if there are too many data sources" do
+  #   get("/name_resolvers.json", 
+  #       :names => "Leiothrix argentauris (Hodgson, 1838)|Treron|Larus occidentalis wymani|Plantago major L.",
+  #       :with_context => false,
+  #       :data_source_ids => "1|2|3|4|5|6")
+  #   body = last_response.body
+  #   res = JSON.parse(body, :symbolize_names => true)
+  #   res[:status].should == ProgressStatus.failed.name
+  #   res[:message].should == NameResolver::MESSAGES[:too_many_data_sources]
+  # end
 
   it "should produce an error if there are no names" do
     get("/name_resolvers.json", 

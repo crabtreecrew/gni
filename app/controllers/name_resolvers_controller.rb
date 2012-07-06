@@ -2,7 +2,7 @@ class NameResolversController < ApplicationController
 
   def index
     if params[:names]
-      create(true)
+      create
     end
   end
 
@@ -13,7 +13,7 @@ class NameResolversController < ApplicationController
     end
   end
 
-  def create(from_get = false)
+  def create
     new_data = get_data
     opts = get_opts
     token = "_"
@@ -44,13 +44,14 @@ class NameResolversController < ApplicationController
       :token => token
     )
 
-    if new_data.size < 500 || from_get
-      resolver.reconcile
-    else
-      resolver.progress_message = "In a que" 
-      resolver.save!
-      Resque.enqueue(NameResolver, resolver.id)
-    end
+    resolver.reconcile
+    # if new_data.size < 1000
+    #   resolver.reconcile
+    # else
+    #   resolver.progress_message = "In a que" 
+    #   resolver.save!
+    #   Resque.enqueue(NameResolver, resolver.id)
+    # end
     respond_to do |format|
       present_result(format, resolver)
     end

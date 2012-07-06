@@ -17,7 +17,7 @@ class NameResolver < ActiveRecord::Base
   EXACT_CANONICAL_SPECIES_LEVEL = 4
   FUZZY_CANONICAL_SPECIES_LEVEL = 5
   EXACT_CANONICAL_GENUS_LEVEL = 6
-  MAX_NAME_STRING = 10_000
+  MAX_NAME_STRING = 1000
   MAX_DATA_SOURCES = 5
   NAME_TYPES = { 1 => "uninomial", 2 => "binomial", 3 => "trinomial" }
   MESSAGES = {
@@ -110,7 +110,7 @@ private
     @taxamatch = Taxamatch::Base.new
     @spellchecker = Gni::SolrSpellchecker.new
     @data_sources = options[:data_sources].select {|ds| ds.is_a? Fixnum}
-    raise Gni::NameResolverError, MESSAGES[:too_many_data_sources] if @data_sources.size > MAX_DATA_SOURCES 
+    # raise Gni::NameResolverError, MESSAGES[:too_many_data_sources] if @data_sources.size > MAX_DATA_SOURCES 
     raise Gni::NameResolverError, MESSAGES[:no_names] if data.blank?
     raise Gni::NameResolverError, MESSAGES[:too_many_names] if data.size > MAX_NAME_STRING
     @with_context = options[:with_context]
@@ -262,6 +262,7 @@ private
         end
       end
     end
+    delete_names_with_results
   end
 
   def get_partial_binomials
@@ -289,24 +290,6 @@ private
     end
   end
 
-  def get_rid_of_unparsed
-    #delete found words
-    @names.each do |key, values|
-      parsed, unparsed = values.partition {|value| value[:canonical_form]}
-      if parsed.empty?
-        @names.delete(key)
-      else
-        @names[key] = parsed
-      end
-      # 
-      # unparsed.each do |value|
-      #   value[:indices].each do |index|
-      #     data[index].merge!({ :match_type => UNPARSEABLE })
-      #   end
-      # end
-    end
-  end
-  
   def get_canonical_forms
     update_attributes(:progress_message => MESSAGES[:parsing])
     return if @names.blank?
@@ -440,7 +423,7 @@ private
       s = 8
       s = 3 if (canonical_match || match_type == EXACT_CANONICAL)
       if match_type == FUZZY_CANONICAL
-        s = 0.5
+        s = 1
         a = auth_score
         c = context
       end
