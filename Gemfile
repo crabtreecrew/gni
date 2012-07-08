@@ -19,6 +19,7 @@ gem "composite_primary_keys", ">= 4.0.0"
 gem "rest-client"
 gem "ruby-stemmer"
 gem "optiflag"
+gem "high_voltage"
 
 
 group :assets do

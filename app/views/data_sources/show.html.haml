@@ -1,5 +1,10 @@
-%p#notice= notice
+=title "#{@data_source.title}"
 
+- content_for :content_splash do
+  - ellipsis = (@data_source.title.length > 140) ? @data_source.title[0..137] + "..." : @data_source.title
+  %h2 #{ellipsis}
+
+%p #{@data_source.description}
 
 = link_to 'Edit', edit_data_source_path(@data_source)
 \|

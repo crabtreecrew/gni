@@ -28,7 +28,7 @@
         <span class="source-name-string"><%= source[:name_string] %></span>
         <span class="score">[Score: <%= source[:score] %>]</span>
       </div>
-      <div class="source-classification-path"><%= source[:classification_path].gsub("|", " >> ") %></div>
+      <div class="source-classification-path"><%= source[:classification_path].gsub("|", " >> ") if source[:classification_path] %></div>
     </div>
   <% end %>
   </div>

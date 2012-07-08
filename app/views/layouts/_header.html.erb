@@ -2,7 +2,7 @@
   <div class="inner">
     <div id="Logo">
       <a href="/">
-        <h1>Global Names Resolver (Alpha)</h1>
+        <h1>Global Names Resolver</h1>
       </a>
     </div>
     <ul id="SiteNavigation">
@@ -10,6 +10,21 @@
         <li class="active"><%= link_to "Home", root_path %></li>
       <%- else -%>
         <li><%= link_to "Home", root_path %></li>
+      <%- end -%>
+      <%- if controller_name == "data_sources" -%>
+        <li class="active"><%= link_to "Sources", data_sources_path %></li>
+      <%- else -%>
+        <li><%= link_to "Sources", data_sources_path %></li>
+      <%- end -%>
+      <%- if controller_name == 'pages' && static_path == "/about" -%>
+        <li class="active"><%= link_to "About", static_path(:about) %></li>
+      <%- else -%>
+        <li><%= link_to "About", static_path(:about) %></li>
+      <%- end -%>
+      <%- if controller_name == 'pages' && static_path == "/api" -%>
+        <li class="active"><%= link_to "API", static_path(:api) %></li>
+      <%- else -%>
+        <li><%= link_to "API", static_path(:api) %></li>
       <%- end -%>
     </ul>
   </div>

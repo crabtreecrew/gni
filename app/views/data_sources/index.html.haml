@@ -1,16 +1,23 @@
-%h1 Listing data_sources
+=title "Data Sources"
+
+-content_for :content_splash do
+  %h2 Names Data Sources
 
 %table
   %tr
-    %th
-    %th
-    %th
+    %th Title
+    %th.actions Actions
 
+  - cycle = "odd"
   - @data_sources.each do |data_source|
-    %tr
-      %td= link_to 'Show', data_source
-      %td= link_to 'Edit', edit_data_source_path(data_source)
-      %td= link_to 'Destroy', data_source, :confirm => 'Are you sure?', :method => :delete
+    - cycle = (cycle == "odd") ? "even" : "odd"
+    %tr{:class => cycle}
+      - ellipsis = (data_source.title.length > 75) ? data_source.title[0..72] + "..." : data_source.title
+      %td= ellipsis
+      - show = link_to 'Show', data_source
+      - edit = link_to 'Edit', edit_data_source_path(data_source)
+      - destroy = link_to 'Destroy', data_source, :confirm => 'Are you sure?', :method => :delete
+      %td.actions #{show} | #{edit} | #{destroy}
 
 %br
 
