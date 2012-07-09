@@ -11,7 +11,7 @@
   :escaped
     gem install rest-client
 
-
+%hr
 
 %h3 Show Data Sources
 
@@ -59,15 +59,15 @@
   %dt
     names (obligatory)
   %dd
-    Type: string. Default: none. List of names either pipe character "|" or new line character "\n" delmited. Use pipe character for GET requests, new line for POST requests. Optionally for POST requests you can supply your local ID for each name using formatting like this:
+    Type: string. Default: none. List of names delimited by either pipe character "|" or new line character "\n". Use pipe character for GET requests, new line for POST requests. Optionally for POST requests you can supply your local ID for each name using formatting like this:
     
     %pre.code
       :escaped
-            123|Parus major
+        123|Parus major
         125|Parus thruppi
         126|Parus carpi
 
-    Your names will return back with the ID supplied by you, making it easier to process the results. Files also can be upload with names listed in the same format using multipart POST request.
+    Your names will return back with the ID supplied by you, making it easier to process the results. You can also upload files using mulpipart POST request (see example below). Name strings has to be listed in the described above fasion.
   %dt
     resolve_once (optional)
   %dd
