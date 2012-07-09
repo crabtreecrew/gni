@@ -1,31 +1,104 @@
-=title "API"
+=title "API (Alpha -- might change in the future)"
 
 - content_for :content_splash do
   %h2 Application Programming Interface
 
-%h3 Base URL
+%h5 Note:
 
-#base-url
-  %p= name_resolvers_url + ".json"
-
-%h3 Parameters (GET or POST)
-%dl
-  %dt
-  %dd
-
-  %dt
-  %dd
-
-%h3 Output Format
-%dl
-  %dt JSON (default)
-  %dd
-
-  %dt XML
-  %dd
-
-%h3 Example
+%p Ruby examples require gem rest-client. To install it use
 
 %pre.code
   :escaped
-    { "code" : "here" }
+    gem install rest-client
+
+
+
+%h3 Show Data Sources
+
+%p You can resolve names against specific data sources or against the whole resolver database. For resolving against data sources you need to know their ids. This simple API allows you find them.
+
+%h4 Resource URI
+- resource_url = Gni::Config.base_url + "/data_sources"
+
+#base-url
+  %p= resource_url + ".xml (xml output)"
+  %p= resource_url + ".json (json output)"
+  
+%h4 Example
+
+%pre.code
+  :escaped
+    #{resource_url}.xml
+    #{resource_url}.json
+
+%h4 Ruby Code Example
+
+%pre.code
+  :escaped
+    #!/usr/bin/env ruby
+    require 'rest-client'
+    puts RestClient.get("#{resource_url}.json")
+
+%hr
+%h3 Resolve Names
+
+%p 
+  Takes list of names and resolves them against the whole resolver database or specific data sources. Underlying resolving and scoring algorithms are described at 
+  %a{:href => '/about'} About 
+  page.
+
+%h4 Resource URI
+- resource_url = Gni::Config.base_url + "/name_resolvers"
+
+#base-url
+  %p= resource_url + ".xml (xml output)"
+  %p= resource_url + ".json (json output)"
+  
+%h3 Parameters (GET or POST)
+%dl
+  %dt
+    names (obligatory)
+  %dd
+    Type: string. Default: none. List of names either pipe character "|" or new line character "\n" delmited. Use pipe character for GET requests, new line for POST requests. Optionally for POST requests you can supply your local ID for each name using formatting like this:
+    
+    %pre.code
+      :escaped
+            123|Parus major
+        125|Parus thruppi
+        126|Parus carpi
+
+    Your names will return back with the ID supplied by you, making it easier to process the results. Files also can be upload with names listed in the same format using multipart POST request.
+  %dt
+    resolve_once (optional)
+  %dd
+    Type: boolean (true/false). Default: 'false'. Tries to find canonical exact and fuzzy match even if exact string match was found. When true -- you get results faster, but they are not complete. Set this parameter to 'true' if you try to find if a name is real name, but you do not care to find it in all possible databases with all possible renderings of a name. To make wait longer and receive more complete data set it to 'false'.
+  %dt
+    with_context (optional)
+  %dd
+    Type: boolean (true/false). Default: 'true'. This parameter allows to weed out homonyms from the results. When this parameter is set to true a common context of the names is calculated for data sources with classification trees. All names for which classification path is found are used for calculating a context. Context of a name collection is a lowest clade which contains 90% of all resolved names. Names out of determined context get penalized significantly during score calculation.
+%h4 Example
+
+%pre.code
+  :escaped
+    #{resource_url}.xml?names=Plantago+major|Monohamus+galloprovincialis|Felis+concolor&data_source_ids=1|12
+    #{resource_url}.json?names=Plantago+major|Monohamus+galloprovincialis|Felis+concolor
+    #{resource_url}.json?names=Plantago+major|Monohamus+galloprovincialis|Felis+concolor@data_source_ids=1|12&resolve_once=false
+
+%h4 Ruby Code Example
+
+%pre.code
+  :escaped
+    #!/usr/bin/env ruby
+    require 'rest-client'
+    require 'uri'
+
+    puts "GET request\n"
+    puts RestClient.get(URI.escape("#{resource_url}.json?names=Plantago major|Monohamus galloprovincialis|Felis concolor&resolve_once=false&data_source_ids=1|3"))
+    
+    puts "\n\nPOST request with names and supplied IDs\n"
+    puts RestClient.post(resource_url, :format => "json", :names =>"1|Plantago major\n2|Pardosa moesta L.\n3|Felis concolor", :resolve_once => false, :data_source_ids => "1")
+    
+    if File.exists?('names_list.txt')
+        puts "\n\nPOST request with an uploaded file\n"
+        puts RestClient.post(resource_url, :format => "json", :file =>File.new("names_list.txt", "r:utf-8"), :resolve_once => false, :data_source_ids => "1")
+    end

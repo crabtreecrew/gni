@@ -82,7 +82,7 @@ describe "name_resolvers API" do
         :data => "2|Calidris cooperi\n1|Leiothrix argentauris\n4|Plantago major L.")
     body = last_response.body
     res = JSON.parse(body, :symbolize_names => true)
-    res[:parameters].should == {:with_context => false, :data_sources => [], :resolve_once => true}
+    res[:parameters].should == {:with_context => true, :data_sources => [], :resolve_once => true}
   end
 
   it "should be able to use uploaded file for resolving names" do

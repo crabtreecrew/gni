@@ -411,7 +411,7 @@ private
     data_source_id = result[:data_source_id]
     classification_path = result[:classification_path] ? result[:classification_path].split("|") : []
     context = 0
-    if @with_context && !classification_path.empty?
+    if @with_context && @context && !classification_path.empty?
       context = classification_path.include?(@contexts[data_source_id]) ? 1 : -1
     end
     prescore = 0
@@ -452,7 +452,7 @@ private
   end
 
   def add_default_options
-    self.options = {:with_context => false, :data_sources => [], :resolve_once => true}.merge(self.options)
+    self.options = {:with_context => true, :data_sources => [], :resolve_once => true}.merge(self.options)
   end  
   
   def format_result
