@@ -2,3 +2,30 @@
 
 - content_for :content_splash do
   %h2 Application Programming Interface
+
+%h3 Base URL
+
+#base-url
+  %p= name_resolvers_url + ".json"
+
+%h3 Parameters (GET or POST)
+%dl
+  %dt
+  %dd
+
+  %dt
+  %dd
+
+%h3 Output Format
+%dl
+  %dt JSON (default)
+  %dd
+
+  %dt XML
+  %dd
+
+%h3 Example
+
+%pre.code
+  :escaped
+    { "code" : "here" }
