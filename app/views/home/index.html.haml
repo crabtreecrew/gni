@@ -1,24 +1,27 @@
 - content_for :content_splash do
   %p.tagline= "Global Names resolution tools and services"
 
-%p= "Resolve lists of scientific names against several simultaneous sources. This service parses incoming names, executes exact or fuzzy matching as required, and displays the identifiers in the sources with a confidence score for each match."
+%p= "Resolve lists of scientific names against known sources. This service parses incoming names, executes exact or fuzzy matching as required, and displays a confidence score for each match along with its identifier."
 
 #resolver-form
   %form{:action => "/name_resolvers", :method => "POST"}
     %label{:for => "data"} Paste Scientific Names
     %textarea{:name => "data", :cols => 24, :rows => 12}
-    %fieldset
-      %legend= "Data Sources"
-      %input{:type => "checkbox", :id => 'data_source_ids_1', :name => "data_source_ids[1]"}
-      %label{:for => 'data_source_ids_1'} Catalogue of Life
-      %input{:type => "checkbox", :id => 'data_source_ids_3', :name => "data_source_ids[3]"}
-      %label{:for => 'data_source_ids_3'} ITIS
-      %input{:type => "checkbox", :id => 'data_source_ids_5', :name => "data_source_ids[5]"}
-      %label{:for => 'data_source_ids_5'} Index Fungorum
-      %input{:type => "checkbox", :id => 'data_source_ids_11', :name => "data_source_ids[11]"}
-      %label{:for => 'data_source_ids_11'} GBIF
-      %input{:type => "checkbox", :id => 'data_source_ids_167', :name => "data_source_ids[167]"}
-      %label{:for => 'data_source_ids_167'} IPNI
+    #advanced_options
+      %a{:href => "#"} Advanced Options &gt;&gt;
+    #advanced_selections
+      %fieldset
+        %legend= "Data Sources"
+        %input{:type => "checkbox", :id => 'data_source_ids_1', :name => "data_source_ids[1]"}
+        %label{:for => 'data_source_ids_1'} Catalogue of Life
+        %input{:type => "checkbox", :id => 'data_source_ids_3', :name => "data_source_ids[3]"}
+        %label{:for => 'data_source_ids_3'} ITIS
+        %input{:type => "checkbox", :id => 'data_source_ids_5', :name => "data_source_ids[5]"}
+        %label{:for => 'data_source_ids_5'} Index Fungorum
+        %input{:type => "checkbox", :id => 'data_source_ids_11', :name => "data_source_ids[11]"}
+        %label{:for => 'data_source_ids_11'} GBIF
+        %input{:type => "checkbox", :id => 'data_source_ids_167', :name => "data_source_ids[167]"}
+        %label{:for => 'data_source_ids_167'} IPNI
 
     %div
       %input{:type => "submit", :class => "form-button submit-button", :name => "commit", :value => "Resolve Names"}
