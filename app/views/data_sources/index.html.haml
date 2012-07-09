@@ -3,11 +3,10 @@
 -content_for :content_splash do
   %h2 Names Data Sources
 
-%table
+%table#data-sources
   %tr
     %th.identifier ID
     %th Source
-    %th.actions Actions
 
   - cycle = "odd"
   - @data_sources.each do |data_source|
@@ -16,10 +15,3 @@
       %td.identifier= data_source.id
       - ellipsis = (data_source.title.length > 75) ? data_source.title[0..72] + "..." : data_source.title
       %td= link_to ellipsis, data_source
-      - edit = link_to 'Edit', edit_data_source_path(data_source)
-      - destroy = link_to 'Destroy', data_source, :confirm => 'Are you sure?', :method => :delete
-      %td.actions #{edit} | #{destroy}
-
-%br
-
-= link_to 'New Data source', new_data_source_path

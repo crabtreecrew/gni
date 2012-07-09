@@ -1,6 +1,7 @@
 // Place all the styles related to the DataSources controller here.
 // They will automatically be included in application.css.
 // You can use Sass (SCSS) here: http://sass-lang.com/
+#data-sources{width:85%;margin:0px auto;}
 table{background:none repeat scroll 0 0 #e6e6e6;border:1px solid gray;border-collapse:collapse;width:95%;color:#555;}
 table thead tr{height:1.75em;}
 th.identifier, td.identifier{width:50px;text-align:center;}

@@ -21,7 +21,9 @@
           .source-match
             .source-names-score
               %span.source-name-string= source[:name_string]
-              %span.score= "[ Score: #{source[:score].round(4)} ]"
-            .source-title= DataSource.find(source[:data_source_id]).title
+              %span.score= "[ #{match_type(source[:match_type])}, Score: #{source[:score].round(4)} ]"
+            .source-title
+              %a{ :href => data_source_path(source[:data_source_id]) }
+                = DataSource.find(source[:data_source_id]).title
             - if !source[:classification_path].nil?
               .source-classification-path= source[:classification_path].gsub('|', ' >> ')

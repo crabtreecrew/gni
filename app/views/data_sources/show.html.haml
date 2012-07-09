@@ -4,12 +4,12 @@
   - ellipsis = (@data_source.title.length > 140) ? @data_source.title[0..137] + "..." : @data_source.title
   %h2 #{ellipsis}
 
-.data-source-id
+- if @data_source.web_site_url
+  %p
+    %a{:href => @data_source.web_site_url}= @data_source.web_site_url
+
+%p.data-source-id
   = "Data Source ID:"
   %span= @data_source.id
 
 %p #{@data_source.description}
-
-= link_to 'Edit', edit_data_source_path(@data_source)
-\|
-= link_to 'Back', data_sources_path
