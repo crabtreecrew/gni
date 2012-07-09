@@ -1,16 +1,18 @@
 // Place all the styles related to the name_resolvers controller here.
 // They will automatically be included in application.css.
 // You can use Sass (SCSS) here: http://sass-lang.com/
+.outputs{position:absolute;right:2em;top:50%;}
+.outputs span{background-color:#fafafa;border:1px solid #ccc;padding:5px;border-radius:6px;margin-right:5px;}
+.outputs span:hover{background-color:#eee;}
 .section{margin-bottom:1.5em;}
-.results{margin-left:1em;}
+.results{margin:0.5em 0 0.5em;}
 
-.searched-name{border-bottom:1px solid #aaa;width:100%;margin-top:20px;position:relative;}
-.searched-name h4{border-bottom:2px solid #bbb;margin:0px;padding:3px 0px;width:30em;font-size:1em;}
-.number-matches{position:absolute; right:0px;top:25%;font-size:0.8em;}
-.results {margin-top:0.5em;}
-.nothing{font-style:italic;font-size:0.9em;}
-.source-match{margin-bottom:1.5em;}
+.searched-name{background-color:#e6e6e6;border-bottom:1px solid #aaa;margin-top:1em;position:relative;padding:0 5px;}
+.searched-name h4{margin:0px;padding:3px 0px;width:800px;font-size:1em;font-weight:normal;}
+.number-matches{position:absolute;right:5px;top:25%;font-size:0.8em;}
+.source-match{padding:10px;margin-bottom:0.5em;}
+.source-name-string{font-weight:bold;}
 .source-names-score{margin-bottom:0.5em;}
-.source-name-string{color:#45704D;}
-.source-classification-path{line-height:1.5em;}
+.source-title{line-height:1.5em;margin-left:10px;}
+.source-classification-path{line-height:1.5em;font-size:0.8em;margin-left:10px;}
 .score{font-size:0.8em;}
