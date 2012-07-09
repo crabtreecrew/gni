@@ -1,0 +1,27 @@
+=title "Results"
+
+- content_for :content_splash do
+  %h2 Results
+
+.parameters
+- @res[:parameters][:data_sources].each do |source|
+  = DataSource.find(source).title
+
+- @res[:data].each do |result|
+  .section
+    .searched-name
+      %h4= h result[:name_string]
+      - num_matches = (result[:results] && result[:results].size > 0) ? result[:results].size : 0
+      %span.number-matches= "Number matches: #{num_matches}"
+
+    .results
+      - if result[:results].nil?
+        .nothing= "nothing found"
+      - else
+        - result[:results].each do |source|
+          .source-match
+            .source-names-score
+              %span.source-name-string= source[:name_string]
+              %span.score= "[Score: #{source[:score]}]"
+            - if !source[:classification_path].nil?
+              .source-classification-path= source[:classification_path].gsub('|', ' >> ')

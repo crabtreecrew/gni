@@ -5,6 +5,7 @@
 
 %table
   %tr
+    %th.identifier ID
     %th Title
     %th.actions Actions
 
@@ -12,6 +13,7 @@
   - @data_sources.each do |data_source|
     - cycle = (cycle == "odd") ? "even" : "odd"
     %tr{:class => cycle}
+      %td.identifier= data_source.id
       - ellipsis = (data_source.title.length > 75) ? data_source.title[0..72] + "..." : data_source.title
       %td= ellipsis
       - show = link_to 'Show', data_source
