@@ -1,4 +1,61 @@
 =title "About"
 
 - content_for :content_splash do
-  %h2 About
+  %h2 Synopsis
+
+  %p
+    Scientific Names are the most important metadata items in biodiversity. They glue together all sorts of information back to 1750.
+    However they are not perfect. Names change with time because of taxonomic and nomenclatural revisions, or by mistakes and misspellings introduced and copied over. Scanning printed information introduced a problem of OCR errors in names.
+    Also some names are not unique (is a homonym), like for example genus name Aotus. It happens most often if names were introduced under different 
+    %a{:href => "http://en.wikipedia.org/wiki/Nomenclature_codes"}nomenclature codes.
+    
+  %p
+    This resolution service tries to answer following questions about a string representing a scientific name:
+    %ul
+      %li Is this a name?
+      %li It is spelled correctly
+      %li Is this name currently in use?
+      %li What other names are related to this name (e.g. synonyms, lexical variants)?
+      %li If this name string is a homonym, which one name out of several it belongs to?
+
+  %h2 Matching Process
+
+  %h3 1. Exact Matching:
+  
+  %p 
+    Submitted name strings are checked for exact match against name strings in specified data sources or in the whole database. The found names are not removed from the query list after this stage if API option "resolve_once" is set to "true". User interface defaults it to "true"
+
+  %h3 2. Exact Matching of Canonical Forms
+
+  %p
+    Name strings are often supplied with authorship information and can become quite complex (e.g. Racomitrium canescens f. epilosum (H. Müll. ex Milde) G. Jones in Grout). Global Name Parser strips authorship and rank information from names (e.g. Racomitrium canescens epilosum) which makes it possible to compare the string with other variants of the same name. Resulting canonical forms are checked for exact match against canonical forms in specified data sources of in the whole database. After this step all found names are removed from the following steps.
+
+  %h3 3. Fuzzy Matching if Canonical Forms
+
+  %p Mistakes, misspellings, OCR errors often create incorrect variants of scientific names. Remaining canonical forms generated at the previous step are fuzzy matched against canonical forms in specified data sources. We used slightly modified version of TaxaMatch algorithm developed by
+  %a{:href => "http://www.cmar.csiro.au/datacentre/taxamatch.htm"} Tony Rees
+  for these purposes. After this step all found names are removed from the following steps.
+
+  %h3 4. Exact Matching of Specific Part of Names
+
+  %p Some names are recognized by parser as infraspecific, which could not be found during previous steps. Sometimes it happens because this name is not known to resolver database, or to specified data sources. Sometimes a 'junk' word gets included and for parser it looks like an infraspecific epithet. For cases like this the algorithm extracts specific canonical forms from names recognized as infraspecific and tries to match this subset of names against datasources or the whole database. For example "Pardosa moesta spider" will be stripped from "spider" and matched as "Pardosa moesta". All found names are removed from the following steps.
+
+  %h3 5. Fuzzy Matching of Specific Part of Names
+
+  %p Names remaning in the subset from the previous step go through fuzzy match procedure. All found names are removed from the following step.
+
+  %h3 6. Exact Matching of Genus Part of Names
+
+  %p Names remaning in the subset from the previous step as well as all remaining binomial canonical forms are reduced to the genus part of the name and matched against the data sources or the whole database.
+
+  %h2 Taxonomic Context
+    
+  %p If "with_context" parameter is set to "true" apparent taxonomical meaning of the matched names is collected throughout the whole matching process. It is determined by data sources which have name strings organized in hierarhies. This information allows to determine a taxonomic context of the supplied list by finding the lowest clade which contains more than 90% of all found species. For example if supplied list was about beetles common for Scandinavia the resulting context would be 'Coleoptera'. Names which do not belong to the determined context will get lower scores. If it is an undesirable set "with_context" parameter to "false" in API.
+  
+  %h2 Confidence Score
+
+  %p Matched names fall into several categories depending on several factors. For example if name Aotus gets perfectly matched as a plant genus name -- it might be wrong, if the name mentioned in query reffered to a monkey genus. Another example is 'bad' fuzzy matching. Name Afina can fuzzy match genus Alina from Lepidoptera order, which does not make the match 'real'. Usually matches of trinomial or binomial names have better chance to be correct. Matching of authorship information further increases chances of correct match. However different authorship does not always mean different taxonomic meaning. For example "Monochamus galloprovincialis (Olivier, 1795)" and "Monochamus galloprovincialis Secchi, 1998" both refer to the same species, where former name shows the original author of the name, and the later refers to a publication where the name got mentioned. As a result of all the factors scoring the matches is becoming a daunting task. We devised a "confidence score" system to make it possible to take all the factors into account. The confidence score system can be presented as a slider going on X axis of the curve shown on the following chart.
+
+  %img{:src => "confidence_score.png", :alt => "Confidence Score Graph", :width => "250", :height => "200"}
+
+  %p We start at the 0 mark on X axis and assign positive values for events which increase probability score, and negative values to events which decrease it. For example exact match of a binomial name increases probability significantly, so we move the slider 3 points to the right, which sets the score at 0.988 percent. However if authorship of the name did not get matched correctly, we move the slider 2 points to the left, which decreases the score to 0.75%. We try map level of confidence we would have for the match with resulting numbers. 0.5 would mean neutral confidence, where result is needed to be examined by hand, and 0.99 would mean high confidence where the result is most likely be accurate.
