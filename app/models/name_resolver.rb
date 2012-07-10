@@ -460,7 +460,7 @@ private
     if @with_context
       r[:context] = []
       @contexts.each do |key, val|
-        r[:context] << { :data_source_id => key, :clade => val }
+        r[:context] << { :context_data_source_id => key, :context_clade => val }
       end
     end
     r[:data] = []

@@ -122,15 +122,19 @@
 %dt data_sources
 %dd A list of data source ids you used for name resolution. If no data sources were given the list is empty.
 %dt context
-%dd Appears if with_context parameter is set to true. It shows id of a data source which was used to create the context and the context itself -- a lowest clade which contains 90% of names found within the classification. If there were not enough names to collect the statistics the clade remains empty.
+%dd Appears if 'with_context' parameter is set to true.
+%dt context_data_source_id
+%dd The id of a data source used to create the context
+%dt context_clade
+%dd A lowest clade in the data source which contains 90% or more of all names found. If there were not enough names to collect the statistics the clade remains empty.
 %dt data
 %dd A container for the resolution data 
 %dt supplied_name_string
-%dd A name string supplied by you in your list
+%dd A name string supplied by the request list
 %dt supplied_id
-%dd Returns id supplied by you with the name string
+%dd Shows the id of the supplied name string (if it was given)
 %dt results
-%dd A container for diplaying found names for a particular name string
+%dd A container for displaying found names for a particular name string
 %dt data_source_id
 %dd An id of a data source where a name was found
 %dt gni_uuid
@@ -158,7 +162,7 @@
     %li 5 - Partial fuzzy match by species part of canonical form
     %li 6 - Exact match by genus part of a canonical form
 %dd prescore
-%dt Points used to calculate the score delimited by '|' -- "Match points|Author match points|Context points". Negative points decrease the final result. 
+%dt Displays points used to calculate the score delimited by '|' -- "Match points|Author match points|Context points". Negative points decrease the final result. 
 %dt score
 %dd 
   A confidence score calculated for the match. 0.5 means an uncertain result which needs to be checked manually. Result higher than 0.9 corresponds to 'good' matches. Results between 0.5 and 0.9 should be taken with caution. Results less than 0.5 are most probably wrong matches. The scoring is described in more details on the 
