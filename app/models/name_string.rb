@@ -12,6 +12,7 @@ class NameString < ActiveRecord::Base
   end
 
   def self.normalize(nstring)
+    return '' if nstring == nil || nstring.empty?
     Taxamatch::Normalizer.normalize(nstring)[0...255]
   end
 
