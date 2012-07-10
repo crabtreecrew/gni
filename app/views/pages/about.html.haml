@@ -93,6 +93,6 @@
   %em Monochamus galloprovincialis
   Secchi, 1998 both refer to the same species, where the former indicates the original author of the name, and the latter is merely a reference to the name. This names resolver produces a "confidence score" to accommodate all these potential issues. The score is produced from a curvilinear plot of weighted decisions.
 
-= image_tag "confidence_score.png", { :alt => "Confidence Score Graph", :width => "250", :height => "200" }
+= image_tag "confidence_score.png", { :alt => "Confidence Score Graph", :width => "500", :height => "400" }
 
 %p We start at 0 on the x-axis and assign positive values for events that increase the probability score, and negative values to events that decrease it. For example, an exact match of a binomial name increases the probability significantly, so we adjust the slider 3 points to the right with a corresponding score of 0.988. However, if the authorship of the name did not get correctly matched, we adjust the slider 2 points to the left, to a corresponding score of 0.75. We try to map confidence level the with resulting scores. For example, 0.5 means neutral confidence whereas 0.99 mean high confidence.
