@@ -1,11 +1,9 @@
 =title "API"
 
 - content_for :content_splash do
-  %h2 Application Programming Interface (Alpha -- might change in the future)
+  %h2 Application Programming Interface (Alpha -- subject to change)
 
-%h5 Note:
-
-%p Ruby examples require gem rest-client. To install it use
+%p Ruby examples require the rest-client gem. To install it use:
 
 %pre.code
   :escaped
@@ -13,23 +11,16 @@
 
 %hr
 
-%h3 Show Data Sources
+%h3 Data Sources
 
-%p You can resolve names against specific data sources or against the whole resolver database. For resolving against data sources you need to know their ids. This simple API allows you find them.
+%p You can resolve names against specific data sources or against the whole resolver database. To resolve against data sources you must supply their ids; this simple API allows you to find them.
 
 %h4 Resource URI
 - resource_url = Gni::Config.base_url + "/data_sources"
 
 #base-url
-  %p= resource_url + ".xml (xml output)"
-  %p= resource_url + ".json (json output)"
-  
-%h4 Example
-
-%pre.code
-  :escaped
-    #{resource_url}.xml
-    #{resource_url}.json
+  %p= resource_url + ".xml (XML output)"
+  %p= resource_url + ".json (JSON output)"
 
 %h4 Ruby Code Example
 
@@ -43,39 +34,39 @@
 %h3 Resolve Names
 
 %p 
-  Takes list of names and resolves them against the whole resolver database or specific data sources. Underlying resolving and scoring algorithms are described at 
-  %a{:href => '/about'} About 
-  page.
+  Receives a list of names and resolves each against the entire resolver database or against specific data sources. Underlying resolving and scoring algorithms are described
+  = succeed '.' do
+    %a{:href => '/about'} elsewhere
 
 %h4 Resource URI
 - resource_url = Gni::Config.base_url + "/name_resolvers"
 
 #base-url
-  %p= resource_url + ".xml (xml output)"
-  %p= resource_url + ".json (json output)"
+  %p= resource_url + ".xml (XML output)"
+  %p= resource_url + ".json (JSON output)"
   
-%h3 Parameters (GET or POST)
+%h4 Parameters (GET or POST)
 %dl
   %dt
-    names (obligatory)
+    names (required)
   %dd
-    Type: string. Default: none. List of names delimited by either pipe character "|" or new line character "\n". Use pipe character for GET requests, new line for POST requests. Optionally for POST requests you can supply your local ID for each name using formatting like this:
+    Type: string, Default: none. List of names delimited by either pipe "|" or new line "\n". Use a pipe for GET requests, new line for POST requests. For POST requests you may optionally supply your local id for each name as:
     
     %pre.code
-      :escaped
+      :preserve
         123|Parus major
         125|Parus thruppi
         126|Parus carpi
 
-    Your names will return back with the ID supplied by you, making it easier to process the results. You can also upload files using mulpipart POST request (see example below). Name strings has to be listed in the described above fasion.
+    Names in the response will contain your supplied ids, facilitating integration. You can also upload files using a multipart POST request (see example below). Name strings must be listed as above.
   %dt
     resolve_once (optional)
   %dd
-    Type: boolean (true/false). Default: 'false'. Tries to find canonical exact and fuzzy match even if exact string match was found. When true -- you get results faster, but they are not complete. Set this parameter to 'true' if you try to find if a name is real name, but you do not care to find it in all possible databases with all possible renderings of a name. To make wait longer and receive more complete data set it to 'false'.
+    Type: boolean (true/false), Default: 'false'. Find the first available match instead of matches across all data sources with all possible renderings of a name. When 'true', response is rapid but incomplete.
   %dt
     with_context (optional)
   %dd
-    Type: boolean (true/false). Default: 'true'. This parameter allows to weed out homonyms from the results. When this parameter is set to true a common context of the names is calculated for data sources with classification trees. All names for which classification path is found are used for calculating a context. Context of a name collection is a lowest clade which contains 90% of all resolved names. Names out of determined context get penalized significantly during score calculation.
+    Type: boolean (true/false), Default: 'true'. Reduce the likelihood of matches to taxonomic homonyms. When 'true' a common taxonomic context is calculated for all supplied names from matches in data sources that have classification tree paths. Names out of determined context are penalized during score calculation.
 
 %h4 Output Example
 
