@@ -19,7 +19,7 @@ class NameResolver < ActiveRecord::Base
   EXACT_CANONICAL_GENUS_LEVEL = 6
   MAX_NAME_STRING = 10_000
   MAX_DATA_SOURCES = 5
-  NAME_TYPES = { 1 => "uninomial", 2 => "binomial", 3 => "trinomial" }
+  NAME_TYPES = { 0 => "unknown", 1 => "uninomial", 2 => "binomial", 3 => "trinomial" }
   MESSAGES = {
     :too_many_data_sources => "Too many data sources. Please provide from 1 to %s for data_source_ids parameter" % MAX_DATA_SOURCES,
     :no_names => "No name strings found in your data. Please provide from 1 to %s name strings" % MAX_NAME_STRING,
@@ -86,6 +86,9 @@ class NameResolver < ActiveRecord::Base
       calculate_scores
       format_result
     rescue Gni::Error => e
+      self.progress_status = ProgressStatus.failed
+      self.progress_message = e.message
+    rescue RuntimeError => e
       self.progress_status = ProgressStatus.failed
       self.progress_message = e.message
     end
@@ -164,8 +167,13 @@ private
       name_normalized = row[2]
       @names[name_normalized][:indices].each do |i|
         datum = data[i]
-        canonical_match = NameString.normalize(record[:canonical_form]) == NameString.normalize(record[:name])
-        type = NAME_TYPES[record[:canonical_form].split(" ").size]
+        if record[:canonical_form]
+          canonical_match = NameString.normalize(record[:canonical_form]) == NameString.normalize(record[:name])
+          type = NAME_TYPES[record[:canonical_form].split(" ").size]
+        else
+          canonical_match = false
+          type = NameType[0]
+        end
         record.merge!(:match_type => @match_type, :name_type => type, :match_by_canonical => canonical_match) 
         record_id = get_record_id(record)
         datum.has_key?(:results) ? datum[:results][record_id] = record : datum[:results] = {record_id => record}
