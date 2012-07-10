@@ -456,7 +456,7 @@ private
     end
     prescore += (s + a + c)
     result[:prescore] = "%s|%s|%s" % [s,a,c]
-    result[:score] = "%0.3f" % Gni.num_to_score(prescore)
+    result[:score] = "%0.3f" % Gni.num_to_score(prescore).to_f
   end
 
   def add_default_options
