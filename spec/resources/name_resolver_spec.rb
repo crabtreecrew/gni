@@ -47,7 +47,7 @@ describe "name_resolvers API" do
     body = last_response.body
     res = JSON.parse(body, :symbolize_names => true)
     res[:data].first[:results].first[:taxon_id].should == "6868221"
-    res[:data].select { |r| r.has_key?(:id) }.size.should > 0
+    res[:data].select { |r| r.has_key?(:supplied_id) }.size.should > 0
   end
 
   it "should be able to continue with canonical form search if resolve_once option is false" do
@@ -73,7 +73,7 @@ describe "name_resolvers API" do
         :resolve_once => false)
     body = last_response.body
     res = JSON.parse(body, :symbolize_names => true)
-    res[:data][-1].should == {:name_string=>"Treron somthing", :id=>"5", :results=>[{:data_source_id=>1, :gni_uuid=>"02450740-2179-4891-4420-116063658828", :name_string=>"Treron", :canonical_form=>"Treron", :classification_path=>"Animalia|Chordata|Aves|Columbiformes|Columbidae|Treron", :classification_path_ids=>"2362377|2362754|2363138|2363188|2363295|2378348", :taxon_id=>"2378348", :local_id=>nil, :match_type=>6, :prescore=>"1|0|0", :score=>0.75}]}
+    res[:data][-1].should == {:supplied_name_string=>"Treron somthing", :supplied_id=>"5", :results=>[{:data_source_id=>1, :gni_uuid=>"02450740-2179-4891-4420-116063658828", :name_string=>"Treron", :canonical_form=>"Treron", :classification_path=>"Animalia|Chordata|Aves|Columbiformes|Columbidae|Treron", :classification_path_ids=>"2362377|2362754|2363138|2363188|2363295|2378348", :taxon_id=>"2378348", :local_id=>nil, :match_type=>6, :prescore=>"1|0|0", :score=>0.75}]}
     res[:data][-3][:results].map {|r| r[:match_type]}.should == [5,5,5]
   end
 
@@ -112,19 +112,19 @@ describe "name_resolvers API" do
     body = last_response.body
     res = JSON.parse(body, :symbolize_names => true)
     res0 = res[:data][0]
-    res0[:name_string].should == "Calidris cooperi var"
+    res0[:supplied_name_string].should == "Calidris cooperi var"
     res0[:results].map {|r| r[:name_string]}.uniq.should == ["Calidris cooperi (Baird, 1858)", "Calidris cooperi"]
     res1 = res[:data][1]
-    res1[:name_string].should == "Liothrix argentauris ssp."
+    res1[:supplied_name_string].should == "Liothrix argentauris ssp."
     res1[:results].map {|r| r[:name_string]}.uniq.should == ["Leiothrix argentauris (Hodgson, 1838)", "Leiothrix argentauris"] 
     res2 = res[:data][2]
-    res2[:name_string].should == "Treron aff. argentauris (Hodgson, 1838)"
+    res2[:supplied_name_string].should == "Treron aff. argentauris (Hodgson, 1838)"
     res2[:results].map {|r| r[:name_string]}.uniq.should == ["Treron"] 
     res3 = res[:data][3]
-    res3[:name_string].should == "Treron spp."
+    res3[:supplied_name_string].should == "Treron spp."
     res3[:results].map {|r| r[:name_string]}.uniq.should == ["Treron"] 
     res4 = res[:data][4]
-    res4[:name_string].should == "Larus occidentalis cf. wymani"
+    res4[:supplied_name_string].should == "Larus occidentalis cf. wymani"
     res4[:results].map {|r| r[:name_string]}.uniq.should == ["Larus occidentalis wymani"] 
   end
   

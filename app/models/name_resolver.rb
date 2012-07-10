@@ -465,8 +465,8 @@ private
     end
     r[:data] = []
     data.each do |d|
-      res = { :name_string => d[:name_string] } 
-      res[:id] = d[:id] if d[:id]
+      res = { :supplied_name_string => d[:name_string] } 
+      res[:supplied_id] = d[:id] if d[:id]
       if d[:results]
         res[:results] = []
         d[:results].values.each do |dr|
