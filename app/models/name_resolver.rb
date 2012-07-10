@@ -172,7 +172,7 @@ private
           type = NAME_TYPES[record[:canonical_form].split(" ").size]
         else
           canonical_match = false
-          type = NameType[0]
+          type = NAME_TYPES[0]
         end
         record.merge!(:match_type => @match_type, :name_type => type, :match_by_canonical => canonical_match) 
         record_id = get_record_id(record)
