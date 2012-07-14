@@ -83,15 +83,15 @@
 %p
   Matched names fall into several categories. For example, if the name
   %em Aotus
-  gets perfectly matched as a plant genus, this may be incorrect if the name mentioned in query actually refers to a genus of monkey. Another example is poor fuzzy matching. The name
+  gets perfectly matched as a plant genus, this may be incorrect if the queried name actually refers to a genus of monkey. Another example is poor fuzzy matching. The name
   %em Afina
   can be fuzzily matched to the genus
   %em Alina
-  in the Order Lepidoptera. Matches of trinomial or binomial names have greater accuracy. Matching of authorship information further increases the likelihood of a correct match. However different authorship does not always mean different taxonomic meaning. For example,
+  in the Order Lepidoptera. Matches of trinomial or binomial names have greater accuracy. Matching of authorship information further increases the likelihood of a correct match. However, different authorship does not always mean different taxonomic meaning. For example,
   %em Monochamus galloprovincialis
   (Olivier, 1795) and
   %em Monochamus galloprovincialis
-  Secchi, 1998 both refer to the same species, where the former indicates the original author of the name, and the latter is merely a reference to the name. This names resolver produces a "confidence score" to accommodate all these potential issues. The score is produced from a curvilinear plot of weighted decisions.
+  Secchi, 1998 both refer to the same species, where the former indicates the original author of the name and the latter is merely a reference to the name. The name resolver produces a "confidence score" to accommodate all these potential issues. The score is produced from a curvilinear plot of weighted decisions.
 
 = image_tag "confidence_score.png", { :alt => "Confidence Score Graph", :width => "500", :height => "400" }
 

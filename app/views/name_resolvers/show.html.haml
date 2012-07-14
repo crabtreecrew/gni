@@ -11,7 +11,7 @@
 - @res[:data].each do |result|
   .section
     .searched-name
-      %h4= h result[:name_string]
+      %h4= h result[:supplied_name_string]
       - num_matches = (result[:results] && result[:results].size > 0) ? result[:results].size : 0
       %span.number-matches= "Number of matches: #{num_matches}"
 
