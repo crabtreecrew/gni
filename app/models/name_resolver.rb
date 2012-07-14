@@ -310,7 +310,7 @@ private
     update_attributes(:progress_message => MESSAGES[:parsing])
     return if @names.blank?
     @names.keys.each do |key|
-      @names[key][:parsed] = @atomizer.parse(@names[key][:name_string])
+      @names[key][:parsed] = @atomizer.parse(@names[key][:name_string]) rescue nil
       if @names[key][:parsed]
         @names[key][:canonical_form] = @names[key][:parsed][:canonical_form]
       else
