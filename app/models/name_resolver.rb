@@ -420,6 +420,7 @@ private
       context = classification_path.include?(@contexts[data_source_id]) ? 1 : -1
     end
     prescore = 0
+    a = c = s = 0
     if name_type == "uninomial"
       a = auth_score * 2
       c = context * 2
