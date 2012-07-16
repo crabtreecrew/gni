@@ -88,9 +88,6 @@ class NameResolver < ActiveRecord::Base
     rescue Gni::Error => e
       self.progress_status = ProgressStatus.failed
       self.progress_message = e.message
-    rescue StandardError => e
-      self.progress_status = ProgressStatus.failed
-      self.progress_message = e.message
     end
     save!
   end
