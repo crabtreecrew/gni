@@ -425,7 +425,7 @@ private
       a = auth_score * 2
       c = context * 2
       s = 4
-      s = 1 if (canonical_match || match_type == EXACT_CANONICAL)
+      s = 1 if (canonical_match || [EXACT_CANONICAL, EXACT_CANONICAL_GENUS_LEVEL].include?(match_type))
       if match_type == FUZZY_CANONICAL
         s = 0
         a = auth_score
@@ -435,8 +435,8 @@ private
       a = auth_score * 2
       c = context * 4
       s = 8
-      s = 3 if (canonical_match || match_type == EXACT_CANONICAL)
-      if match_type == FUZZY_CANONICAL
+      s = 3 if (canonical_match || [EXACT_CANONICAL, EXACT_CANONICAL_SPECIES_LEVEL].include?(match_type))
+      if [FUZZY_CANONICAL, FUZZY_CANONICAL_SPECIES_LEVEL].include?(match_type)
         s = 1
         a = auth_score
         c = context

@@ -36,4 +36,15 @@ module Gni
     Math.atan(num * num**2) * 0.5/(Math::PI*0.5) + 0.5
   end
 
+  def self.version_to_int(version)
+    coeff = 1
+    res = 0
+    version_ary = version.split(".")
+    until version_ary.empty?
+      num = version_ary.pop.to_i
+      res += coeff * num
+      coeff *= 100
+    end
+    res
+  end
 end

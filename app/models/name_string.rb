@@ -34,6 +34,7 @@ class NameString < ActiveRecord::Base
     res = super
     res ? ::UUID.parse(res.to_s(16)).to_s : nil
   end
+  
   private
 
   def pre_process_name_string

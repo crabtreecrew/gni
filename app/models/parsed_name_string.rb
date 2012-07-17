@@ -2,10 +2,15 @@
 class ParsedNameString < ActiveRecord::Base
   has_one :name_string
 
+  def self.reparse
+    #TODO implement reparsing
+  end
+
   def self.update(opts = {})
     #TODO implement reparsing for newer parser versions
     opts = {:update_outdated => false, :logger_object_id => 0}.merge(opts)
     Gni.logger_write(opts[:logger_object_id], "Parsing incoming strings")
+    parser_version_int = Gni.version_to_int(ScientificNameParser::VERSION)
     count = 0
     NameString.transaction do
       while true do
@@ -29,7 +34,7 @@ class ParsedNameString < ActiveRecord::Base
           "%s, %s, '%s', %s, %s, %s, '%s', '%s'" % [id, parsed, parser_version, parser_run, canonical, dump_data, now, now]
         end.join("),(")
         self.connection.execute("INSERT IGNORE INTO parsed_name_strings (id, parsed, parser_version, pass_num, canonical_form, data, created_at, updated_at) VALUES (%s)" % sql_data)
-        self.connection.execute("UPDATE name_strings SET has_words = 1 WHERE id IN (#{res.map{|i| i[0]}.join(",")})")
+        self.connection.execute("UPDATE name_strings SET has_words = 1, parser_version = #{parser_version_int} WHERE id IN (#{res.map{|i| i[0]}.join(",")})")
         self.insert_words(words) if words.size > 0
         self.process_canonical_form(res)
         count += set_size
