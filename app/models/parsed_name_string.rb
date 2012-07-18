@@ -4,6 +4,17 @@ class ParsedNameString < ActiveRecord::Base
 
   def self.reparse
     #TODO implement reparsing
+    while true
+      ids = NameString.connection.select_values("select id from name_strings where parser_version < %s limit %s" % [Gni.version_to_int(ScientificNameParser::VERSION), Gni::Config.batch_size])
+      break if ids.size == 0
+      ids_string = ids.join(",") 
+      NameString.transaction do
+        NameString.connection.execute("delete from name_word_semantic_meanings where name_string_id in (%s)" % ids_string)
+        NameString.connection.execute("delete from parsed_name_strings where id in (%s)" % ids_string)
+        NameString.connection.execute("update name_strings set has_words = 0 where id in (%s)" % ids_string)
+      end
+      ParsedNameString.update
+    end
   end
 
   def self.update(opts = {})
@@ -15,7 +26,7 @@ class ParsedNameString < ActiveRecord::Base
     NameString.transaction do
       while true do
         now = self.time_string
-        q = "SELECT id, name FROM name_strings WHERE has_words IS NULL LIMIT %s" % Gni::Config.batch_size
+        q = "SELECT id, name FROM name_strings WHERE has_words IS NULL or has_words = 0 LIMIT %s" % Gni::Config.batch_size
         parser = ScientificNameParser.new
         res = self.connection.select_rows(q)
         set_size = res.size

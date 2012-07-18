@@ -1,5 +1,10 @@
 require 'spec_helper'
 
 describe ParsedNameString do
-  pending "add some examples to (or delete) #{__FILE__}"
+  it "should reparse names from database" do
+    NameString.where("parser_version < ?", Gni.version_to_int(ScientificNameParser::VERSION)).size.should > 0
+    ParsedNameString.reparse
+    NameString.where("parser_version < ?", Gni.version_to_int(ScientificNameParser::VERSION)).size.should == 0
+    NameString.where(:parser_version => Gni.version_to_int(ScientificNameParser::VERSION)).size.should == NameString.count
+  end
 end
