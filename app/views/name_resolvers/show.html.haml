@@ -22,13 +22,12 @@
             .source-names-score
               %span.source-name-string= source[:name_string]
               %span.score= "[ #{match_type(source[:match_type])}, Score: #{source[:score].round(4)} ]"
-            .source-names-score
-              Current name:
-              %span.current-name-string= source[:current_name_string]
+            - if source[:current_name_string]
+              .source-names-score
+                Current name:
+                %span.current-name-string= source[:current_name_string]
             .source-title
               %a{ :href => data_source_path(source[:data_source_id]) }
                 = DataSource.find(source[:data_source_id]).title
             - if source[:classification_path]
               .source-classification-path= source[:classification_path].gsub('|', ' >> ')
-            - if source[:current_name_string]
-              %span.source-name-string= "Current name: #{source[:current_name_string]}"
