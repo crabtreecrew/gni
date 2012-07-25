@@ -44,15 +44,15 @@
 %h3 3. Fuzzy Matching of Canonical Forms
 
 %p
-  Mistakes, misspellings, or OCR errors can create incorrect variants of scientific names. Remaining canonical forms generated from the previous step are fuzzy matched against canonical forms in specified data sources. We use a modified version of the TaxaMatch algorithm developed by
+  Mistakes, misspellings, or OCR errors can create incorrect variants of scientific names. Remaining canonical forms generated from the previous step are fuzzily matched against canonical forms in specified data sources. We use a modified version of the TaxaMatch algorithm developed by
   = succeed '.' do
     %a{:href => "http://www.cmar.csiro.au/datacentre/taxamatch.htm"} Tony Rees
   After this step all found names are removed from the process.
 
-%h3 4. Exact Matching of Specific Part of Names
+%h3 4. Exact Matching of Specific Parts of Names
 
 %p
-  Some names are recognized by the parser as infraspecific names, which could not be found during previous steps of the process. This may be because the name is unknown to the resolver database. Sometimes a 'junk' word gets included and for parser it looks like an infraspecific epithet. For cases like this the algorithm extracts specific canonical forms from names recognized as infraspecific and tries to match this subset of names against datasources or the entire resolver database. For example,
+  Some names are recognized by the parser as infraspecific names, which were not found during previous steps of the process. This may be because the name is unknown to the resolver database. Sometimes a 'junk' word is wrongly included and the parser may recognize it as an infraspecific epithet. The algorithm extracts specific canonical forms from names recognized as infraspecific and tries to match this subset of names against datasources or the entire resolver database. For example,
   = surround '"' do
     %em Pardosa moesta
     spider
@@ -61,7 +61,7 @@
     = succeed "." do
       = surround '"' do
         Pardosa moesta
-  All found names are removed the process prior to the following steps.
+  All found names are removed from the process prior to proceeding to the following steps.
 
 %h3 5. Fuzzy Matching of Specific Parts of Names
 
@@ -76,7 +76,7 @@
 %h2 Taxonomic Context
   
 %p
-  If the "with_context" parameter is set to "true", the apparent taxonomic meaning of all matched names is collected throughout the process. For example, if a supplied list is about beetles common to Scandinavia, the resulting context would be 'Coleoptera'. Names that do not belong to a determined context will receive lower scores. If this is undesirable behavior, this parameter may be set to "false".
+  If the "with_context" parameter is set to "true", the overall taxonomic group of all matched names is collected throughout the process. Scores for possible homonym matches are down-weighted if the resolved names do not belong to the overall taxonomic group of the queried list. If this is undesirable behavior, this parameter may be set to "false".
 
 %h2 Confidence Score
 
