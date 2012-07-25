@@ -152,10 +152,7 @@ class DwcaImporter < ActiveRecord::Base
           local_id = taxon.local_id.blank? ? "NULL" : @db.quote(taxon.local_id)
           global_id = taxon.global_id.blank? ? "NULL" : @db.quote(taxon.global_id)
           classification_path_id =  taxon.classification_path_id.compact
-          classification_path = "''"
-          unless classification_path_id.blank?
-            classification_path = @db.quote(get_classification_path(taxon))
-          end
+          classification_path = @db.quote(get_classification_path(taxon))
           classification_path_id = @db.quote(classification_path_id.join("|"))
           if name_string_id != "NULL"
             names_index << [data_source_id, name_string_id, taxon_id, source, local_id, global_id, rank, taxon_id, "NULL", classification_path, classification_path_id, now, now].join(",")
@@ -229,15 +226,29 @@ class DwcaImporter < ActiveRecord::Base
   end
 
   def get_classification_path(taxon)
-    taxon.classification_path_id.compact.map do |key|
-      if @data[key].current_name_canonical # reuse canonica data if exists
+    classification_path = ""
+    if !taxon.classification_path_id.blank?
+      classification_path = get_classification_path_array(taxon.classification_path_id.compact).join("|")
+    elsif !taxon.linnean_classification_path.blank?
+      canonical_form = get_classification_path_array([taxon.id])[0]
+      if canonical_form && canonical_form.split(" ").size > 1
+        classification_path = taxon.linnean_classification_path.map { |i| i.first }
+        classification_path << canonical_form
+        classification_path = classification_path.join('|')
+      end
+    end
+  end
+
+  def get_classification_path_array(ids)
+    ids.map do |key|
+      if @data[key].current_name_canonical # reuse canonical data if exists
         @data[key].current_name_canonical
       else
         name_string = @db.quote(NameString.normalize_space(@data[key].current_name))
         res = @db.select_rows("SELECT cf.name FROM name_strings ns JOIN canonical_forms cf ON ns.canonical_form_id = cf.id WHERE ns.name = #{name_string}")[0]
         @data[key].current_name_canonical = res.blank? ? '' : res[0]
       end
-    end.join("|")
+    end
   end
 
   def time_string
