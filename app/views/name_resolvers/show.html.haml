@@ -25,5 +25,7 @@
             .source-title
               %a{ :href => data_source_path(source[:data_source_id]) }
                 = DataSource.find(source[:data_source_id]).title
-            - if !source[:classification_path].nil?
+            - if source[:classification_path]
               .source-classification-path= source[:classification_path].gsub('|', ' >> ')
+            - if source[:current_name_string]
+              %span.source-name_string= "Current name: #{source[:current_name_string]}"
