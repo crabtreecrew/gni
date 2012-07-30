@@ -6,6 +6,13 @@ class NameString < ActiveRecord::Base
   after_create :post_process_name_string
 
   scope :data_source, joins("join name_string_indices on name_string.id = name_string_indices.name_string_id").where("name_string_indices.data_source_id" => [1,2])
+  
+  def self.kill_orphans
+    #we only remove orphans which parser could not process, keep the rest, because there is a good chance they might be reentered into the system.
+    NameString.connection.execute('delete from name_strings where id not in (select name_string_id from name_string_indices) and id in (select id from parsed_name_strings where parsed=0)')
+    NameString.connection.execute('delete from parsed_name_strings where id not in (select id from name_strings)')
+  end
+
 
   def self.normalize_space(nstring)
     nstring.gsub(/\s{2,}/, ' ').strip[0...255]
