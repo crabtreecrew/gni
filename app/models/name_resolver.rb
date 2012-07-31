@@ -484,10 +484,9 @@ private
           match[:classification_path] = dr[:classification_path]
           match[:classification_path_ids] = dr[:classification_path_ids]
           match[:taxon_id] = dr[:taxon_id]
-          match[:local_id] = dr[:local_id]
-          #placeholders for the future
-          #match[:guid] = dr[:guid]
-          #match[:urls] = [] 
+          match[:local_id] = dr[:local_id] unless dr[:local_id].blank?
+          match[:global_id] = dr[:global_id] unless dr[:global_id].blank?
+          match[:url] = dr[:url] unless dr[:url].blank?
           if dr[:classification_path_ids]
             last_classification_id = dr[:classification_path_ids].split("|").last
             if last_classification_id && last_classification_id != dr[:taxon_id]

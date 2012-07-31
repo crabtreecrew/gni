@@ -30,6 +30,12 @@ the command reads data from spec/files/addnames.csv to add more records to the s
 
   bundle exec rake assets:precompile
 
+== Rebuilding images for production
+
+  from the machine with solr go to gni dir and run
+
+  rake db:solr:build RAILS_ENV=production
+
 == Copyright
 
 Authors: Dmitry Mozzherin, David Shorthouse
