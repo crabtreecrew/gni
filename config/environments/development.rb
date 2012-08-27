@@ -28,3 +28,9 @@ Gni::Application.configure do
   # Expands the lines which load the assets
   config.assets.debug = true
 end
+
+begin
+    require File.join(File.dirname(__FILE__), "production_gni_site")
+rescue LoadError
+    puts '********************WARNING: COULD NOT LOAD PRODUCTION_GNI_SITE FILE***********************'
+end

@@ -203,7 +203,7 @@ private
       found_name_parsed = @atomizer.organize_results(JSON.parse(row[11], :symbolize_names => true)[:scientificName])
       update_found_words(record[:canonical_form])
       @names[record[:canonical_form]].each do |val|
-        auth_score = get_authorship_score(val[:parsed], found_name_parsed)
+        auth_score = get_authorship_score(val[:parsed], found_name_parsed) rescue 0
       
         val[:indices].each do |i|
           datum = data[i]
