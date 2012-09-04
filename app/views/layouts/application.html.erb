@@ -2,9 +2,12 @@
 <html>
 <head>
   <title><%= content_for?(:title) ? "Global Names Resolver :: " << content_for(:title) : "Global Names Resolver" %></title>
-  <%= stylesheet_link_tag    "application" %>
-  <%= javascript_include_tag "application" %>
+  <% if @redirect_url %>
+    <meta http-equiv='refresh' content='<%= @redirect_delay -%>;url=<%= @redirect_url -%>'>
+  <% end %>
   <%= csrf_meta_tags %>
+  <%= javascript_include_tag "application" %>
+  <%= stylesheet_link_tag    "application" %>
 </head>
 <body>
   <div id="SiteContainer" class="structural">
