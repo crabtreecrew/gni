@@ -65,7 +65,6 @@
         125|Parus thruppi
         126|Parus carpi
 
-
     Names in the response will contain your supplied ids, facilitating integration. You can also upload files using a multipart POST request (see example below) with names and ids organized as in the example above.
   %dt
     resolve_once (optional)
@@ -76,12 +75,26 @@
   %dd
     Type: boolean (true/false), Default: 'true'. Reduce the likelihood of matches to taxonomic homonyms. When 'true' a common taxonomic context is calculated for all supplied names from matches in data sources that have classification tree paths. Names out of determined context are penalized during score calculation.
 
-%h4 Output Example
+%h4 Initial Output Example
+%p
+  The API operates in a queue with an initial response containing a url to be polled for a final response. For a query containing fewer than 1000 names, the queue is not used.
 
 %pre.code
   :escaped
     {
 
+      "id": "31FqejHuQYm980nCtUgvaw",
+      "url": "http://resolver.globalnames.org/name_resolvers/31FqejHuQYm980nCtUgvaw.json",
+      "data_sources": [ ],
+      "status": "working",
+      "message": "In the queue",
+    }
+
+%h4 Final Output Example
+
+%pre.code
+  :escaped
+    {
       "id": "31FqejHuQYm980nCtUgvaw",
       "url": "http://resolver.globalnames.org/name_resolvers/31FqejHuQYm980nCtUgvaw.json",
       "data_sources": [ ],
