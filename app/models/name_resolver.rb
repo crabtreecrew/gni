@@ -255,7 +255,7 @@ private
             record = {:gni_id => row[0], :name_uuid => UUID.parse(row[1].to_s(16)).to_s, :name => row[3], :data_source_id => row[4], :taxon_id => row[5], :global_id => row[6], :url => row[7], :classification_path => row[8], :classification_path_ids => row[9], :canonical_form => found_canonical_form, :local_id => row[12] }
             found_name_parsed = @atomizer.organize_results(JSON.parse(row[11], :symbolize_names => true)[:scientificName])
             @names[canonical_form].each do |val|
-              auth_score = get_authorship_score(val[:parsed], found_name_parsed)
+              auth_score = get_authorship_score(val[:parsed], found_name_parsed) rescue 0
               val[:indices].each do |i|
                 datum = data[i]
                 canonical_match = NameString.normalize(record[:canonical_form]) == NameString.normalize(record[:name])

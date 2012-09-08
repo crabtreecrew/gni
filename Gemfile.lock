@@ -33,7 +33,7 @@ GEM
     archive-tar-minitar (0.5.2)
     arel (2.2.1)
     bcrypt-ruby (3.0.1)
-    biodiversity19 (1.0.19)
+    biodiversity19 (1.0.22)
       parallel
       parallel
       treetop
@@ -285,7 +285,7 @@ PLATFORMS
   ruby
 
 DEPENDENCIES
-  biodiversity19 (>= 1.0.19)
+  biodiversity19 (>= 1.0.22)
   capistrano
   capybara
   coffee-rails (~> 3.1.1)
