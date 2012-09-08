@@ -4,4 +4,8 @@ class ApplicationController < ActionController::Base
   def json_callback(json_struct, callback)
     callback ? callback + "(" + json_struct + ");" : json_struct
   end
+
+  def redirect_with_delay(url, delay = 0)
+    @redirect_url, @redirect_delay = url, delay
+  end
 end

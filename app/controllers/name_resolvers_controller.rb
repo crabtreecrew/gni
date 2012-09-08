@@ -9,6 +9,10 @@ class NameResolversController < ApplicationController
   def show
     resolver = NameResolver.find_by_token(params[:id])
     respond_to do |format|
+      if (!params[:format] || params[:format] == 'html') && resolver.progress_status == ProgressStatus.working
+        @redirect_url = name_resolver_path(resolver.token)
+        @redirect_delay = 10
+      end
       present_result(format, resolver, true)
     end
   end
@@ -44,14 +48,14 @@ class NameResolversController < ApplicationController
       :token => token
     )
 
-    resolver.reconcile
-    # if new_data.size < 1000
-    #   resolver.reconcile
-    # else
-    #   resolver.progress_message = "In a que" 
-    #   resolver.save!
-    #   Resque.enqueue(NameResolver, resolver.id)
-    # end
+    if new_data.size < 1000 || !workers_running?
+      resolver.reconcile
+    else
+      resolver.progress_message = "In the queue"
+      resolver.save!
+      Resque.enqueue(NameResolver, resolver.id)
+    end
+
     respond_to do |format|
       present_result(format, resolver)
     end
@@ -59,6 +63,10 @@ class NameResolversController < ApplicationController
   end
 
   private
+
+  def workers_running?
+    !Resque.redis.smembers('workers').select {|w| w.index("name_resolver")}.empty?
+  end
 
   def present_result(format, resolver, is_show = false)
     @res = resolver.result
