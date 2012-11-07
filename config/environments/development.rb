@@ -30,7 +30,7 @@ Gni::Application.configure do
 end
 
 begin
-    require File.join(File.dirname(__FILE__), "production_gni_site")
+    require File.join(File.dirname(__FILE__), "development_gni_site")
 rescue LoadError
-    puts '********************WARNING: COULD NOT LOAD PRODUCTION_GNI_SITE FILE***********************'
+    puts '********************WARNING: COULD NOT LOAD DEVELOPMENT_GNI_SITE FILE***********************'
 end
