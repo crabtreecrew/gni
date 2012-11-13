@@ -1,13 +1,23 @@
 # encoding: utf-8
 module Gni
   class SolrSpellchecker
+
+    @queue = :solr_search
+    
+    def self.perform(id, name)
+      spellchecker = Gni::SolrSpellchecker.new
+      cfs = spellchecker.find(name + '~')
+      cfs -= [name.downcase]
+      puts "%s, %s\n%s" % [id, name, cfs.join(",")]
+    end
+
     def initialize
       @core = SolrCoreCanonicalForm.new
       @solr_client = SolrClient.new(solr_url: @core.solr_url, update_csv_params: @core.update_csv_params)
     end
 
     def find(name)
-      res = @solr_client.search("*:*&rows=0&spellcheck=true&spellcheck.accuracy=0.75&spellcheck.q=\"#{name}\"&spellcheck.rows=1000")
+      #res = @solr_client.search("*:*&rows=0&spellcheck=true&spellcheck.accuracy=0.75&spellcheck.q=\"#{name}\"&spellcheck.rows=1000")
       res = @solr_client.search("*:*&rows=0&spellcheck=true&spellcheck.accuracy=0.8&spellcheck.q=#{name}&spellcheck.rows=1000")
       
       if res[:spellcheck][:suggestions].blank?
