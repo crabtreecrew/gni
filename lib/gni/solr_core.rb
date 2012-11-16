@@ -8,7 +8,11 @@ module Gni
       spellchecker = Gni::SolrSpellchecker.new
       cfs = spellchecker.find(name + '~')
       cfs -= [name.downcase]
-      puts "%s, %s\n%s" % [id, name, cfs.join(",")]
+      unless cfs.empty?
+        cfs.each do |candidate_name|
+          NameString.connection.execute("INSERT IGNORE INTO lexical_match_candidates (canonical_form_id, candidate_name, created_at, updated_at) values (%s, %s, now(), now())" %  [id, NameString.connection.quote(candidate_name)])
+        end
+      end
     end
 
     def initialize
