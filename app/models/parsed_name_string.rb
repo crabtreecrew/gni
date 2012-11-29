@@ -3,7 +3,6 @@ class ParsedNameString < ActiveRecord::Base
   has_one :name_string
 
   def self.reparse
-    #TODO implement reparsing
     while true
       ids = NameString.connection.select_values("select id from name_strings where parser_version < %s limit %s" % [Gni.version_to_int(ScientificNameParser::VERSION), Gni::Config.batch_size])
       break if ids.size == 0
@@ -18,7 +17,6 @@ class ParsedNameString < ActiveRecord::Base
   end
 
   def self.update(opts = {})
-    #TODO implement reparsing for newer parser versions
     opts = {:update_outdated => false, :logger_object_id => 0}.merge(opts)
     Gni.logger_write(opts[:logger_object_id], "Parsing incoming strings")
     parser_version_int = Gni.version_to_int(ScientificNameParser::VERSION)

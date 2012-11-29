@@ -6,4 +6,8 @@ class LexicalMatcher
     @genera_matches = {}
     @species_matches = {}
   end
+
+  def match_names
+
+  end
 end
