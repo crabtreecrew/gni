@@ -67,6 +67,13 @@
 
     Names in the response will contain your supplied ids, facilitating integration. You can also upload files using a multipart POST request (see example below) with names and ids organized as in the example above.
   %dt
+    data_source_ids (optional)
+  %dd
+    Type: string, Default: none. A pipe-delimited list of data sources. See a the list of
+    = succeed '.' do
+      %a{:href => '/data_sources'} data sources
+
+  %dt
     resolve_once (optional)
   %dd
     Type: boolean (true/false), Default: 'false'. Find the first available match instead of matches across all data sources with all possible renderings of a name. When 'true', response is rapid but incomplete.
@@ -200,7 +207,7 @@
   :escaped
     #{resource_url}.xml?names=Plantago+major|Monohamus+galloprovincialis|Felis+concolor&data_source_ids=1|12
     #{resource_url}.json?names=Plantago+major|Monohamus+galloprovincialis|Felis+concolor+species
-    #{resource_url}.json?names=Plantago+major|Monohamus+galloprovincialis|Felis+concolor@data_source_ids=1|12&resolve_once=false
+    #{resource_url}.json?names=Plantago+major|Monohamus+galloprovincialis|Felis+concolor&data_source_ids=1|12&resolve_once=false
 
 %h4 Ruby Code Example
 
