@@ -9,8 +9,8 @@ xml.rdf(:RDF,
   "xmlns:dc"      => "http://purl.org/dc/elements/1.1/",
   "xmlns:dwc"     => "http://rs.tdwg.org/dwc/terms/",
   "xmlns:dcterms" => "http://purl.org/dc/terms/",
-  "xmlns:cc"      => "http://creativecommons.org/ns#"),
-  "xmlns:wdrs"    => "http://www.w3.org/2007/05/powder-s#">do
+  "xmlns:cc"      => "http://creativecommons.org/ns#",
+  "xmlns:wdrs"    => "http://www.w3.org/2007/05/powder-s#") do
 
   xml.rdf(:Description, "rdf:about" => gni_url) do
     xml.dcterms(:title, "About: " + @name_string.name)
