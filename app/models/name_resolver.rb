@@ -458,7 +458,9 @@ private
   end
 
   def add_default_options
-    self.options = {:with_context => true, :data_sources => [], :resolve_once => true}.merge(self.options)
+    self.options = { with_context: false, 
+                     data_sources: [], 
+                     resolve_once: false }.merge(self.options)
   end  
   
   def format_result
