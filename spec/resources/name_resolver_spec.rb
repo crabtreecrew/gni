@@ -108,12 +108,12 @@ describe "name_resolvers API" do
 
   it "should be able to find as best as it can species with lost epithets, with cf or aff qualifiers" do
     get("/name_resolvers.json", 
-        :names => "Calidris cooperi var|Liothrix argentauris ssp.|Treron aff. argentauris (Hodgson, 1838)|Treron spp.|Larus occidentalis cf. wymani",
+        :names => "Calidris cf. cooperi|Liothrix argentauris ssp.|Treron aff. argentauris (Hodgson, 1838)|Treron spp.|Calidris cf. cooperi",
         :resolve_once => false)
     body = last_response.body
     res = JSON.parse(body, :symbolize_names => true)
     res0 = res[:data][0]
-    res0[:supplied_name_string].should == "Calidris cooperi var"
+    res0[:supplied_name_string].should == "Calidris cf. cooperi"
     res0[:results].map {|r| r[:name_string]}.uniq.should == ["Calidris cooperi (Baird, 1858)", "Calidris cooperi"]
     res1 = res[:data][1]
     res1[:supplied_name_string].should == "Liothrix argentauris ssp."
@@ -125,8 +125,8 @@ describe "name_resolvers API" do
     res3[:supplied_name_string].should == "Treron spp."
     res3[:results].map {|r| r[:name_string]}.uniq.should == ["Treron"] 
     res4 = res[:data][4]
-    res4[:supplied_name_string].should == "Larus occidentalis cf. wymani"
-    res4[:results].map {|r| r[:name_string]}.uniq.should == ["Larus occidentalis wymani"] 
+    res4[:supplied_name_string].should == 'Calidris cf. cooperi'
+    res4[:results].map { |r| r[:name_string] }.uniq.should == ['Calidris cooperi (Baird, 1858)', 'Calidris cooperi']
   end
   
   # REMOVED this CONSTRAIN FOR NOW
