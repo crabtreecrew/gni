@@ -50,7 +50,7 @@ class NameResolversController < ApplicationController
       token: token
     )
 
-    if new_data.size < 1000 || !workers_running?
+    if new_data.size < 1050 || !workers_running?
       resolver.reconcile
     else
       resolver.progress_message = 'In the queue'
@@ -108,15 +108,21 @@ class NameResolversController < ApplicationController
     if params.has_key?(:with_context)
       opts[:with_context] = !(params[:with_context] == 'false') 
     end
+
     if params[:data_source_ids]
       if params[:data_source_ids].is_a?(Hash)
-        opts[:data_sources] = params[:data_source_ids].keys.map { |i| i.to_i }
+        opts[:data_sources] = params[:data_source_ids].keys.map(&:to_i)
       else
         opts[:data_sources] = params[:data_source_ids].
                                             split('|').
-                                            map { |i| i.to_i } 
+                                            map(&:to_i) 
       end
     end
+
+    if params[:data_sources_sorting].is_a?(Array)
+      opts[:data_sources_sorting] = params[:data_sources_sorting].map(&:to_i)
+    end
+
     if params.has_key?(:resolve_once)
       opts[:resolve_once] = !(params[:resolve_once] == 'false')
     end

@@ -79,11 +79,17 @@ describe "name_resolvers API" do
   end
 
   it "should create default options" do
-    post("/name_resolvers.json", 
-        :data => "2|Calidris cooperi\n1|Leiothrix argentauris\n4|Plantago major L.")
+    data =  '2|Calidris cooperi\n1|Leiothrix argentauris\n4|Plantago major L.'
+    post('/name_resolvers.json',
+         data: data,
+         data_sources_sorting: [3, 1]
+        )
     body = last_response.body
-    res = JSON.parse(body, :symbolize_names => true)
-    res[:parameters].should == {:with_context => false, :data_sources => [], :resolve_once => false}
+    res = JSON.parse(body, symbolize_names: true)
+    res[:parameters].should == { with_context: false, 
+                                 data_sources: [], 
+                                 resolve_once: false, 
+                                 data_sources_sorting: [3, 1] }
   end
 
   it "should be able to use uploaded file for resolving names" do
@@ -114,7 +120,7 @@ describe "name_resolvers API" do
     res = JSON.parse(body, :symbolize_names => true)
     res0 = res[:data][0]
     res0[:supplied_name_string].should == "Calidris cf. cooperi"
-    res0[:results].map {|r| r[:name_string]}.uniq.should == ["Calidris cooperi (Baird, 1858)", "Calidris cooperi"]
+    res0[:results].map {|r| r[:name_string]}.uniq.should == ["Calidris cooperi", "Calidris cooperi (Baird, 1858)"]
     res1 = res[:data][1]
     res1[:supplied_name_string].should == "Liothrix argentauris ssp."
     res1[:results].map {|r| r[:name_string]}.uniq.should == ["Leiothrix argentauris (Hodgson, 1838)", "Leiothrix argentauris"] 
@@ -126,21 +132,9 @@ describe "name_resolvers API" do
     res3[:results].map {|r| r[:name_string]}.uniq.should == ["Treron"] 
     res4 = res[:data][4]
     res4[:supplied_name_string].should == 'Calidris cf. cooperi'
-    res4[:results].map { |r| r[:name_string] }.uniq.should == ['Calidris cooperi (Baird, 1858)', 'Calidris cooperi']
+    res4[:results].map { |r| r[:name_string] }.uniq.should == ["Calidris cooperi", "Calidris cooperi (Baird, 1858)"]
   end
   
-  # REMOVED this CONSTRAIN FOR NOW
-  # it "should produce an error if there are too many data sources" do
-  #   get("/name_resolvers.json", 
-  #       :names => "Leiothrix argentauris (Hodgson, 1838)|Treron|Larus occidentalis wymani|Plantago major L.",
-  #       :with_context => false,
-  #       :data_source_ids => "1|2|3|4|5|6")
-  #   body = last_response.body
-  #   res = JSON.parse(body, :symbolize_names => true)
-  #   res[:status].should == ProgressStatus.failed.name
-  #   res[:message].should == NameResolver::MESSAGES[:too_many_data_sources]
-  # end
-
   it "should produce an error if there are no names" do
     get("/name_resolvers.json", 
         :names => "",

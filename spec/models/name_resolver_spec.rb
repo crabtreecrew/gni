@@ -59,7 +59,8 @@ describe NameResolver do
     elr.data[0].should == { id: nil, 
                             name_string: 'Andrena anthrisci Blüthgen, 1925' }
     elr.options.should == { with_context: true, 
-                            data_sources: [], 
+                            data_sources: [],
+                            data_sources_sorting: [],
                             resolve_once: false } 
   end
 
@@ -70,20 +71,20 @@ describe NameResolver do
     elr.data.select{|d| d.has_key?(:results)}.size.should > 0
   end
 
-  # it 'resolves names against data sources in the order they are received' do
-  #   elr = NameResolver.create(options: { data_sources: [3,1] }, 
-  #                             data: @test_names)
-  #   elr.reconcile
-  #   r = elr.result[:data][11][:results]
-  #   r[0][:data_source_id].should == 3
-  #   r[1][:data_source_id].should == 1
-  #   elr = NameResolver.create(options: { data_sources: [1,3] }, 
-  #                             :data => @test_names)
-  #   elr.reconcile
-  #   r = elr.result[:data][11][:results]
-  #   r[0][:data_source_id].should == 1
-  #   r[1][:data_source_id].should == 3
-  # end
+  it 'should take in account data sources sorting parameter' do
+    elr = NameResolver.create(options: { data_sources_sorting: [3,1] }, 
+                              data: @test_names)
+    elr.reconcile
+    r = elr.result[:data][11][:results]
+    r[0][:data_source_id].should == 3
+    r[1][:data_source_id].should == 1
+    elr = NameResolver.create(options: { data_sources: [1,3] }, 
+                              :data => @test_names)
+    elr.reconcile
+    r = elr.result[:data][11][:results]
+    r[0][:data_source_id].should == 1
+    r[1][:data_source_id].should == 3
+  end
  
   
 end

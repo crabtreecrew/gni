@@ -459,7 +459,8 @@ private
 
   def add_default_options
     self.options = { with_context: false, 
-                     data_sources: [], 
+                     data_sources: [],
+                     data_sources_sorting: [],
                      resolve_once: false }.merge(self.options)
   end  
   
@@ -502,11 +503,32 @@ private
           match[:score] = dr[:score]
           res[:results] << match
         end
+        res[:results] = res[:results].compact
+        sort_data_sources(res)
       end
       r[:data] << res
     end
     self.progress_status = ProgressStatus.success
     self.progress_message = MESSAGES[:success]
+  end
+
+  def sort_data_sources(res)
+    sorted = []
+    res_hash = res[:results].inject({}) do |h, d|
+      ds_id = d[:data_source_id]
+      h[ds_id] ? h[ds_id] << d : h[ds_id] = [d]
+      h
+    end
+
+    ds_sort = self.options[:data_sources_sorting]
+    ds_sort.inject(sorted) do |ary, ds_id|
+      data = res_hash.delete(ds_id)
+      ary << data
+      ary
+    end unless ds_sort.empty?
+
+    res_hash.keys.sort.each { |i| sorted << res_hash[i] }
+    res[:results] = sorted.flatten 
   end
 
 end
