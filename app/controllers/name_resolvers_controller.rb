@@ -119,8 +119,10 @@ class NameResolversController < ApplicationController
       end
     end
 
-    if params[:data_sources_sorting].is_a?(Array)
-      opts[:data_sources_sorting] = params[:data_sources_sorting].map(&:to_i)
+    if params[:data_sources_sorting]
+      opts[:data_sources_sorting] = params[:data_sources_sorting].
+                                    split('|').      
+                                    map(&:to_i)
     end
 
     if params.has_key?(:resolve_once)

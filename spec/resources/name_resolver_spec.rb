@@ -82,7 +82,7 @@ describe "name_resolvers API" do
     data =  '2|Calidris cooperi\n1|Leiothrix argentauris\n4|Plantago major L.'
     post('/name_resolvers.json',
          data: data,
-         data_sources_sorting: [3, 1]
+         data_sources_sorting: "3|1"
         )
     body = last_response.body
     res = JSON.parse(body, symbolize_names: true)

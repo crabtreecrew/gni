@@ -72,7 +72,7 @@ describe NameResolver do
   end
 
   it 'should take in account data sources sorting parameter' do
-    elr = NameResolver.create(options: { data_sources_sorting: [3,1] }, 
+    elr = NameResolver.create(options: { data_sources_sorting: [3, 1] }, 
                               data: @test_names)
     elr.reconcile
     r = elr.result[:data][11][:results]
