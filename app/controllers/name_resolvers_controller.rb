@@ -33,21 +33,21 @@ class NameResolversController < ApplicationController
     opts[:data_sources].map do |ds_id| 
       ds_title = DataSource.find(ds_id).title.strip rescue nil
       data_sources << { id: ds_id, title: ds_title } if ds_title
-    end
+    end if opts[:data_sources]
 
     result = {
-      :id => token, 
-      :url => "%s/name_resolvers/%s" % [Gni::Config.base_url, token],
-      :data_sources => data_sources,
-      }
+      id: token, 
+      url: "%s/name_resolvers/%s" % [Gni::Config.base_url, token],
+      data_sources: data_sources
+    }
 
     resolver = NameResolver.create!(
-      :data => new_data, 
-      :result => result, 
-      :options => opts, 
-      :progress_status => status, 
-      :progress_message => message, 
-      :token => token
+      data: new_data, 
+      result: result, 
+      options: opts, 
+      progress_status: status, 
+      progress_message: message, 
+      token: token
     )
 
     if new_data.size < 1000 || !workers_running?
@@ -83,9 +83,9 @@ class NameResolversController < ApplicationController
     else
       format.html { redirect_to name_resolver_path(resolver.token) }
     end
-    format.json { render :json => json_callback(@res.to_json, 
+    format.json { render json: json_callback(@res.to_json, 
                                                 params[:callback]) }
-    format.xml  { render :xml => @res.to_xml }
+    format.xml  { render xml: @res.to_xml }
   end
 
   def get_data
@@ -120,6 +120,7 @@ class NameResolversController < ApplicationController
     if params.has_key?(:resolve_once)
       opts[:resolve_once] = !(params[:resolve_once] == 'false')
     end
-    { with_context: false, data_sources: [], resolve_once: false }.merge(opts)
+    opts
   end
+
 end
