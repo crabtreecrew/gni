@@ -28,6 +28,7 @@ class DwcaImporter < ActiveRecord::Base
       publish_new_data
       true
     rescue Exception => e
+      raise e
       DarwinCore.logger_write(@dwc.object_id, "Import Failed: %s" % e.message)
       false
     end
@@ -152,10 +153,12 @@ class DwcaImporter < ActiveRecord::Base
           local_id = taxon.local_id.blank? ? "NULL" : @db.quote(taxon.local_id)
           global_id = taxon.global_id.blank? ? "NULL" : @db.quote(taxon.global_id)
           classification_path_id =  taxon.classification_path_id.compact
-          classification_path = @db.quote(get_classification_path(taxon))
+          classification_path, classification_path_ranks = get_classification_path(taxon)
+          classification_path = @db.quote(classification_path)
+          classification_path_ranks = @db.quote(classification_path_ranks)
           classification_path_id = @db.quote(classification_path_id.join("|"))
           if name_string_id != "NULL"
-            names_index << [data_source_id, name_string_id, taxon_id, source, local_id, global_id, rank, taxon_id, "NULL", classification_path, classification_path_id, now, now].join(",")
+            names_index << [data_source_id, name_string_id, taxon_id, source, local_id, global_id, rank, taxon_id, "NULL", classification_path, classification_path_id, classification_path_ranks, now, now].join(",")
           else
             puts "*" * 80
             puts "Taxon with id %s was not created" % key
@@ -169,7 +172,7 @@ class DwcaImporter < ActiveRecord::Base
             synonym_global_id = synonym.global_id.blank? ? global_id : @db.quote(synonym.global_id)
             synonym_taxon_id = @db.quote(synonym_taxon_id)
             if synonym_string_id != "NULL"
-              names_index << [data_source_id, synonym_string_id, synonym_taxon_id, synonym_source, synonym_local_id, synonym_global_id, rank, taxon_id, "'synonym'", classification_path, classification_path_id, now, now].join(",")
+              names_index << [data_source_id, synonym_string_id, synonym_taxon_id, synonym_source, synonym_local_id, synonym_global_id, rank, taxon_id, "'synonym'", classification_path, classification_path_id, classification_path_ranks, now, now].join(",")
             end
           end
           taxon.vernacular_names.each do |vernacular|
@@ -186,7 +189,7 @@ class DwcaImporter < ActiveRecord::Base
         names_index = names_index.join("),(")
         vernacular_index = vernacular_index.join("),(")
         if names_index.size > 0
-          q = "INSERT IGNORE INTO tmp_name_string_indices (data_source_id, name_string_id, taxon_id, url, local_id, global_id, rank, accepted_taxon_id, synonym, classification_path, classification_path_ids, created_at, updated_at) VALUES (#{names_index})"
+          q = "INSERT IGNORE INTO tmp_name_string_indices (data_source_id, name_string_id, taxon_id, url, local_id, global_id, rank, accepted_taxon_id, synonym, classification_path, classification_path_ids, classification_path_ranks, created_at, updated_at) VALUES (#{names_index})"
           @db.execute(q)
         end
         if vernacular_index.size > 0
@@ -227,26 +230,36 @@ class DwcaImporter < ActiveRecord::Base
 
   def get_classification_path(taxon)
     classification_path = ""
+    classification_path_ranks = ""
     if !taxon.classification_path_id.blank?
-      classification_path = get_classification_path_array(taxon.classification_path_id.compact).join("|")
+      taxons = get_classification_path_array(taxon.classification_path_id.compact)
+      classification_path = taxons.map(&:current_name_canonical).join("|")
+      classification_path_ranks = taxons.map(&:rank).join("|")
     elsif !taxon.linnean_classification_path.blank?
-      canonical_form = get_classification_path_array([taxon.id])[0]
+      taxon_cached = get_classification_path_array([taxon.id])[0]
+      canonical_form = taxon_cached.current_name_canonical
+      rank = taxon_cached.rank
       if canonical_form && canonical_form.split(" ").size > 1
-        classification_path = taxon.linnean_classification_path.map { |i| i.first }
+        classification_path = taxon.linnean_classification_path.map(&:first)
+        classification_path_ranks = taxon.linnean_classification_path.map(&:last)
         classification_path << canonical_form
+        classification_path_ranks << rank
         classification_path = classification_path.join('|')
+        classification_path_ranks = classification_path_ranks.join('|')
       end
     end
+    [classification_path, classification_path_ranks]
   end
 
   def get_classification_path_array(ids)
     ids.map do |key|
       if @data[key].current_name_canonical # reuse canonical data if exists
-        @data[key].current_name_canonical
+        @data[key]
       else
         name_string = @db.quote(NameString.normalize_space(@data[key].current_name))
         res = @db.select_rows("SELECT cf.name FROM name_strings ns JOIN canonical_forms cf ON ns.canonical_form_id = cf.id WHERE ns.name = #{name_string}")[0]
         @data[key].current_name_canonical = res.blank? ? '' : res[0]
+        @data[key]
       end
     end
   end
