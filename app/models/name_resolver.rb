@@ -19,30 +19,50 @@ class NameResolver < ActiveRecord::Base
   EXACT_CANONICAL_GENUS_LEVEL = 6
   MAX_NAME_STRING = 10_000
   MAX_DATA_SOURCES = 5
-  NAME_TYPES = { 0 => "unknown", 1 => "uninomial", 2 => "binomial", 3 => "trinomial" }
+  NAME_TYPES = { 0 => 'unknown',
+                 1 => 'uninomial',
+                 2 => 'binomial',
+                 3 => 'trinomial' }
   MESSAGES = {
-    :too_many_data_sources => "Too many data sources. Please provide from 1 to %s for data_source_ids parameter" % MAX_DATA_SOURCES,
-    :no_names => "No name strings found in your data. Please provide from 1 to %s name strings" % MAX_NAME_STRING,
-    :too_many_names => "Too many name strings. Please provide from 1 to %s name strings" % MAX_NAME_STRING,
-    :resolving => "Starting names resolution",
-    :resolving_exact => "Collecting exact matches of name strings",
-    :parsing => "Parsing name strings",
-    :resolving_exact_canonical => "Resolving matches by canonical names",
-    :resolving_fuzzy_canonical => "Fuzzy matching of canonical_names",
-    :resolving_partial_binomials => "Exact matching of binomials made from reduced unmatched strings",
-    :resolving_partial_binomials_fuzzy => "Fuzzy matching of binomials made from reduced unmatched strings",
-    :resolving_partial_uninomials => "Exact matching of uninomials made from reduced unmatched strings",
-    :success => "Success",
-    :preparing_results => "Preparing results",
+    too_many_data_sources:
+      'Too many data sources. ' +
+      "Please provide from 1 to %s for data_source_ids parameter" %
+         MAX_DATA_SOURCES,
+    no_names:
+      'No name strings found in your data. ' +
+      "Please provide from 1 to %s name strings" % MAX_NAME_STRING,
+    too_many_names:
+      'Too many name strings. ' +
+      "Please provide from 1 to %s name strings" % MAX_NAME_STRING,
+    resolving:
+      'Starting names resolution',
+    resolving_exact:
+      'Collecting exact matches of name strings',
+    parsing:
+      'Parsing name strings',
+    resolving_exact_canonical:
+      'Resolving matches by canonical names',
+    resolving_fuzzy_canonical:
+      'Fuzzy matching of canonical_names',
+    resolving_partial_binomials:
+      'Exact matching of binomials made from reduced unmatched strings',
+    resolving_partial_binomials_fuzzy:
+      'Fuzzy matching of binomials made from reduced unmatched strings',
+    resolving_partial_uninomials:
+      'Exact matching of uninomials made from reduced unmatched strings',
+    success:
+      'Success',
+    preparing_results:
+      'Preparing results',
   }
-  
+
   def self.perform(name_resolver_id)
     r = NameResolver.find(name_resolver_id)
     r.reconcile
   end
 
-  # read data for cases where it is supplied in a file.
   def self.read_file(file_path)
+    # read data for cases where it is supplied in a file.
     process_data(open(file_path))
   end
 
@@ -64,25 +84,31 @@ class NameResolver < ActiveRecord::Base
 
   def reconcile
     begin
-      update_attributes(:progress_message => MESSAGES[:resolving])
+      update_attributes(progress_message: MESSAGES[:resolving])
       prepare_variables
-      update_attributes(:progress_message => MESSAGES[:resolving_exact])
+      update_attributes(progress_message: MESSAGES[:resolving_exact])
       find_exact
       get_canonical_forms
-      update_attributes(:progress_message => MESSAGES[:resolving_exact_canonical]) unless @names.empty?
+      update_attributes(progress_message:
+              MESSAGES[:resolving_exact_canonical]) unless @names.empty?
       find_canonical_exact
-      update_attributes(:progress_message => MESSAGES[:resolving_fuzzy_canonical]) unless @names.empty?
+      update_attributes(progress_message:
+              MESSAGES[:resolving_fuzzy_canonical]) unless @names.empty?
       find_canonical_fuzzy
       get_partial_binomials
-      update_attributes(:progress_message => MESSAGES[:resolving_partial_binomials]) unless @names.empty?
+      update_attributes(progress_message:
+              MESSAGES[:resolving_partial_binomials]) unless @names.empty?
       find_canonical_exact
       find_canonical_fuzzy
-      update_attributes(:progress_message => MESSAGES[:resolving_partial_binomials_fuzzy]) unless @names.empty?
+      update_attributes(progress_message:
+              MESSAGES[:resolving_partial_binomials_fuzzy]) unless @names.empty?
       get_partial_uninomials
-      update_attributes(:progress_message => MESSAGES[:resolving_partial_uninomials]) unless @names.empty?
+      update_attributes(progress_message:
+              MESSAGES[:resolving_partial_uninomials]) unless @names.empty?
       find_canonical_exact
       get_contexts if @with_context
-      update_attributes(:progress_message => MESSAGES[:preparing_results])
+      update_attributes(progress_message:
+              MESSAGES[:preparing_results])
       calculate_scores
       format_result
     rescue Gni::Error => e
@@ -97,12 +123,13 @@ private
   def self.process_data(new_data)
     conv = Iconv.new('UTF-8', 'ISO-8859-1')
     new_data.inject([]) do |res, line|
-      #for now we assume that non-utf8 charachters are in latin1, might need to add others
+      # for now we assume that non-utf8
+      # charachters are in latin1, might need to add others
       line = conv.conv(line) unless line.valid_encoding?
-      #skip the line if encoding is still wrong
+      # skip the line if encoding is still wrong
       next unless line.valid_encoding?
-      line = line.strip.gsub("\t", "|")
-      fields = line.split("|")
+      line = line.strip.gsub("\t", '|')
+      fields = line.split('|')
       name = id = nil
       return res if fields.blank?
       if fields.size == 1
@@ -121,17 +148,24 @@ private
     @taxamatch = Taxamatch::Base.new
     @spellchecker = Gni::SolrSpellchecker.new
     @data_sources = options[:data_sources].select {|ds| ds.is_a? Fixnum}
-    # raise Gni::NameResolverError, MESSAGES[:too_many_data_sources] if @data_sources.size > MAX_DATA_SOURCES 
     raise Gni::NameResolverError, MESSAGES[:no_names] if data.blank?
-    raise Gni::NameResolverError, MESSAGES[:too_many_names] if data.size > MAX_NAME_STRING
+    if data.size > MAX_NAME_STRING
+      raise Gni::NameResolverError, MESSAGES[:too_many_names]
+    end
     @with_context = options[:with_context]
     @names = {}
     @matched_words = {}
     data.each_with_index do |datum, i|
       name_string = datum[:name_string]
       normalized_name_string = NameString.normalize(name_string)
-      @names[normalized_name_string] ? @names[normalized_name_string][:indices] << i : @names[normalized_name_string] = { :indices => [i] }
-      @names[normalized_name_string][:name_string] = name_string unless @names[normalized_name_string][:name_string]
+      if @names[normalized_name_string]
+        @names[normalized_name_string][:indices] << i
+      else
+        @names[normalized_name_string] = { :indices => [i] }
+      end
+      unless @names[normalized_name_string][:name_string]
+        @names[normalized_name_string][:name_string] = name_string
+      end
     end
     @found_words = {}
     if @with_context
@@ -153,45 +187,45 @@ private
   def find_exact
     @match_type += 1
     names = get_quoted_names(@names.keys)
-    data_sources = @data_sources.join(",")
-    q = "select 
-           ns.id, 
-           ns.uuid, 
-           ns.normalized, 
-           ns.name, 
-           nsi.data_source_id, 
-           nsi.taxon_id, 
-           nsi.global_id, 
-           nsi.url, 
-           nsi.classification_path, 
-           nsi.classification_path_ids, 
-           cf.name, 
+    data_sources = @data_sources.join(',')
+    q = "select
+           ns.id,
+           ns.uuid,
+           ns.normalized,
+           ns.name,
+           nsi.data_source_id,
+           nsi.taxon_id,
+           nsi.global_id,
+           nsi.url,
+           nsi.classification_path,
+           nsi.classification_path_ids,
+           cf.name,
            nsi.local_id,
            nsi.classification_path_ranks
-         from 
-           name_string_indices nsi 
-           join name_strings ns 
-             on ns.id = nsi.name_string_id 
-           left outer join canonical_forms cf 
-             on cf.id = ns.canonical_form_id 
+         from
+           name_string_indices nsi
+           join name_strings ns
+             on ns.id = nsi.name_string_id
+           left outer join canonical_forms cf
+             on cf.id = ns.canonical_form_id
          where ns.normalized in (#{names})"
     q += " and data_source_id in (#{data_sources})" unless @data_sources.blank?
     res = DataSource.connection.select_rows(q)
 
     res.each do |row|
-      record = { 
-        auth_score: 0, 
-        gni_id: row[0], 
-        name_uuid: UUID.parse(row[1].to_s(16)).to_s, 
-        name: row[3], 
-        data_source_id: row[4], 
-        taxon_id: row[5], 
-        global_id: row[6], 
-        url: row[7], 
-        classification_path: row[8], 
-        classification_path_ids: row[9], 
-        canonical_form: row[10], 
-        local_id: row[11], 
+      record = {
+        auth_score: 0,
+        gni_id: row[0],
+        name_uuid: UUID.parse(row[1].to_s(16)).to_s,
+        name: row[3],
+        data_source_id: row[4],
+        taxon_id: row[5],
+        global_id: row[6],
+        url: row[7],
+        classification_path: row[8],
+        classification_path_ids: row[9],
+        canonical_form: row[10],
+        local_id: row[11],
         classification_path_ranks: row[12]
       }
       update_found_words(record[:canonical_form])
@@ -199,22 +233,34 @@ private
       @names[name_normalized][:indices].each do |i|
         datum = data[i]
         if record[:canonical_form]
-          canonical_match = NameString.normalize(record[:canonical_form]) == NameString.normalize(record[:name])
-          type = NAME_TYPES[record[:canonical_form].split(" ").size]
+          canonical_match = NameString.normalize(record[:canonical_form]) ==
+                            NameString.normalize(record[:name])
+          type = NAME_TYPES[record[:canonical_form].split(' ').size]
         else
           canonical_match = false
           type = NAME_TYPES[0]
         end
-        record.merge!(:match_type => @match_type, :name_type => type, :match_by_canonical => canonical_match) 
+        record.merge!(match_type: @match_type,
+                      name_type: type,
+                      match_by_canonical: canonical_match)
         record_id = get_record_id(record)
-        datum.has_key?(:results) ? datum[:results][record_id] = record : datum[:results] = {record_id => record}
-        @names[name_normalized][:results] = true unless @names[name_normalized][:results]
+        if datum.has_key?(:results)
+          datum[:results][record_id] = record
+        else
+          datum[:results] = {record_id => record}
+        end
+
+        unless @names[name_normalized][:results]
+          @names[name_normalized][:results] = true
+        end
         update_context(record) if @with_context
       end
     end
 
     if options[:resolve_once]
-      @names.keys.each { |key| @names.delete(key) if @names[key].has_key?(:results) }
+      @names.keys.each do |key|
+        @names.delete(key) if @names[key].has_key?(:results)
+      end
     end
   end
 
@@ -227,63 +273,71 @@ private
     return if @names.empty?
     canonical_forms = @names.keys
     names = get_quoted_names(canonical_forms)
-    data_sources = @data_sources.join(",")
-    
-    q = "select 
-      ns.id, 
-      ns.uuid, 
-      null, 
-      ns.name, 
-      nsi.data_source_id, 
-      nsi.taxon_id, 
-      nsi.global_id, 
-      nsi.url, 
-      nsi.classification_path, 
-      nsi.classification_path_ids, 
-      cf.name, 
-      pns.data, 
-      nsi.local_id, 
-      nsi.classification_path_ranks 
-    from 
-      name_string_indices nsi 
-      join name_strings ns 
-        on ns.id = nsi.name_string_id 
-      join canonical_forms cf 
-        on cf.id = ns.canonical_form_id 
-      join parsed_name_strings pns 
-        on pns.id = ns.id 
+    data_sources = @data_sources.join(',')
+
+    q = "select
+      ns.id,
+      ns.uuid,
+      null,
+      ns.name,
+      nsi.data_source_id,
+      nsi.taxon_id,
+      nsi.global_id,
+      nsi.url,
+      nsi.classification_path,
+      nsi.classification_path_ids,
+      cf.name,
+      pns.data,
+      nsi.local_id,
+      nsi.classification_path_ranks
+    from
+      name_string_indices nsi
+      join name_strings ns
+        on ns.id = nsi.name_string_id
+      join canonical_forms cf
+        on cf.id = ns.canonical_form_id
+      join parsed_name_strings pns
+        on pns.id = ns.id
     where cf.name in (#{names})"
     q += " and data_source_id in (#{data_sources})" unless @data_sources.blank?
     res = DataSource.connection.select_rows(q)
     res.each do |row|
-      record = { 
-        gni_id: row[0], 
-        name_uuid: UUID.parse(row[1].to_s(16)).to_s, 
-        name: row[3], 
-        data_source_id: row[4], 
-        taxon_id: row[5], 
-        global_id: row[6], 
-        url: row[7], 
-        classification_path: row[8], 
-        classification_path_ids: row[9], 
-        canonical_form: row[10], 
+      record = {
+        gni_id: row[0],
+        name_uuid: UUID.parse(row[1].to_s(16)).to_s,
+        name: row[3],
+        data_source_id: row[4],
+        taxon_id: row[5],
+        global_id: row[6],
+        url: row[7],
+        classification_path: row[8],
+        classification_path_ids: row[9],
+        canonical_form: row[10],
         local_id: row[12],
         classification_path_ranks: row[13]
 
       }
-      found_name_parsed = @atomizer.organize_results(JSON.parse(row[11], symbolize_names: true)[:scientificName])
+      parse_res = JSON.parse(row[11], symbolize_names: true)
+      found_name_parsed = @atomizer.organize_results(parse_res[:scientificName])
       update_found_words(record[:canonical_form])
       @names[record[:canonical_form]].each do |val|
-        auth_score = get_authorship_score(val[:parsed], found_name_parsed) rescue 0
-      
+        auth_score = get_authorship_score(val[:parsed],
+                                          found_name_parsed) rescue 0
+
         val[:indices].each do |i|
           datum = data[i]
-          canonical_match = NameString.normalize(record[:canonical_form]) == NameString.normalize(record[:name])
-          type = NAME_TYPES[record[:canonical_form].split(" ").size]
-          res = record.merge(:match_type => @match_type, :name_type => type, :match_by_canonical => canonical_match, :auth_score => auth_score) 
+          canonical_match = NameString.normalize(record[:canonical_form]) ==
+                            NameString.normalize(record[:name])
+          type = NAME_TYPES[record[:canonical_form].split(' ').size]
+          res = record.merge(match_type: @match_type,
+                             name_type: type,
+                             match_by_canonical: canonical_match,
+                             auth_score: auth_score)
           record_id = get_record_id(record)
-          if datum.has_key?(:results) 
-            datum[:results][record_id] = res unless datum[:results].has_key?(record_id)
+          if datum.has_key?(:results)
+            unless datum[:results].has_key?(record_id)
+              datum[:results][record_id] = res
+            end
           else
             datum[:results] = { record_id => res }
           end
@@ -308,19 +362,21 @@ private
 
   def find_canonical_fuzzy
     @match_type += 1
-    data_sources = @data_sources.join(",")
+    data_sources = @data_sources.join(',')
     @names.keys.each do |key|
       next unless key
       canonical_form = key
       canonical_forms = @spellchecker.find(canonical_form)
+      q_canonical = canonical_forms.map { |n| NameString.connection.quote(n) }.
+                                          join(',')
       unless canonical_forms.blank?
-        q = "select 
-          ns.id, 
-          ns.uuid, 
-          null, 
-          ns.name, 
-          nsi.data_source_id, 
-          nsi.taxon_id, 
+        q = "select
+          ns.id,
+          ns.uuid,
+          null,
+          ns.name,
+          nsi.data_source_id,
+          nsi.taxon_id,
           nsi.global_id,
           nsi.url,
           nsi.classification_path,
@@ -329,24 +385,27 @@ private
           pns.data,
           nsi.local_id,
           nsi.classification_path_ranks
-        from 
-          canonical_forms cf 
-          join name_strings ns 
-            on ns.canonical_form_id = cf.id 
-          join parsed_name_strings pns 
-            on pns.id = ns.id 
-          join name_string_indices nsi 
-            on nsi.name_string_id = ns.id 
-        where cf.name in (%s)" % canonical_forms.map { |n| NameString.connection.quote(n) }.join(",")
-        q += " and data_source_id in (#{data_sources})" unless @data_sources.blank?
+        from
+          canonical_forms cf
+          join name_strings ns
+            on ns.canonical_form_id = cf.id
+          join parsed_name_strings pns
+            on pns.id = ns.id
+          join name_string_indices nsi
+            on nsi.name_string_id = ns.id
+        where cf.name in (%s)" % q_canonical
+        unless @data_sources.blank?
+          q += " and data_source_id in (#{data_sources})"
+        end
         res = NameString.connection.select_rows(q)
         fuzzy_data = {}
         res.each do |row|
           found_canonical_form = row[10]
-          next if canonical_form.split(" ").size != found_canonical_form.split(" ").size
-          is_match = match_names(canonical_form, found_canonical_form) 
+          next if canonical_form.split(" ").size !=
+                  found_canonical_form.split(" ").size
+          is_match = match_names(canonical_form, found_canonical_form)
           if is_match
-            record = { 
+            record = {
               gni_id: row[0],
               name_uuid: UUID.parse(row[1].to_s(16)).to_s,
               name: row[3],
@@ -360,17 +419,26 @@ private
               local_id: row[12],
               classification_path_ranks: row[13]
             }
-            found_name_parsed = @atomizer.organize_results(JSON.parse(row[11], :symbolize_names => true)[:scientificName])
+            parsed_name = JSON.parse(row[11],
+                                     symbolize_names: true)[:scientificName]
+            found_name_parsed = @atomizer.organize_results(parsed_name)
             @names[canonical_form].each do |val|
-              auth_score = get_authorship_score(val[:parsed], found_name_parsed) rescue 0
+              auth_score = get_authorship_score(val[:parsed],
+                                                found_name_parsed) rescue 0
               val[:indices].each do |i|
                 datum = data[i]
-                canonical_match = NameString.normalize(record[:canonical_form]) == NameString.normalize(record[:name])
-                type = NAME_TYPES[record[:canonical_form].split(" ").size]
-                res = record.merge(:match_type => @match_type, :name_type => type, :match_by_canonical => canonical_match, :auth_score => auth_score) 
+                canonical_match = NameString.normalize(record[:canonical_form]) ==
+                  NameString.normalize(record[:name])
+                type = NAME_TYPES[record[:canonical_form].split(' ').size]
+                res = record.merge(match_type: @match_type,
+                                   name_type: type,
+                                   match_by_canonical: canonical_match,
+                                   auth_score: auth_score)
                 record_id = get_record_id(record)
-                if datum.has_key?(:results) 
-                  datum[:results][record_id] = res unless datum[:results].has_key?(record_id)
+                if datum.has_key?(:results)
+                  unless datum[:results].has_key?(record_id)
+                    datum[:results][record_id] = res
+                  end
                 else
                   datum[:results] = { record_id => res }
                 end
@@ -390,23 +458,31 @@ private
     @names = {}
     @not_found.each do |key, value|
       next unless key
-      canonical_ary = key.split(" ")
+      canonical_ary = key.split(' ')
       @not_found.delete(key) if canonical_ary.size < 2
       if canonical_ary.size > 2
-        canonical_form = canonical_ary[0..1].join(" ")
-        @names.has_key?(canonical_form) ? @names[canonical_form] += value : @names[canonical_form] = value
+        canonical_form = canonical_ary[0..1].join(' ')
+        if @names.has_key?(canonical_form)
+          @names[canonical_form] += value
+        else
+          @names[canonical_form] = value
+        end
         @not_found.delete(key)
       end
     end
   end
-  
+
   def get_partial_uninomials
     @not_found.merge!(@names)
     @names = {}
     @not_found.each do |key, value|
       next unless key
       canonical_form = key.gsub(/ .*$/, '')
-      @names.has_key?(canonical_form) ? @names[canonical_form] += value : @names[canonical_form] = value
+      if @names.has_key?(canonical_form)
+        @names[canonical_form] += value
+      else
+        @names[canonical_form] = value
+      end
     end
   end
 
@@ -424,34 +500,43 @@ private
     #switch names to canonical forms from normalized names
     new_names = {}
     @names.values.each do |v|
-      new_names.has_key?(v[:canonical_form]) ? new_names[v[:canonical_form]] << v : new_names[v[:canonical_form]] = [v]
+      if new_names.has_key?(v[:canonical_form])
+        new_names[v[:canonical_form]] << v
+      else
+        new_names[v[:canonical_form]] = [v]
+      end
     end
     @names = new_names
   end
 
   def get_quoted_names(names_array)
-    names_array.map {|name| NameString.connection.quote(name)}.join(",")
+    names_array.map {|name| NameString.connection.quote(name)}.join(',')
   end
 
   def update_found_words(canonical_form)
     return if canonical_form.blank?
-    words = canonical_form.split(" ")
-    if words.size > 1 
-      genus = (words[0] == "x") ? words[1] : words[0]
-      @found_words[genus] = :genus unless @found_words[genus] && @found_words[genus] == :genus
+    words = canonical_form.split(' ')
+    if words.size > 1
+      genus = (words[0] == 'x') ? words[1] : words[0]
+      unless @found_words[genus] && @found_words[genus] == :genus
+        @found_words[genus] = :genus
+      end
     else
       @found_words[words[0]] = :uninomial unless @found_words[words[0]]
     end
   end
 
-  # Collect data for finding out the list 'context' taxon (for example Aves for birds list)
   def update_context(record)
+    # Collect data for finding out the list 'context'
+    # taxon (for example Aves for birds list)
     return if record[:classification_path].blank?
-    taxa = record[:classification_path].split("|")
+    taxa = record[:classification_path].split('|')
     data_source_id = record[:data_source_id]
     taxa.each_with_index do |taxon, i|
       if @data_sources.blank?
-        update_tree_counter(@tree_counter[Gni::Config.reference_data_source_id], taxon, i)
+        update_tree_counter(@tree_counter[Gni::Config.reference_data_source_id],
+                            taxon,
+                            i)
       else
         update_tree_counter(@tree_counter[data_source_id], taxon, i)
       end
@@ -469,11 +554,11 @@ private
   end
 
   def get_authorship_score(parsed1, parsed2)
-    @taxamatch.match_authors(parsed1, parsed2)  
+    @taxamatch.match_authors(parsed1, parsed2)
   end
 
   def match_names(name1, name2)
-    words = name1.split(" ").zip(name2.split(" "))
+    words = name1.split(' ').zip(name2.split(' '))
     count = nil
     words.each_with_index do |w, i|
       return nil unless w[0] && w[1] #should never happen
@@ -487,9 +572,19 @@ private
   def match_words(word1, word2, index)
     index = 1 if index > 0
     return true if word1 == word2
-    words_concatenate = [index.to_s, word1, word2].sort.join("_") 
-    return @matched_words[words_concatenate] if @matched_words.has_key?(words_concatenate)
-    @matched_words[words_concatenate] = index == 0 ? @taxamatch.match_genera({normalized:word1}, {normalized:word2}, :with_phonetic_match => false)["match"] : @taxamatch.match_species({normalized:word1}, {normalized:word2}, :with_phonetic_match => false)["match"]
+    words_concatenate = [index.to_s, word1, word2].sort.join('_')
+    if @matched_words.has_key?(words_concatenate)
+      return @matched_words[words_concatenate]
+    end
+    if @matched_words[words_concatenate] = index == 0
+      @taxamatch.match_genera({ normalized: word1 },
+                              { normalized: word2 },
+                              with_phonetic_match: false)['match']
+    else
+      @taxamatch.match_species({ normalized: word1 },
+                               { normalized: word2 },
+                               with_phonetic_match: false)['match']
+    end
   end
 
   def get_contexts
@@ -521,34 +616,42 @@ private
     canonical_match = result[:match_by_canonical]
     match_type = result[:match_type]
     data_source_id = result[:data_source_id]
-    classification_path = result[:classification_path] ? result[:classification_path].split("|") : []
+    classification_path = []
+    if result[:classification_path]
+      classification_path = result[:classification_path].split('|')
+    end
     context = 0
     if @with_context && @context && !classification_path.empty?
       context = classification_path.include?(@contexts[data_source_id]) ? 1 : -1
     end
     prescore = 0
     a = c = s = 0
-    if name_type == "uninomial"
+    if name_type == 'uninomial'
       a = auth_score * 2
       c = context * 2
       s = 4
-      s = 1 if (canonical_match || [EXACT_CANONICAL, EXACT_CANONICAL_GENUS_LEVEL].include?(match_type))
+      s = 1 if (canonical_match ||
+                [EXACT_CANONICAL,
+                 EXACT_CANONICAL_GENUS_LEVEL].include?(match_type))
       if match_type == FUZZY_CANONICAL
         s = 0
         a = auth_score
         c = context
       end
-    elsif name_type == "binomial"
+    elsif name_type == 'binomial'
       a = auth_score * 2
       c = context * 4
       s = 8
-      s = 3 if (canonical_match || [EXACT_CANONICAL, EXACT_CANONICAL_SPECIES_LEVEL].include?(match_type))
-      if [FUZZY_CANONICAL, FUZZY_CANONICAL_SPECIES_LEVEL].include?(match_type)
+      s = 3 if (canonical_match ||
+                [EXACT_CANONICAL,
+                 EXACT_CANONICAL_SPECIES_LEVEL].include?(match_type))
+      if [FUZZY_CANONICAL,
+          FUZZY_CANONICAL_SPECIES_LEVEL].include?(match_type)
         s = 1
         a = auth_score
         c = context
       end
-    elsif name_type == "trinomial"
+    elsif name_type == 'trinomial'
       a = auth_score * 2
       c = context
       s = 8
@@ -565,23 +668,23 @@ private
   end
 
   def add_default_options
-    self.options = { with_context: false, 
+    self.options = { with_context: false,
                      data_sources: [],
                      data_sources_sorting: [],
                      resolve_once: false }.merge(self.options)
-  end  
-  
+  end
+
   def format_result
     r = result
     if @with_context
       r[:context] = []
       @contexts.each do |key, val|
-        r[:context] << { :context_data_source_id => key, :context_clade => val }
+        r[:context] << { context_data_source_id: key, context_clade: val }
       end
     end
     r[:data] = []
     data.each do |d|
-      res = { :supplied_name_string => d[:name_string] } 
+      res = { supplied_name_string: d[:name_string] }
       res[:supplied_id] = d[:id] if d[:id]
       if d[:results]
         res[:results] = []
@@ -599,9 +702,19 @@ private
           match[:global_id] = dr[:global_id] unless dr[:global_id].blank?
           match[:url] = dr[:url] unless dr[:url].blank?
           if dr[:classification_path_ids]
-            last_classification_id = dr[:classification_path_ids].split("|").last
+            last_classification_id = dr[:classification_path_ids].split('|').last
             if last_classification_id && last_classification_id != dr[:taxon_id]
-              ns = NameString.connection.select_value("select name from name_strings ns join name_string_indices nsi on nsi.name_string_id = ns.id where nsi.taxon_id = %s and data_source_id = %s limit 1" % [NameString.connection.quote(last_classification_id), NameString.connection.quote(dr[:data_source_id])])
+              ns = NameString.connection.select_value("
+                select
+                  name
+                from
+                  name_strings ns
+                join name_string_indices nsi
+                  on nsi.name_string_id = ns.id
+                where nsi.taxon_id = %s
+                  and data_source_id = %s limit 1" %
+                    [NameString.connection.quote(last_classification_id),
+                     NameString.connection.quote(dr[:data_source_id])])
               match[:current_taxon_id] = last_classification_id
               match[:current_name_string] = ns if ns
             end
@@ -636,7 +749,7 @@ private
     end unless ds_sort.empty?
 
     res_hash.keys.sort.each { |i| sorted << res_hash[i] }
-    res[:results] = sorted.flatten 
+    res[:results] = sorted.flatten
   end
 
 end
