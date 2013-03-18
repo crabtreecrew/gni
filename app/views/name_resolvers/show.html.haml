@@ -33,5 +33,4 @@
                 %a{ :href => data_source_path(source[:data_source_id]) }
                   = DataSource.find(source[:data_source_id]).title
               - if source[:classification_path]
-                .source-classification-path= source[:classification_path].gsub('|', ' >> ')
-                .source-classification-path= source[:classification_path_ranks].gsub('|', ' >> ')
+                .source-classification-path= classification_path(source)

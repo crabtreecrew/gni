@@ -138,7 +138,7 @@ private
         id = fields[0].strip
         name = fields[1].strip
       end
-      res << { :id => id, :name_string => name }
+      res << { id: id, name_string: name }
       res
     end
   end
@@ -161,7 +161,7 @@ private
       if @names[normalized_name_string]
         @names[normalized_name_string][:indices] << i
       else
-        @names[normalized_name_string] = { :indices => [i] }
+        @names[normalized_name_string] = { indices: [i] }
       end
       unless @names[normalized_name_string][:name_string]
         @names[normalized_name_string][:name_string] = name_string
@@ -487,7 +487,7 @@ private
   end
 
   def get_canonical_forms
-    update_attributes(:progress_message => MESSAGES[:parsing])
+    update_attributes(progress_message: MESSAGES[:parsing])
     return if @names.blank?
     @names.keys.each do |key|
       @names[key][:parsed] = @atomizer.parse(@names[key][:name_string]) rescue nil
@@ -669,6 +669,7 @@ private
 
   def add_default_options
     self.options = { with_context: false,
+                     best_match_only: false,
                      data_sources: [],
                      data_sources_sorting: [],
                      resolve_once: false }.merge(self.options)
@@ -729,6 +730,7 @@ private
       end
       r[:data] << res
     end
+    # abbreviated_name_resolver if self.options[:abbreviated]
     self.progress_status = ProgressStatus.success
     self.progress_message = MESSAGES[:success]
   end

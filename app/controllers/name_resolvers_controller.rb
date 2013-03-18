@@ -9,9 +9,9 @@ class NameResolversController < ApplicationController
   def show
     resolver = NameResolver.find_by_token(params[:id])
     respond_to do |format|
-      is_html_format = !params[:format] || params[:format] == 'html' 
+      is_html_format = !params[:format] || params[:format] == 'html'
       is_in_progress = resolver.progress_status == ProgressStatus.working
-      if is_html_format  && is_in_progress 
+      if is_html_format  && is_in_progress
         @redirect_url = name_resolver_path(resolver.token)
         @redirect_delay = 10
       end
@@ -23,30 +23,30 @@ class NameResolversController < ApplicationController
     new_data = get_data
     opts = get_opts
     token = '_'
-    while token.match(/_/) 
+    while token.match(/_/)
       token = Base64.urlsafe_encode64(UUID.create_v4.raw_bytes)[0..-3]
     end
     status = ProgressStatus.working
     message = 'Submitted'
 
     data_sources = []
-    opts[:data_sources].map do |ds_id| 
+    opts[:data_sources].map do |ds_id|
       ds_title = DataSource.find(ds_id).title.strip rescue nil
       data_sources << { id: ds_id, title: ds_title } if ds_title
     end if opts[:data_sources]
 
     result = {
-      id: token, 
+      id: token,
       url: "%s/name_resolvers/%s" % [Gni::Config.base_url, token],
       data_sources: data_sources
     }
 
     resolver = NameResolver.create!(
-      data: new_data, 
-      result: result, 
-      options: opts, 
-      progress_status: status, 
-      progress_message: message, 
+      data: new_data,
+      result: result,
+      options: opts,
+      progress_status: status,
+      progress_message: message,
       token: token
     )
 
@@ -73,8 +73,8 @@ class NameResolversController < ApplicationController
 
   def present_result(format, resolver, is_show = false)
     @res = resolver.result
-    json_or_xml = ['xml', 'json'].include?(params[:format]) 
-    @res[:url] += ".%s" % params[:format] if json_or_xml 
+    json_or_xml = ['xml', 'json'].include?(params[:format])
+    @res[:url] += ".%s" % params[:format] if json_or_xml
     @res[:status] = resolver.progress_status.name
     @res[:message] = resolver.progress_message
     @res[:parameters] = resolver.options
@@ -83,7 +83,7 @@ class NameResolversController < ApplicationController
     else
       format.html { redirect_to name_resolver_path(resolver.token) }
     end
-    format.json { render json: json_callback(@res.to_json, 
+    format.json { render json: json_callback(@res.to_json,
                                                 params[:callback]) }
     format.xml  { render xml: @res.to_xml }
   end
@@ -104,9 +104,9 @@ class NameResolversController < ApplicationController
 
   def get_opts
     opts = {}
-    
+
     if params.has_key?(:with_context)
-      opts[:with_context] = !(params[:with_context] == 'false') 
+      opts[:with_context] = !(params[:with_context] == 'false')
     end
 
     if params[:data_source_ids]
@@ -115,14 +115,18 @@ class NameResolversController < ApplicationController
       else
         opts[:data_sources] = params[:data_source_ids].
                                             split('|').
-                                            map(&:to_i) 
+                                            map(&:to_i)
       end
     end
 
     if params[:data_sources_sorting]
       opts[:data_sources_sorting] = params[:data_sources_sorting].
-                                    split('|').      
+                                    split('|').
                                     map(&:to_i)
+    end
+
+    if params[:best_match_only]
+      opts[:best_match_only] = !(params[:best_match_only] == 'false')
     end
 
     if params.has_key?(:resolve_once)
