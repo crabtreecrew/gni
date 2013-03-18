@@ -3,7 +3,7 @@ module NameResolversHelper
     classification = result[:classification_path].split('|')
     ranks = result[:classification_path_ranks].split('|')
     classification = classification.zip(ranks).inject([]) do |res, item|
-      if !itesm[1] || item[1].empty?
+      if !item[1] || item[1].empty?
         res << item[0]
       else
         res << "%s (%s)" % item
