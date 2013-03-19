@@ -2,7 +2,6 @@ require 'iconv'
 class NameResolver < ActiveRecord::Base
   @queue = :name_resolver
   attr :contexts
-  attr_writer :data, :result
   belongs_to :progress_status
 
   serialize :options, Hash
@@ -92,8 +91,9 @@ class NameResolver < ActiveRecord::Base
     file_name = File.join(data_path, token.to_s + '_data')
     if File.exist?(file_name)
       f = open(file_name, 'r:binary')
-      @data = Marshal.load(f.read) rescue []
+      content = f.read
       f.close
+      @data = Marshal.load(content) rescue []
     else
       @data = []
     end
@@ -108,8 +108,9 @@ class NameResolver < ActiveRecord::Base
     file_name = File.join(data_path, token.to_s + '_result')
     if File.exist?(file_name)
       f = open(file_name, 'r:binary')
-      @result = Marshal.load(f.read) rescue {}
+      content = f.read
       f.close
+      @result = Marshal.load(content) rescue {}
     else
       @result = {}
     end

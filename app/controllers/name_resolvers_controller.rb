@@ -75,6 +75,7 @@ class NameResolversController < ApplicationController
     @res = resolver.result
     json_or_xml = ['xml', 'json'].include?(params[:format])
     @res[:url] += ".%s" % params[:format] if json_or_xml
+
     @res[:status] = resolver.progress_status.name
     @res[:message] = resolver.progress_message
     @res[:parameters] = resolver.options
