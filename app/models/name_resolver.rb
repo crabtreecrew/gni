@@ -8,7 +8,7 @@ class NameResolver < ActiveRecord::Base
   serialize :options, Hash
 
   before_create :add_default_options
-  # before_save :save_files
+  before_save :save_files
 
   CONTEXT_THRESHOLD             = 0.9
   EXACT_STRING                  = 1
@@ -91,7 +91,9 @@ class NameResolver < ActiveRecord::Base
     return @data if @data
     file_name = File.join(data_path, token.to_s + '_data')
     if File.exist?(file_name)
-      @data = Marshal.load(open(file_name, 'r:binary').read)
+      f = open(file_name, 'r:binary')
+      @data = Marshal.load(f.read) rescue []
+      f.close
     else
       @data = []
     end
@@ -105,7 +107,9 @@ class NameResolver < ActiveRecord::Base
     return @result if @result
     file_name = File.join(data_path, token.to_s + '_result')
     if File.exist?(file_name)
-      @result = Marshal.load(open(file_name, 'r:binary').read)
+      f = open(file_name, 'r:binary')
+      @result = Marshal.load(f.read) rescue {}
+      f.close
     else
       @result = {}
     end
@@ -117,7 +121,7 @@ class NameResolver < ActiveRecord::Base
   
   def save_files
     [:data, :result].each do |sym|
-      file_name = File.join(data_path, token + '_' + sym.to_s)
+      file_name = File.join(data_path, token.to_s + '_' + sym.to_s)
       file = open(file_name, 'w:binary')
       file.write(Marshal.dump(self.send(sym)))
       file.close

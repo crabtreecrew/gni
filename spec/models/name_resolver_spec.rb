@@ -87,5 +87,4 @@ describe NameResolver do
     r[1][:data_source_id].should == 3
   end
 
-
 end
