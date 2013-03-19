@@ -2,27 +2,28 @@ require 'iconv'
 class NameResolver < ActiveRecord::Base
   @queue = :name_resolver
   attr :contexts
+  attr_writer :data, :result
   belongs_to :progress_status
 
-  serialize :data, Array
   serialize :options, Hash
-  serialize :result, Hash
 
   before_create :add_default_options
+  # before_save :save_files
 
-  CONTEXT_THRESHOLD = 0.9
-  EXACT_STRING = 1
-  EXACT_CANONICAL = 2
-  FUZZY_CANONICAL = 3
+  CONTEXT_THRESHOLD             = 0.9
+  EXACT_STRING                  = 1
+  EXACT_CANONICAL               = 2
+  FUZZY_CANONICAL               = 3
   EXACT_CANONICAL_SPECIES_LEVEL = 4
   FUZZY_CANONICAL_SPECIES_LEVEL = 5
-  EXACT_CANONICAL_GENUS_LEVEL = 6
-  MAX_NAME_STRING = 10_000
-  MAX_DATA_SOURCES = 5
-  NAME_TYPES = { 0 => 'unknown',
-                 1 => 'uninomial',
-                 2 => 'binomial',
-                 3 => 'trinomial' }
+  EXACT_CANONICAL_GENUS_LEVEL   = 6
+  MAX_NAME_STRING               = 10_000
+  MAX_DATA_SOURCES              = 5
+  NAME_TYPES                    = { 0 => 'unknown',
+                                    1 => 'uninomial',
+                                    2 => 'binomial',
+                                    3 => 'trinomial' }
+
   MESSAGES = {
     too_many_data_sources:
       'Too many data sources. ' +
@@ -80,6 +81,47 @@ class NameResolver < ActiveRecord::Base
       end
     end
     read_data(data)
+  end
+  
+  def data_path
+    @data_path ||= Rails.root.join('tmp', 'name_resolvers').to_s
+  end
+
+  def data
+    return @data if @data
+    file_name = File.join(data_path, token.to_s + '_data')
+    if File.exist?(file_name)
+      @data = Marshal.load(open(file_name, 'r:binary').read)
+    else
+      @data = []
+    end
+  end
+
+  def data=(new_data)
+    @data = new_data
+  end
+
+  def result
+    return @result if @result
+    file_name = File.join(data_path, token.to_s + '_result')
+    if File.exist?(file_name)
+      @result = Marshal.load(open(file_name, 'r:binary').read)
+    else
+      @result = {}
+    end
+  end
+
+  def result=(new_result)
+    @result = new_result
+  end
+  
+  def save_files
+    [:data, :result].each do |sym|
+      file_name = File.join(data_path, token + '_' + sym.to_s)
+      file = open(file_name, 'w:binary')
+      file.write(Marshal.dump(self.send(sym)))
+      file.close
+    end
   end
 
   def reconcile
