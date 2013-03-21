@@ -94,7 +94,15 @@ class NameResolver < ActiveRecord::Base
     if File.exist?(file_name)
       File.open(file_name) do |f|
         f.flock(File::LOCK_SH)
-        @data = Marshal.load(f)
+        count = 0
+        begin
+          @data = Marshal.load(f)
+        rescue ArgumentError
+          sleep 1
+          count += 1
+          retry if count < 5
+          @data = []
+        end
       end
     else
       @data = []
@@ -111,7 +119,15 @@ class NameResolver < ActiveRecord::Base
     if File.exist?(file_name)
       File.open(file_name) do |f|
         f.flock(File::LOCK_SH)
-        @results = Marshal.load(f)
+        count = 0
+        begin
+          @result = Marshal.load(f)
+        rescue ArgumentError
+          sleep 1
+          count += 1
+          retry if count < 5
+          @result = {}
+        end
       end
     else
       @result = {}
