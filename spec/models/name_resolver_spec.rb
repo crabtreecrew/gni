@@ -52,7 +52,10 @@ describe NameResolver do
 
   it 'should be able to create and and find an instance' do
     elr = NameResolver.create(options: { with_context: true },
-                              data: @names_latin1)
+                              data: @names_latin1,
+                              token: SecureRandom.hex(16),
+                              result: {url: 'something'})
+
     instance = NameResolver.find(elr.id)
     elr.should == instance
     elr.data.class.should == Array
@@ -67,20 +70,26 @@ describe NameResolver do
 
   it 'should be able to reconcile names against one data_source' do
     elr = NameResolver.create(options: { data_sources: [1,3] },
-                              data: @test_names)
+                              data: @test_names,
+                              token: SecureRandom.hex(16),
+                              result: {url: 'something'})
     elr.reconcile
     elr.data.select{|d| d.has_key?(:results)}.size.should > 0
   end
 
   it 'should take in account data sources sorting parameter' do
     elr = NameResolver.create(options: { data_sources_sorting: [3, 1] },
-                              data: @test_names)
+                              data: @test_names,
+                              token: SecureRandom.hex(16),
+                              result: {url: 'something'})
     elr.reconcile
     r = elr.result[:data][11][:results]
     r[0][:data_source_id].should == 3
     r[1][:data_source_id].should == 1
     elr = NameResolver.create(options: { data_sources: [1,3] },
-                              :data => @test_names)
+                              data: @test_names,
+                              token: SecureRandom.hex(16),
+                              result: {url: 'something'})
     elr.reconcile
     r = elr.result[:data][11][:results]
     r[0][:data_source_id].should == 1

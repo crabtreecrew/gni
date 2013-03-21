@@ -8,4 +8,8 @@ class ApplicationController < ActionController::Base
   def redirect_with_delay(url, delay = 0)
     @redirect_url, @redirect_delay = url, delay
   end
+
+  def not_found
+    raise ActionController::RoutingError.new('Not Found')
+  end
 end

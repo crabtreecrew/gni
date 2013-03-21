@@ -58,6 +58,8 @@ class NameResolver < ActiveRecord::Base
 
   def self.perform(name_resolver_id)
     r = NameResolver.find(name_resolver_id)
+
+    #preloading data and result from files, otherwise all chokes
     r.reconcile
   end
 
@@ -81,7 +83,7 @@ class NameResolver < ActiveRecord::Base
     end
     read_data(data)
   end
-  
+
   def data_path
     @data_path ||= Rails.root.join('tmp', 'name_resolvers').to_s
   end
@@ -90,10 +92,10 @@ class NameResolver < ActiveRecord::Base
     return @data if @data
     file_name = File.join(data_path, token.to_s + '_data')
     if File.exist?(file_name)
-      f = open(file_name, 'r:binary')
-      content = f.read
-      f.close
-      @data = Marshal.load(content) rescue []
+      File.open(file_name) do |f|
+        f.flock(File::LOCK_SH)
+        @data = Marshal.load(f)
+      end
     else
       @data = []
     end
@@ -107,10 +109,10 @@ class NameResolver < ActiveRecord::Base
     return @result if @result
     file_name = File.join(data_path, token.to_s + '_result')
     if File.exist?(file_name)
-      f = open(file_name, 'r:binary')
-      content = f.read
-      f.close
-      @result = Marshal.load(content) rescue {}
+      File.open(file_name) do |f|
+        f.flock(File::LOCK_SH)
+        @results = Marshal.load(f)
+      end
     else
       @result = {}
     end
@@ -119,17 +121,23 @@ class NameResolver < ActiveRecord::Base
   def result=(new_result)
     @result = new_result
   end
-  
+
   def save_files
     [:data, :result].each do |sym|
       file_name = File.join(data_path, token.to_s + '_' + sym.to_s)
-      file = open(file_name, 'w:binary')
-      file.write(Marshal.dump(self.send(sym)))
-      file.close
+      File.open(file_name, File::CREAT|File::RDWR) do |f|
+        f.flock(File::LOCK_EX)
+        f.truncate(0)
+        Marshal.dump(self.send(sym), f)
+      end
     end
   end
 
   def reconcile
+    # preload data and result from files
+    data
+    result
+
     begin
       update_attributes(progress_message: MESSAGES[:resolving])
       prepare_variables
@@ -723,6 +731,12 @@ private
   end
 
   def format_result
+    data_sources = NameString.connection.select_rows("
+      select
+        id, title
+      from data_sources").map { |a| [a[0], a[1].to_s.strip] }
+    data_sources = Hash[data_sources]
+
     r = result
     if @with_context
       r[:context] = []
@@ -739,6 +753,7 @@ private
         d[:results].values.each do |dr|
           match = {}
           match[:data_source_id] = dr[:data_source_id]
+          match[:data_source_title] = data_sources[dr[:data_source_id]]
           match[:gni_uuid] = dr[:name_uuid]
           match[:name_string] = dr[:name]
           match[:canonical_form] = dr[:canonical_form]
@@ -750,7 +765,8 @@ private
           match[:global_id] = dr[:global_id] unless dr[:global_id].blank?
           match[:url] = dr[:url] unless dr[:url].blank?
           if dr[:classification_path_ids]
-            last_classification_id = dr[:classification_path_ids].split('|').last
+            last_classification_id = dr[:classification_path_ids].
+                                       split('|').last
             if last_classification_id && last_classification_id != dr[:taxon_id]
               ns = NameString.connection.select_value("
                 select
@@ -773,6 +789,7 @@ private
           res[:results] << match
         end
         res[:results] = res[:results].compact
+        adjust_scores(res)
         sort_data_sources(res)
       end
       r[:data] << res
@@ -780,6 +797,10 @@ private
     # abbreviated_name_resolver if self.options[:abbreviated]
     self.progress_status = ProgressStatus.success
     self.progress_message = MESSAGES[:success]
+  end
+
+  def adjust_scores(res)
+
   end
 
   def sort_data_sources(res)
@@ -793,12 +814,14 @@ private
     ds_sort = self.options[:data_sources_sorting]
     ds_sort.inject(sorted) do |ary, ds_id|
       data = res_hash.delete(ds_id)
-      ary << data
+      if data
+        data.sort_by! { |d| d[:score] }
+        ary << data
+      end
       ary
     end unless ds_sort.empty?
 
     res_hash.keys.sort.each { |i| sorted << res_hash[i] }
     res[:results] = sorted.flatten
   end
-
 end

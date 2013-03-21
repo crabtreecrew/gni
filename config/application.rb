@@ -39,8 +39,11 @@ module Gni
     # Run "rake -D time" for a list of tasks for finding time zone names. Default is UTC.
     # config.time_zone = 'Central Time (US & Canada)'
 
-    # The default locale is :en and all translations from config/locales/*.rb,yml are auto loaded.
-    config.i18n.load_path += Dir[Rails.root.join('my', 'locales', '*.{rb,yml}').to_s]
+    # The default locale is :en and all translations from
+    # config/locales/*.rb,yml are auto loaded.
+    config.i18n.load_path += Dir[Rails.root.join('my',
+                                                 'locales',
+                                                 '*.{rb,yml}').to_s]
     config.i18n.default_locale = :en
 
     # Configure the default encoding used in templates for Ruby 1.9.
@@ -65,7 +68,7 @@ module Gni
   end
 
   Mysql2::Client.default_query_options[:connect_flags] |= Mysql2::Client::LOCAL_FILES
-  
+
   require Rails.root.join('vendor', 'lib', 'ruby-uuid', 'uuid').to_s
   require Rails.root.join('lib', 'gni').to_s
 
@@ -76,6 +79,7 @@ module Gni
     solr_url: "http://localhost:8983/solr",
     base_url: "http://localhost:3000",
     reference_data_source_id: "1",
+    curated_data_sources: [],
   )
 
 end

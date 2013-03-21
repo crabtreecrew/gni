@@ -14,13 +14,15 @@
 
 == Working with seed data
 
-Use rake "db:seed RAILS_ENV=your_env" to populate tables in development, test and production environments.
-Different environments differ in how and which tables are populated.
-To add more data for testing/development purposes use
-    
+Use rake "db:seed RAILS_ENV=your_env" to populate tables in development,
+test and production environments. Different environments differ in how and
+which tables are populated. To add more data for testing/development
+purposes use
+
     rake db:addnames
 
-the command reads data from spec/files/addnames.csv to add more records to the system.
+the command reads data from spec/files/addnames.csv to add more records
+to the system.
 
 
 == Resolver worker
@@ -40,5 +42,5 @@ the command reads data from spec/files/addnames.csv to add more records to the s
 
 Authors: Dmitry Mozzherin, David Shorthouse
 
-Copyright (c) 2012 Marine Biological Laboratory. See LICENSE.txt for
+Copyright (c) 2012-2013 Marine Biological Laboratory. See LICENSE.txt for
 further details.

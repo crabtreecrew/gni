@@ -3,11 +3,14 @@ class NameResolversController < ApplicationController
   def index
     if params[:names]
       create
+    else
+      redirect_to root_path
     end
   end
 
   def show
-    resolver = NameResolver.find_by_token(params[:id])
+    resolver = NameResolver.find_by_token(params[:id]) || not_found
+
     respond_to do |format|
       is_html_format = !params[:format] || params[:format] == 'html'
       is_in_progress = resolver.progress_status == ProgressStatus.working
@@ -50,7 +53,7 @@ class NameResolversController < ApplicationController
       token: token
     )
 
-    if new_data.size < 1050 || !workers_running?
+    if new_data.size < 150 || !workers_running?
       resolver.reconcile
     else
       resolver.progress_message = 'In the queue'
@@ -72,6 +75,8 @@ class NameResolversController < ApplicationController
   end
 
   def present_result(format, resolver, is_show = false)
+    resolver.result
+    resolver.data
     @res = resolver.result
     json_or_xml = ['xml', 'json'].include?(params[:format])
     @res[:url] += ".%s" % params[:format] if json_or_xml
