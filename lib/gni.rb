@@ -8,7 +8,7 @@ require 'lingua/stemmer'
 Dir[Rails.root.join("lib", "gni", "*.rb")].each { |f| require f }
 
 module Gni
-  
+
   def self.logger
     @@logger ||= Logger.new(nil)
   end
@@ -27,7 +27,8 @@ module Gni
 
   def self.num_to_score(num)
     #  plotting in R
-    #> a <- c(-10, -9, -8, -7, -6, -5, -4, -3, -2, -1, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10)
+    #> a <- c(-10, -9, -8, -7, -6, -5, -4, -3,
+    #    -2, -1, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10)
     #> b = atan(a * a**2) * 50/(pi*0.5) + 50
     #> plot(a,b)
     #> text(a,b, round(b,2), pos = 4, cex=1.3, las = 2, col='blue')
@@ -46,5 +47,11 @@ module Gni
       coeff *= 100
     end
     res
+  end
+
+  def self.cleanup
+    resolver_dir = Rails.root.join('tmp', 'name_resolvers').to_s
+    %x(find #{resolver_dir} -name *_* -maxdepth 0 -mtime 1 -exec rm -rf {} \\\;)
+    NameResolver.where("updated_at < ?", 1.day.ago).destroy_all
   end
 end

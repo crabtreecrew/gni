@@ -27,7 +27,7 @@ class NameResolversController < ApplicationController
     opts = get_opts
     token = '_'
     while token.match(/_/)
-      token = Base64.urlsafe_encode64(UUID.create_v4.raw_bytes)[0..-3]
+      token = rand(36**12).to_s(36)
     end
     status = ProgressStatus.working
     message = 'Submitted'

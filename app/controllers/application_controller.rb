@@ -1,4 +1,5 @@
 class ApplicationController < ActionController::Base
+  before_filter :cleanup_periodically
   protect_from_forgery
 
   def json_callback(json_struct, callback)
@@ -11,5 +12,12 @@ class ApplicationController < ActionController::Base
 
   def not_found
     raise ActionController::RoutingError.new('Not Found')
+  end
+
+  def cleanup_periodically
+    if rand > 0.995
+      Rails.logger.info 'Cleaning up old data'
+      Gni::cleanup
+    end
   end
 end
