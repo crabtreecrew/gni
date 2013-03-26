@@ -128,6 +128,7 @@ describe 'name_resolvers API' do
     body = last_response.body
     res = JSON.parse(body, symbolize_names: true)
     res[:parameters].should == { with_context: false,
+                                 header_only: false,
                                  best_match_only: false,
                                  data_sources: [],
                                  resolve_once: false,
@@ -249,5 +250,26 @@ describe 'name_resolvers API' do
     -> { get('/name_resolvers') }.
       should_not raise_error(ActionController::RoutingError)
   end
+
+  it 'should be able to display only header' do
+    get("/name_resolvers.json",
+        names: 'Calidris cf. cooperi|Liothrix argentauris ssp.|' +
+               'Treron aff. argentauris (Hodgson, 1838)|' +
+               'Treron spp.|Calidris cf. cooperi',
+        resolve_once: false,
+        header_only: true)
+    body = last_response.body
+    res = JSON.parse(body, symbolize_names: true)
+    res[:data].should be_nil
+    get("/name_resolvers.json",
+        names: 'Calidris cf. cooperi|Liothrix argentauris ssp.|' +
+               'Treron aff. argentauris (Hodgson, 1838)|' +
+               'Treron spp.|Calidris cf. cooperi',
+        resolve_once: false,
+        header_only: false)
+    body = last_response.body
+    res = JSON.parse(body, symbolize_names: true)
+    res[:data].should_not be_nil
+   end
 
 end

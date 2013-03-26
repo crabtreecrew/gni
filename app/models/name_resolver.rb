@@ -740,6 +740,7 @@ private
 
   def add_default_options
     self.options = { with_context: false,
+                     header_only: false,
                      best_match_only: false,
                      data_sources: [],
                      data_sources_sorting: [],
@@ -747,12 +748,6 @@ private
   end
 
   def format_result
-    data_sources = NameString.connection.select_rows("
-      select
-        id, title
-      from data_sources").map { |a| [a[0], a[1].to_s.strip] }
-    data_sources = Hash[data_sources]
-
     r = result
     if @with_context
       r[:context] = []
@@ -760,6 +755,23 @@ private
         r[:context] << { context_data_source_id: key, context_clade: val }
       end
     end
+    add_data(r) unless options[:header_only]
+    # abbreviated_name_resolver if self.options[:abbreviated]
+    self.progress_status = ProgressStatus.success
+    self.progress_message = MESSAGES[:success]
+  end
+
+  def adjust_scores(res)
+
+  end
+
+  def add_data(r)
+    data_sources = NameString.connection.select_rows("
+      select
+        id, title
+      from data_sources").map { |a| [a[0], a[1].to_s.strip] }
+    data_sources = Hash[data_sources]
+
     r[:data] = []
     data.each do |d|
       res = { supplied_name_string: d[:name_string] }
@@ -810,13 +822,6 @@ private
       end
       r[:data] << res
     end
-    # abbreviated_name_resolver if self.options[:abbreviated]
-    self.progress_status = ProgressStatus.success
-    self.progress_message = MESSAGES[:success]
-  end
-
-  def adjust_scores(res)
-
   end
 
   def sort_data_sources(res)

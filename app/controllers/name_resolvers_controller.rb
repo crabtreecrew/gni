@@ -114,6 +114,10 @@ class NameResolversController < ApplicationController
     if params.has_key?(:with_context)
       opts[:with_context] = !(params[:with_context] == 'false')
     end
+    
+    if params.has_key?(:header_only)
+      opts[:header_only] = !(params[:header_only] == 'false')
+    end
 
     if params[:data_source_ids]
       if params[:data_source_ids].is_a?(Hash)
