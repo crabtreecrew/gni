@@ -226,6 +226,7 @@ private
     @with_context = options[:with_context]
     @names = {}
     @matched_words = {}
+    @curated_data_sources = Set.new(Gni::Config.curated_data_sources)
     data.each_with_index do |datum, i|
       name_string = datum[:name_string]
       normalized_name_string = NameString.normalize(name_string)
@@ -743,7 +744,7 @@ private
                      header_only: false,
                      best_match_only: false,
                      data_sources: [],
-                     data_sources_sorting: [],
+                     preferred_data_sources: [],
                      resolve_once: false }.merge(self.options)
   end
 
@@ -761,10 +762,6 @@ private
     self.progress_message = MESSAGES[:success]
   end
 
-  def adjust_scores(res)
-
-  end
-
   def add_data(r)
     data_sources = NameString.connection.select_rows("
       select
@@ -774,13 +771,18 @@ private
 
     r[:data] = []
     data.each do |d|
-      res = { supplied_name_string: d[:name_string] }
+      res = { 
+        supplied_name_string: d[:name_string],
+      }
+      data_sources_set = Set.new
       res[:supplied_id] = d[:id] if d[:id]
       if d[:results]
         res[:results] = []
         d[:results].values.each do |dr|
+          next if options[:best_match_only] && dr[:score] < 0.7
           match = {}
           match[:data_source_id] = dr[:data_source_id]
+          data_sources_set << dr[:data_source_id]
           match[:data_source_title] = data_sources[dr[:data_source_id]]
           match[:gni_uuid] = dr[:name_uuid]
           match[:name_string] = dr[:name]
@@ -817,32 +819,28 @@ private
           res[:results] << match
         end
         res[:results] = res[:results].compact
-        adjust_scores(res)
         sort_data_sources(res)
+        if options[:best_match_only]
+          res[:data_sources_number] = data_sources_set.size
+          res[:in_curated_sources] = 
+            data_sources_set.intersection(@curated_data_sources).size > 0 
+        end
       end
       r[:data] << res
     end
   end
 
   def sort_data_sources(res)
-    sorted = []
-    res_hash = res[:results].inject({}) do |h, d|
-      ds_id = d[:data_source_id]
-      h[ds_id] ? h[ds_id] << d : h[ds_id] = [d]
-      h
-    end
-
-    ds_sort = self.options[:data_sources_sorting]
-    ds_sort.inject(sorted) do |ary, ds_id|
-      data = res_hash.delete(ds_id)
-      if data
-        data.sort_by! { |d| d[:score] }
-        ary << data
-      end
-      ary
-    end unless ds_sort.empty?
-
-    res_hash.keys.sort.each { |i| sorted << res_hash[i] }
-    res[:results] = sorted.flatten
+    res[:results].sort_by! { |r| [-r[:score], r[:data_source_id]] }
+    preferred_data_sources(res)
+    res[:results] = [res[:results][0]] if options[:best_match_only]
   end
+
+  def preferred_data_sources(res)
+    return if options[:preferred_data_sources].empty?
+    res[:preferred_results] = res[:results].select do |r| 
+      options[:preferred_data_sources].include? r[:data_source_id]
+    end
+  end
+
 end

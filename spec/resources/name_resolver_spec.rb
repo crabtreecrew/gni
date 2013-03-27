@@ -123,7 +123,7 @@ describe 'name_resolvers API' do
     data =  '2|Calidris cooperi\n1|Leiothrix argentauris\n4|Plantago major L.'
     post('/name_resolvers.json',
          data: data,
-         data_sources_sorting: "3|1"
+         preferred_data_sources: "3|1"
         )
     body = last_response.body
     res = JSON.parse(body, symbolize_names: true)
@@ -131,8 +131,8 @@ describe 'name_resolvers API' do
                                  header_only: false,
                                  best_match_only: false,
                                  data_sources: [],
-                                 resolve_once: false,
-                                 data_sources_sorting: [3, 1] }
+                                 preferred_data_sources: [3, 1],
+                                 resolve_once: false }
   end
 
   it 'should be able to use uploaded file for resolving names' do
@@ -148,6 +148,27 @@ describe 'name_resolvers API' do
     res = JSON.parse(body, symbolize_names: true)
     res[:data][1][:results].first[:taxon_id].should == '2433879'
   end
+
+  it 'should be able to display only header' do
+    get("/name_resolvers.json",
+        names: 'Calidris cf. cooperi|Liothrix argentauris ssp.|' +
+               'Treron aff. argentauris (Hodgson, 1838)|' +
+               'Treron spp.|Calidris cf. cooperi',
+        resolve_once: false,
+        header_only: true)
+    body = last_response.body
+    res = JSON.parse(body, symbolize_names: true)
+    res[:data].should be_nil
+    get("/name_resolvers.json",
+        names: 'Calidris cf. cooperi|Liothrix argentauris ssp.|' +
+               'Treron aff. argentauris (Hodgson, 1838)|' +
+               'Treron spp.|Calidris cf. cooperi',
+        resolve_once: false,
+        header_only: false)
+    body = last_response.body
+    res = JSON.parse(body, symbolize_names: true)
+    res[:data].should_not be_nil
+   end
 
   it 'should search whole GNI if there is no data source information' do
     get('/name_resolvers.json',
@@ -190,6 +211,25 @@ describe 'name_resolvers API' do
       prescore: '1|0|0',
       score: 0.75
     }
+  end
+
+  it 'should be able to return best match only' do
+    Gni::Config.curated_data_sources = [1,2,3,4,5]
+    get("/name_resolvers.json",
+        names: 'Calidris cf. cooperi|Liothrix argentauris ssp.|' +
+               'Treron aff. argentauris (Hodgson, 1838)|' +
+               'Treron spp.|Calidris cf. cooperi',
+        best_match_only: true,
+        resolve_once: false)
+    body = last_response.body
+    res = JSON.parse(body, symbolize_names: true)
+    res[:parameters].should == { with_context: false, 
+                                 header_only: false, 
+                                 best_match_only: true, 
+                                 data_sources: [], 
+                                 preferred_data_sources: [], 
+                                 resolve_once: false }
+    res[:data].map { |d| d[:results].size }.should == [1, 1, 1, 1, 1]
   end
 
   it 'should be able to find sp. epithets, with cf or aff qualifiers' do
@@ -250,26 +290,5 @@ describe 'name_resolvers API' do
     -> { get('/name_resolvers') }.
       should_not raise_error(ActionController::RoutingError)
   end
-
-  it 'should be able to display only header' do
-    get("/name_resolvers.json",
-        names: 'Calidris cf. cooperi|Liothrix argentauris ssp.|' +
-               'Treron aff. argentauris (Hodgson, 1838)|' +
-               'Treron spp.|Calidris cf. cooperi',
-        resolve_once: false,
-        header_only: true)
-    body = last_response.body
-    res = JSON.parse(body, symbolize_names: true)
-    res[:data].should be_nil
-    get("/name_resolvers.json",
-        names: 'Calidris cf. cooperi|Liothrix argentauris ssp.|' +
-               'Treron aff. argentauris (Hodgson, 1838)|' +
-               'Treron spp.|Calidris cf. cooperi',
-        resolve_once: false,
-        header_only: false)
-    body = last_response.body
-    res = JSON.parse(body, symbolize_names: true)
-    res[:data].should_not be_nil
-   end
 
 end

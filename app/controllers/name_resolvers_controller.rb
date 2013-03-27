@@ -129,8 +129,8 @@ class NameResolversController < ApplicationController
       end
     end
 
-    if params[:data_sources_sorting]
-      opts[:data_sources_sorting] = params[:data_sources_sorting].
+    if params[:preferred_data_sources]
+      opts[:preferred_data_sources] = params[:preferred_data_sources].
                                     split('|').
                                     map(&:to_i)
     end

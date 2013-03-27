@@ -65,7 +65,7 @@ describe NameResolver do
                             header_only: false,
                             best_match_only: false,
                             data_sources: [],
-                            data_sources_sorting: [],
+                            preferred_data_sources: [],
                             resolve_once: false }
   end
 
@@ -78,23 +78,15 @@ describe NameResolver do
     elr.data.select{|d| d.has_key?(:results)}.size.should > 0
   end
 
-  it 'should take in account data sources sorting parameter' do
-    elr = NameResolver.create(options: { data_sources_sorting: [3, 1] },
+  it 'should create preferred results if asked' do
+    elr = NameResolver.create(options: { preferred_data_sources: [1] },
                               data: @test_names,
                               token: SecureRandom.hex(16),
                               result: {url: 'something'})
     elr.reconcile
-    r = elr.result[:data][11][:results]
-    r[0][:data_source_id].should == 3
-    r[1][:data_source_id].should == 1
-    elr = NameResolver.create(options: { data_sources: [1,3] },
-                              data: @test_names,
-                              token: SecureRandom.hex(16),
-                              result: {url: 'something'})
-    elr.reconcile
-    r = elr.result[:data][11][:results]
-    r[0][:data_source_id].should == 1
-    r[1][:data_source_id].should == 3
+    elr.result[:data][11][:preferred_results].should_not be_nil
+    elr.result[:data][11][:preferred_results].
+      map { |r| r[:data_source_id] }.uniq.should == [1]
   end
 
 end
