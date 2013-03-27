@@ -230,6 +230,23 @@ describe 'name_resolvers API' do
                                  preferred_data_sources: [], 
                                  resolve_once: false }
     res[:data].map { |d| d[:results].size }.should == [1, 1, 1, 1, 1]
+    get("/name_resolvers.json",
+        names: 'Calidris cf. cooperi|Liothrix argentauris ssp.|' +
+               'Treron aff. argentauris (Hodgson, 1838)|' +
+               'Treron spp.|Calidris cf. cooperi',
+        best_match_only: true,
+        preferred_data_sources: '1',
+        resolve_once: false)
+    body = last_response.body
+    res = JSON.parse(body, symbolize_names: true)
+    res[:parameters].should == { with_context: false, 
+                                 header_only: false, 
+                                 best_match_only: true, 
+                                 data_sources: [], 
+                                 preferred_data_sources: [1], 
+                                 resolve_once: false }
+    res[:data].map { |d| d[:results].size }.should == [1, 1, 1, 1, 1]
+    res[:data].map { |d| d[:preferred_results].size }.should == [0, 1, 0, 0, 0]
   end
 
   it 'should be able to find sp. epithets, with cf or aff qualifiers' do

@@ -831,7 +831,7 @@ private
   end
 
   def sort_data_sources(res)
-    res[:results].sort_by! { |r| [-r[:score], r[:data_source_id]] }
+    res[:results].sort_by! { |r| [-r[:score], r[:data_source_id], r[:match_type]] }
     preferred_data_sources(res)
     res[:results] = [res[:results][0]] if options[:best_match_only]
   end
@@ -840,6 +840,14 @@ private
     return if options[:preferred_data_sources].empty?
     res[:preferred_results] = res[:results].select do |r| 
       options[:preferred_data_sources].include? r[:data_source_id]
+    end
+    if options[:best_match_only]
+      pref_data_sources = {}
+      res[:preferred_results] = res[:preferred_results].select do |r| 
+        has_source = pref_data_sources[r[:data_source_id]]
+        pref_data_sources[r[:data_source_id]] = 1
+        has_source
+      end
     end
   end
 
