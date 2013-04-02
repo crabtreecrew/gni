@@ -1,0 +1,18 @@
+=title "Nomenclatural Codes"
+
+-content_for :content_splash do
+  %h2 Nomenclatural Codes
+
+%table#data-sources
+  %tr
+    %th.identifier ID
+    %th Code
+    %th Description
+
+  - cycle = "odd"
+  - @nomenclatural_codes.each do |nc|
+    - cycle = (cycle == "odd") ? "even" : "odd"
+    %tr{:class => cycle}
+      %td.identifier= nc.id
+      %td= nc.code
+      %td= nc.title
