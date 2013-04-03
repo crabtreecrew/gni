@@ -189,7 +189,7 @@ class DwcaImporter < ActiveRecord::Base
             get_classification_path(taxon)
           classification_path = @db.quote(classification_path)
           classification_path_ranks = @db.quote(classification_path_ranks)
-          classification_path_id = @db.quote(classification_path_id.join("|"))
+          classification_path_id = @db.quote(classification_path_id.join('|'))
           if name_string_id != 'NULL'
             names_index << [data_source_id, name_string_id, 
                             taxon_id, source, local_id, 
