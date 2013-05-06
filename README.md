@@ -61,7 +61,7 @@ Authors: Dmitry Mozzherin, David Shorthouse
 Copyright (c) 2012-2013 Marine Biological Laboratory. See LICENSE.txt for
 further details.
 
-[1]: https://secure.travis-ci.org/GlobalNamesArchitecture/biodiversity.png
-[2]: http://travis-ci.org/GlobalNamesArchitecture/biodiversity
-[3]: https://gemnasium.com/GlobalNamesArchitecture/biodiversity.png
-[4]: https://gemnasium.com/GlobalNamesArchitecture/biodiversity
+[1]: https://secure.travis-ci.org/GlobalNamesArchitecture/gni.png
+[2]: http://travis-ci.org/GlobalNamesArchitecture/gni
+[3]: https://gemnasium.com/GlobalNamesArchitecture/gni.png
+[4]: https://gemnasium.com/GlobalNamesArchitecture/gni
