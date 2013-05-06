@@ -29,12 +29,12 @@ group :assets do
 end
 
 group :development do
+  gem 'ruby-prof'
   gem 'rspec-rails'
+  gem 'debugger'
 end
 
 group :test do
-  gem 'ruby-prof'
-  gem 'debugger'
   gem 'database_cleaner'
   gem 'rails3-generators'
   gem 'rspec-rails'
