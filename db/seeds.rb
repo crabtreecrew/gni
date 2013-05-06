@@ -1,28 +1,66 @@
-# This file should contain all the record creation needed to seed the database with its default values.
-# The data can then be loaded with the rake db:seed (or created alongside the db with db:setup).
-#
-# to create csv files use "select * from table_name into outfile 'csv_file_name'"
-# TODO: create rake db:seed:dump
-#  
+#!/usr/bin/env ruby
+# encoding: utf-8
 
-def load_csv(dir, file)
-  puts "Adding data to table %s" % file[0...-4]
-  NameString.connection.execute("truncate %s" % file[0...-4])
-  local= !!(RUBY_PLATFORM =~ /darwin/) ? '' : 'local' #hack to get around a bug in mysql2 on os x
-  NameString.connection.execute("
-    load data %s infile '%s'
-    into table %s 
-    set created_at = now(), updated_at = now()
-    " % [local, File.join(dir, file), file[0...-4]])
-end
+require File.expand_path(File.join(File.dirname(__FILE__), "../config/environment"))
 
-puts "Preloading data..."
+class Seeder
+  attr :common_dir, :env_dir
 
-csv_dir     = File.join(Rails.root, 'db', 'csv').to_s
-env_csv_dir = File.join(csv_dir, Rails.env).to_s
-
-[csv_dir, env_csv_dir].each do |dir|
-  Dir.entries(dir).each do |file|
-    load_csv(dir, file) if file[-4..-1] == ".csv"
+  def initialize
+    @env = ENV['RAILS_ENV'] ? ENV['RAILS_ENV'].to_s : 'development'
+    @db = NameString.connection
+    @common_dir = File.expand_path(File.join(File.dirname(__FILE__), 'csv'))
+    @env_dir = File.join(common_dir, @env)
+    @path = nil
   end
+
+  def walk_path(path)
+    @path = path
+    files = Dir.entries(path).map {|e| e.to_s}.select {|e| e.match /csv$/}
+    files.each do |file|
+      table = file.gsub(/\.csv/, '')
+      data = get_data(table, file)
+      puts "Repopulating %s for %s environment" % [table, @env]
+      ["truncate table %s" % table,
+       "insert into %s values %s" % [table, data]].each do |q|
+        @db.execute(q)
+      end if data
+      puts table unless data
+    end
+  end
+
+  private
+
+  def get_data(table, file)
+    columns = @db.select_values("show columns from %s" % table)
+    ca_index = columns.index("created_at")
+    ua_index = columns.index("updated_at")
+    csv_args = {:col_sep => "\t"}
+    data = CSV.open(File.join(@path, file), csv_args).map do |row|
+      res = get_row(row, ca_index, ua_index)
+      (columns.size - res.size).times { res << 'null' }
+      res.join(",")
+    end #rescue []
+    data.empty? ? nil : "(%s)" % data.join("), (")
+  end
+
+  def get_row(row, ca_index, ua_index)
+    res = []
+    row.each_with_index do |field, index|
+      if [ca_index, ua_index].include? index
+        res << 'now()'
+      else
+        res << @db.quote(field)
+      end
+    end
+    res
+  end
+
 end
+
+s = Seeder.new
+
+s.walk_path(s.common_dir)
+s.walk_path(s.env_dir)
+
+
