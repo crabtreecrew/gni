@@ -10,10 +10,11 @@ require 'resque/tasks'
 Gni::Application.load_tasks
 
 task(:default).clear
-task :default => [:spec, :cucumber]
+task :default => :spec
 
-task "resque:setup" => :environment do
-end
+task :spec => 'db:seed'
+
+task "resque:setup" => :environment
 
 namespace :db do
   desc "dumps tables from the environment to csv files"
@@ -25,14 +26,14 @@ namespace :db do
     db = ActiveRecord::Base.connection
     db.tables.each do |table|
       count = db.select_value("select count(*) from #{table}")
-      if !shared_tables.include?(table) && count > 0 
+      if !shared_tables.include?(table) && count > 0
         file = "#{csv_dir}/#{table}.csv"
         FileUtils.rm file if File.exists? file
         db.execute("select * into outfile '#{file}' from #{table}")
       end
     end
   end
-  
+
   desc "adds records to a data_source from a file"
   task :addnames => :environment do
     ENV["RAILS_ENV"] ||= 'development'
@@ -78,7 +79,7 @@ namespace :solr do
     puts "** Rebuilding solr indices **"
     system(Escape.shell_command([Rails.root.join('script', 'gni', 'solr_import.rb').to_s]))
   end
-  
+
   desc 'clear solr data'
   task :clear => :environment do
     puts "** Deleting solr data **"

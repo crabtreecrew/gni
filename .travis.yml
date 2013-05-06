@@ -1,0 +1,13 @@
+language: ruby
+rvm:
+  - 1.9.3
+bundler_args: --without development
+before_script:
+  - rake db:create:all
+  - rake db:migrate
+  - rake db:migrate RAILS_ENV=test
+  - rake db:seed
+  - rake db:seed RAILS_ENV=test
+  - rake db:solr:start
+  - rake db:solr:build
+
