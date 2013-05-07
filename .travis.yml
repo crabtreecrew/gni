@@ -12,6 +12,6 @@ before_script:
   - rake db:migrate RAILS_ENV=test
   - rake db:seed
   - rake db:seed RAILS_ENV=test
-  - rake db:solr:start
-  - rake db:solr:build
+  - rake solr:start
+  - rake solr:build
 
