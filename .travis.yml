@@ -1,6 +1,10 @@
-language: ruby
+language:
+  - ruby
+  - java
 rvm:
   - 1.9.3
+jdk:
+  - oraclejdk7
 branches:
   only:
       - master
