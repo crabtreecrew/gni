@@ -29,7 +29,6 @@ group :assets do
 end
 
 group :development do
-  gem 'ruby-prof'
   gem 'rspec-rails'
   gem 'debugger'
 end
@@ -41,6 +40,7 @@ group :test do
   gem 'factory_girl_rails'
   gem 'cucumber-rails'
   gem 'rack-test', :require => 'rack/test'
+  gem 'ruby-prof'
   gem 'capybara'
   gem 'mocha'
 end
