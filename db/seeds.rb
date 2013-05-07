@@ -9,7 +9,7 @@
 #
 
 def localhost?
-  conf = Rails.configuration.database_configuration(Rails.env)
+  conf = Rails.configuration.database_configuration[Rails.env]
   host = conf['host']
   host && !['locahost', '127.0.0.1', '0.0.0.0'].include?(host)
 end
