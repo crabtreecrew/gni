@@ -170,7 +170,7 @@ GEM
       biodiversity19
       redis
     polyglot (0.3.3)
-    rack (1.3.5)
+    rack (1.3.10)
     rack-cache (1.1)
       rack (>= 0.4)
     rack-mount (0.8.3)
@@ -303,6 +303,7 @@ DEPENDENCIES
   oa-oauth
   oa-openid
   optiflag
+  rack
   rack-test
   rails (= 3.1.1)
   rails3-generators

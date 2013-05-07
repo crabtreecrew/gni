@@ -1,6 +1,7 @@
 source 'https://rubygems.org'
 
 gem 'rails', '3.1.1'
+gem 'rack'
 gem 'mysql2'
 gem 'haml'
 gem 'haml-rails', :group => :development
