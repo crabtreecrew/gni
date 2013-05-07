@@ -11,7 +11,7 @@
 def localhost?
   conf = Rails.configuration.database_configuration[Rails.env]
   host = conf['host']
-  host && !['locahost', '127.0.0.1', '0.0.0.0'].include?(host)
+  [nil, 'locahost', '127.0.0.1', '0.0.0.0'].include?(host)
 end
 
 def load_csv(dir, file)
