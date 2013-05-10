@@ -390,6 +390,7 @@ private
 
       }
       parse_res = JSON.parse(row[11], symbolize_names: true)
+      puts parse_res
       found_name_parsed = @atomizer.organize_results(parse_res[:scientificName])
       update_found_words(record[:canonical_form])
       @names[record[:canonical_form]].each do |val|
@@ -771,7 +772,7 @@ private
 
     r[:data] = []
     data.each do |d|
-      res = { 
+      res = {
         supplied_name_string: d[:name_string],
       }
       data_sources_set = Set.new
@@ -822,8 +823,8 @@ private
         sort_data_sources(res)
         if options[:best_match_only]
           res[:data_sources_number] = data_sources_set.size
-          res[:in_curated_sources] = 
-            data_sources_set.intersection(@curated_data_sources).size > 0 
+          res[:in_curated_sources] =
+            data_sources_set.intersection(@curated_data_sources).size > 0
         end
       end
       r[:data] << res
@@ -831,8 +832,8 @@ private
   end
 
   def sort_data_sources(res)
-    res[:results].sort_by! do |r| 
-      [-r[:score], 
+    res[:results].sort_by! do |r|
+      [-r[:score],
       r[:match_type],
       r[:data_source_id]]
     end
@@ -842,12 +843,12 @@ private
 
   def preferred_data_sources(res)
     return if options[:preferred_data_sources].empty?
-    res[:preferred_results] = res[:results].select do |r| 
+    res[:preferred_results] = res[:results].select do |r|
       options[:preferred_data_sources].include? r[:data_source_id]
     end
     if options[:best_match_only]
       pref_data_sources = {}
-      res[:preferred_results] = res[:preferred_results].select do |r| 
+      res[:preferred_results] = res[:preferred_results].select do |r|
         has_source = !pref_data_sources[r[:data_source_id]]
         pref_data_sources[r[:data_source_id]] = 1
         has_source

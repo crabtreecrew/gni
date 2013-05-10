@@ -13,21 +13,21 @@ gem 'devise'
 gem 'oa-oauth', '0.3.2', :require => 'omniauth/oauth'
 gem 'oa-openid', '0.3.2', :require => 'omniauth/openid'
 gem 'thin'
-gem 'resque'
-gem 'biodiversity19', '~> 2.1'
-gem 'dwc-archive', '>= 0.9.3'
-gem 'taxamatch_rb', '~> 0.9.10'
+gem 'resque', '~> 1.24'
 gem 'composite_primary_keys', '~> 5.0'
 gem 'rest-client'
 gem 'ruby-stemmer'
 gem 'optiflag'
 gem 'high_voltage'
+gem 'biodiversity', '~> 3.0.1'
+gem 'dwc-archive', '~> 0.9.4'
+gem 'taxamatch_rb', '~> 1.0.0'
 
 
 group :assets do
-  gem 'sass-rails',   '~> 3.2'
+  gem 'sass-rails', '~> 3.2'
   gem 'coffee-rails', '~> 3.1'
-  gem 'uglifier', '>= 1.0.3'
+  gem 'uglifier', '~> 1.0.3'
 end
 
 group :development do
