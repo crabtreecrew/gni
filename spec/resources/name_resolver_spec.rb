@@ -99,7 +99,7 @@ describe 'name_resolvers API' do
       results: [{
         data_source_id: 1,
         data_source_title: 'Catalogue of Life',
-        gni_uuid: '02450740-2179-4891-4420-116063658828',
+        gni_uuid: 'b85f8a2a-de4c-5ba0-bb94-2b4b8789ef08',
         name_string: 'Treron',
         canonical_form: 'Treron',
         classification_path:
@@ -183,7 +183,7 @@ describe 'name_resolvers API' do
     res[:data][0][:results].first.should == {
       data_source_id: 2,
       data_source_title: nil,
-      gni_uuid: '01435442-3983-5234-9623-022468658894',
+      gni_uuid: '6bfd9d6f-9c68-5f5a-bbc6-99759c730a84',
       name_string: 'Calidris cooperi',
       canonical_form: 'Calidris cooperi',
       classification_path: nil,
@@ -197,7 +197,7 @@ describe 'name_resolvers API' do
     res[:data][1][:results].first.should == {
       data_source_id: 1,
       data_source_title: 'Catalogue of Life',
-      gni_uuid: '01052127-9074-3279-3448-709966846776',
+      gni_uuid: '4f273f15-8b8f-5412-9a02-b256585d8991',
       name_string: 'Leiothrix argentauris (Hodgson, 1838)',
       canonical_form: 'Leiothrix argentauris',
       classification_path: 'Animalia|Chordata|Aves|' +
@@ -223,11 +223,11 @@ describe 'name_resolvers API' do
         resolve_once: false)
     body = last_response.body
     res = JSON.parse(body, symbolize_names: true)
-    res[:parameters].should == { with_context: false, 
-                                 header_only: false, 
-                                 best_match_only: true, 
-                                 data_sources: [], 
-                                 preferred_data_sources: [], 
+    res[:parameters].should == { with_context: false,
+                                 header_only: false,
+                                 best_match_only: true,
+                                 data_sources: [],
+                                 preferred_data_sources: [],
                                  resolve_once: false }
     res[:data].map { |d| d[:results].size }.should == [1, 1, 1, 1, 1]
     get("/name_resolvers.json",
@@ -239,11 +239,11 @@ describe 'name_resolvers API' do
         resolve_once: false)
     body = last_response.body
     res = JSON.parse(body, symbolize_names: true)
-    res[:parameters].should == { with_context: false, 
-                                 header_only: false, 
-                                 best_match_only: true, 
-                                 data_sources: [], 
-                                 preferred_data_sources: [1], 
+    res[:parameters].should == { with_context: false,
+                                 header_only: false,
+                                 best_match_only: true,
+                                 data_sources: [],
+                                 preferred_data_sources: [1],
                                  resolve_once: false }
     res[:data].map { |d| d[:results].size }.should == [1, 1, 1, 1, 1]
     res[:data].map { |d| d[:preferred_results].size }.should == [0, 1, 1, 1, 0]
