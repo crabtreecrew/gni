@@ -288,7 +288,7 @@ private
       record = {
         auth_score: 0,
         gni_id: row[0],
-        name_uuid: UUID.parse(row[1].to_s(16)).to_s,
+        name_uuid: row[1],
         name: row[3],
         data_source_id: row[4],
         taxon_id: row[5],
@@ -376,7 +376,7 @@ private
     res.each do |row|
       record = {
         gni_id: row[0],
-        name_uuid: UUID.parse(row[1].to_s(16)).to_s,
+        name_uuid: row[1],
         name: row[3],
         data_source_id: row[4],
         taxon_id: row[5],
@@ -390,7 +390,6 @@ private
 
       }
       parse_res = JSON.parse(row[11], symbolize_names: true)
-      puts parse_res
       found_name_parsed = @atomizer.organize_results(parse_res[:scientificName])
       update_found_words(record[:canonical_form])
       @names[record[:canonical_form]].each do |val|
@@ -480,7 +479,7 @@ private
           if is_match
             record = {
               gni_id: row[0],
-              name_uuid: UUID.parse(row[1].to_s(16)).to_s,
+              name_uuid: row[1],
               name: row[3],
               data_source_id: row[4],
               taxon_id: row[5],
@@ -781,6 +780,7 @@ private
         res[:results] = []
         d[:results].values.each do |dr|
           next if options[:best_match_only] && dr[:score] < 0.7
+          dr[:name_uuid] = UUID.parse(dr[:name_uuid].to_i.to_s(16)).to_s
           match = {}
           match[:data_source_id] = dr[:data_source_id]
           data_sources_set << dr[:data_source_id]
