@@ -780,7 +780,7 @@ private
         res[:results] = []
         d[:results].values.each do |dr|
           next if options[:best_match_only] && dr[:score] < 0.7
-          dr[:name_uuid] = UUID.parse(dr[:name_uuid].to_i.to_s(16)).to_s
+          dr[:name_uuid] = NameString.parse_uuid(dr[:name_uuid])
           match = {}
           match[:data_source_id] = dr[:data_source_id]
           data_sources_set << dr[:data_source_id]

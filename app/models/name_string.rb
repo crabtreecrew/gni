@@ -7,6 +7,15 @@ class NameString < ActiveRecord::Base
 
   scope :data_source, joins("join name_string_indices on name_string.id = name_string_indices.name_string_id").where("name_string_indices.data_source_id" => [1,2])
   
+  def self.parse_uuid(decimal_uuid)
+    uuid_hex = decimal_uuid.to_i.to_s(16)
+    if uuid_hex.size != 32
+      zeros = '0' * (32 - uuid_hex.size)  
+      uuid_hex = zeros + uuid_hex
+    end
+    ::UUID.parse(uuid_hex).to_s
+  end
+
   def self.kill_orphans
     #we only remove orphans which parser could not process, keep the rest, because there is a good chance they might be reentered into the system.
     NameString.connection.execute('delete from name_strings where id not in (select name_string_id from name_string_indices) and id in (select id from parsed_name_strings where parsed=0)')
@@ -39,7 +48,7 @@ class NameString < ActiveRecord::Base
 
   def uuid
     res = super
-    res ? ::UUID.parse(res.to_s(16)).to_s : nil
+    res ? NameString.parse_uuid(res) : nil
   end
   
   private
