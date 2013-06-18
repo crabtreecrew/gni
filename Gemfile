@@ -19,7 +19,7 @@ gem 'rest-client'
 gem 'ruby-stemmer'
 gem 'optiflag'
 gem 'high_voltage'
-gem 'biodiversity', '~> 3.1.0'
+gem 'biodiversity', '~> 3.1.1'
 gem 'dwc-archive', '~> 0.9.5'
 gem 'taxamatch_rb', '~> 1.0.1'
 
