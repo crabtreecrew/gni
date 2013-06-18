@@ -370,7 +370,8 @@ private
         on cf.id = ns.canonical_form_id
       join parsed_name_strings pns
         on pns.id = ns.id
-    where cf.name in (#{names})"
+    where cf.name in (#{names})
+    and ns.surrogate = 0"
     q += " and data_source_id in (#{data_sources})" unless @data_sources.blank?
     res = DataSource.connection.select_rows(q)
     res.each do |row|
@@ -465,7 +466,8 @@ private
             on pns.id = ns.id
           join name_string_indices nsi
             on nsi.name_string_id = ns.id
-        where cf.name in (%s)" % q_canonical
+        where cf.name in (%s)
+          and ns.surrogate = 0" % q_canonical
         unless @data_sources.blank?
           q += " and data_source_id in (#{data_sources})"
         end
