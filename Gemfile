@@ -20,7 +20,7 @@ gem 'ruby-stemmer'
 gem 'optiflag'
 gem 'high_voltage'
 gem 'biodiversity', '~> 3.1.2'
-gem 'dwc-archive', '~> 0.9.5'
+gem 'dwc-archive', '~> 0.9.6'
 gem 'taxamatch_rb', '~> 1.0.1'
 
 

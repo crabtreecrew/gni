@@ -51,7 +51,7 @@ class DwcaImporter < ActiveRecord::Base
     if url.match(/^\s*http:\/\//)
       dlr = Gni::Downloader.new(url, tarball_path)
       downloaded_length = dlr.download_with_percentage do |r|
-        msg = sprintf('Downloaded %.0f%% in %.0f seconds ETA is %.0f seconds', 
+        msg = sprintf('Downloaded %.0f%% in %.0f seconds ETA is %.0f seconds',
                       r[:percentage], r[:elapsed_time], r[:eta])
         JobLog.create(type: 'DwcaImporterLog', job_id: self.id, message: msg)
       end
@@ -65,15 +65,16 @@ class DwcaImporter < ActiveRecord::Base
   def read_tarball
     @db = NameString.connection
     @dwc               = DarwinCore.new(tarball_path)
-    DarwinCore.logger.subscribe(an_object_id: @dwc.object_id, 
-                                job_id: self.id, 
+    DarwinCore.logger.subscribe(an_object_id: @dwc.object_id,
+                                job_id: self.id,
                                 type: 'DwcaImporterLog')
-    DarwinCore.logger_write(@dwc.object_id, 
-                            'Import started for data source %s' % 
+    DarwinCore.logger_write(@dwc.object_id,
+                            'Import started for data source %s' %
                               data_source.title)
     read_metadata
     normalizer        = DarwinCore::ClassificationNormalizer.new(@dwc)
     @data = normalizer.normalize(with_canonical_names: false);
+    @is_gnub = gnub?
     @tree             = normalizer.tree
     @name_strings     = normalizer.name_strings(with_hash: true)
     @vernacular_strings = normalizer.vernacular_name_strings(with_hash: true)
@@ -84,7 +85,7 @@ class DwcaImporter < ActiveRecord::Base
 
   def store_name_strings
     DarwinCore.logger_write(@dwc.object_id, 'Populating local database')
-    DarwinCore.logger_write(@dwc.object_id, 
+    DarwinCore.logger_write(@dwc.object_id,
                             'Processing scientific name strings')
     count = 0
     NameString.transaction do
@@ -97,23 +98,23 @@ class DwcaImporter < ActiveRecord::Base
           uuid = get_uuid(name)
           @name_strings[name_string] = { normalized: @db.quote(name) }
           tm_normalized = @db.quote(NameString.normalize(name))
-          res << "%s, %s, %s, '%s', '%s'" % 
-            [@name_strings[name_string][:normalized], 
+          res << "%s, %s, %s, '%s', '%s'" %
+            [@name_strings[name_string][:normalized],
              uuid, tm_normalized, now, now]
         end
         group = res.join('), (')
-        @db.execute "INSERT 
-                       IGNORE INTO name_strings 
-                     (name, uuid, normalized, created_at, updated_at) VALUES 
+        @db.execute "INSERT
+                       IGNORE INTO name_strings
+                     (name, uuid, normalized, created_at, updated_at) VALUES
                      (#{group})"
-        DarwinCore.logger_write(@dwc.object_id, 
+        DarwinCore.logger_write(@dwc.object_id,
                                 'Traversed %s scientific name strings' % count)
       end
     end
   end
 
   def store_vernacular_strings
-    DarwinCore.logger_write(@dwc.object_id, 
+    DarwinCore.logger_write(@dwc.object_id,
                             'Processing vernacular name strings')
     count = 0
     NameString.transaction do
@@ -127,14 +128,14 @@ class DwcaImporter < ActiveRecord::Base
           name = NameString.normalize_space(name_string)
           @vernacular_strings[name_string] = { normalized: @db.quote(name) }
           uuid = get_uuid(name)
-          "%s, %s, '%s','%s'" % 
+          "%s, %s, '%s','%s'" %
             [@vernacular_strings[name_string][:normalized], uuid, now, now]
         end.join('), (')
-        @db.execute "INSERT IGNORE INTO 
-                       vernacular_strings 
-                         (name, uuid, created_at, updated_at) 
+        @db.execute "INSERT IGNORE INTO
+                       vernacular_strings
+                         (name, uuid, created_at, updated_at)
                      VALUES (#{group})"
-        DarwinCore.logger_write(@dwc.object_id, 
+        DarwinCore.logger_write(@dwc.object_id,
                                 'Traversed %s vernacular name strings' % count)
       end
     end
@@ -150,29 +151,36 @@ class DwcaImporter < ActiveRecord::Base
       @db.quote(r)
     end
     record << canonical_name
-    @index[name_string] ? 
-      @index[name_string] << record : 
+    @index[name_string] ?
+      @index[name_string] << record :
       @index[name_string] = [record]
   end
 
   def store_index
     DarwinCore.logger_write(@dwc.object_id, 'Inserting indices')
     @db.execute("DROP TEMPORARY TABLE IF EXISTS `tmp_name_string_indices`")
-    @db.execute("DROP 
+    @db.execute("DROP
                   TEMPORARY TABLE IF EXISTS `tmp_vernacular_string_indices`")
-    @db.execute("CREATE 
-                   TEMPORARY TABLE `tmp_name_string_indices` 
+    @db.execute("CREATE
+                   TEMPORARY TABLE `tmp_name_string_indices`
                 LIKE `name_string_indices`")
-    @db.execute("CREATE 
-                   TEMPORARY TABLE 
-                     `tmp_vernacular_string_indices` 
+    @db.execute("CREATE
+                   TEMPORARY TABLE
+                     `tmp_vernacular_string_indices`
                  LIKE `vernacular_string_indices`")
+    if @is_gnub
+      @db.execute("DROP TEMPORARY TABLE IF EXISTS `tmp_gnub_uuids`")
+      @db.execute("CREATE
+                    TEMPORARY TABLE `tmp_gnub_uuids`
+                  LIKE `gnub_uuids`")
+    end
     count = 0
     NameString.transaction do
       @data.keys.in_groups_of(Gni::Config.batch_size) do |group|
         count += Gni::Config.batch_size
         names_index = []
         vernacular_index = []
+        gnub_uuids = [] if @is_gnub
         group.compact.each do |key|
           now = @db.quote(time_string)
           taxon = @data[key]
@@ -181,21 +189,27 @@ class DwcaImporter < ActiveRecord::Base
           rank = taxon.rank.blank? ? 'NULL' : @db.quote(taxon.rank)
           source = taxon.source.blank? ? 'NULL' : @db.quote(taxon.source)
           local_id = taxon.local_id.blank? ? 'NULL' : @db.quote(taxon.local_id)
-          global_id = taxon.global_id.blank? ? 
-                        'NULL' : 
+          global_id = taxon.global_id.blank? ?
+                        'NULL' :
                         @db.quote(taxon.global_id)
           classification_path_id =  taxon.classification_path_id.compact
-          classification_path, classification_path_ranks = 
+          classification_path, classification_path_ranks =
             get_classification_path(taxon)
           classification_path = @db.quote(classification_path)
           classification_path_ranks = @db.quote(classification_path_ranks)
           classification_path_id = @db.quote(classification_path_id.join('|'))
+          if @is_gnub
+            taxon_id.gsub!('-', '')
+            uuid = UUID.parse(taxon.uuid).to_i
+            uuid_path = taxon.uuid_path.map { |u| UUID.parse(u).to_i }
+            gnub_uuids << [taxon_id, uuid, uuid_path]
+          end
           if name_string_id != 'NULL'
-            names_index << [data_source_id, name_string_id, 
-                            taxon_id, source, local_id, 
-                            global_id, rank, taxon_id, 
-                            'NULL', classification_path, 
-                            classification_path_id, classification_path_ranks, 
+            names_index << [data_source_id, name_string_id,
+                            taxon_id, source, local_id,
+                            global_id, rank, taxon_id,
+                            'NULL', classification_path,
+                            classification_path_id, classification_path_ranks,
                             now, now].join(',')
           else
             puts '*' * 80
@@ -205,35 +219,35 @@ class DwcaImporter < ActiveRecord::Base
             count += 1
             synonym_string_id = @db.quote(get_name_string_id(synonym.name))
             synonym_taxon_id = synonym.id ? synonym.id : taxon_id
-            synonym_source = synonym.source.blank? ? 
-                               source : 
+            synonym_source = synonym.source.blank? ?
+                               source :
                                @db.quote(synonym.source)
-            synonym_local_id = synonym.local_id.blank? ? 
-                                 local_id : 
+            synonym_local_id = synonym.local_id.blank? ?
+                                 local_id :
                                  @db.quote(synonym.local_id)
-            synonym_global_id = synonym.global_id.blank? ? 
-                                  global_id : 
+            synonym_global_id = synonym.global_id.blank? ?
+                                  global_id :
                                   @db.quote(synonym.global_id)
             synonym_taxon_id = @db.quote(synonym_taxon_id)
             if synonym_string_id != "NULL"
-              names_index << [data_source_id, synonym_string_id, 
-                              synonym_taxon_id, synonym_source, 
-                              synonym_local_id, synonym_global_id, 
-                              rank, taxon_id, "'synonym'", 
-                              classification_path, classification_path_id, 
+              names_index << [data_source_id, synonym_string_id,
+                              synonym_taxon_id, synonym_source,
+                              synonym_local_id, synonym_global_id,
+                              rank, taxon_id, "'synonym'",
+                              classification_path, classification_path_id,
                               classification_path_ranks, now, now].join(',')
             end
           end
           taxon.vernacular_names.each do |vernacular|
             count += 1
-            vernacular_string_id = 
+            vernacular_string_id =
               @db.quote(get_name_string_id(vernacular.name, true))
             language = @db.quote(vernacular.language)
             locality = @db.quote(vernacular.locality)
             country_code = @db.quote(vernacular.country_code)
             if vernacular_string_id != 'NULL'
-              vernacular_index << [data_source_id, vernacular_string_id, 
-                                   taxon_id, language, locality, 
+              vernacular_index << [data_source_id, vernacular_string_id,
+                                   taxon_id, language, locality,
                                    country_code, now, now].join(',')
             end
           end
@@ -241,24 +255,25 @@ class DwcaImporter < ActiveRecord::Base
         names_index = names_index.join('),(')
         vernacular_index = vernacular_index.join('),(')
         if names_index.size > 0
-          q = "INSERT IGNORE INTO 
-                 tmp_name_string_indices 
-                   (data_source_id, name_string_id, 
-                    taxon_id, url, local_id, global_id, 
-                    rank, accepted_taxon_id, synonym, 
-                    classification_path, classification_path_ids, 
-                    classification_path_ranks, created_at, updated_at) 
+          q = "INSERT IGNORE INTO
+                 tmp_name_string_indices
+                   (data_source_id, name_string_id,
+                    taxon_id, url, local_id, global_id,
+                    rank, accepted_taxon_id, synonym,
+                    classification_path, classification_path_ids,
+                    classification_path_ranks, created_at, updated_at)
                VALUES (#{names_index})"
           @db.execute(q)
         end
         if vernacular_index.size > 0
-          @db.execute("INSERT IGNORE INTO 
-                         tmp_vernacular_string_indices 
-                           (data_source_id, vernacular_string_id, 
-                            taxon_id, language, locality, 
-                            country_code, created_at, updated_at) 
+          @db.execute("INSERT IGNORE INTO
+                         tmp_vernacular_string_indices
+                           (data_source_id, vernacular_string_id,
+                            taxon_id, language, locality,
+                            country_code, created_at, updated_at)
                        VALUES (#{vernacular_index})")
         end
+        insert_gnub_data(gnub_uuids) if @is_gnub
         DarwinCore.logger_write(@dwc.object_id, 'Processed %s indices' % count)
       end
     end
@@ -267,17 +282,17 @@ class DwcaImporter < ActiveRecord::Base
   def publish_new_data
     DarwinCore.logger_write(@dwc.object_id, 'Making new data available')
     @db.transaction do
-      @db.execute("DELETE 
-                     FROM name_string_indices 
+      @db.execute("DELETE
+                     FROM name_string_indices
                    WHERE data_source_id = #{data_source_id}")
-      @db.execute("DELETE 
-                     FROM vernacular_string_indices 
+      @db.execute("DELETE
+                     FROM vernacular_string_indices
                    WHERE data_source_id = #{data_source_id}")
-      @db.execute("INSERT INTO 
-                     name_string_indices 
+      @db.execute("INSERT INTO
+                     name_string_indices
                        (SELECT * FROM tmp_name_string_indices)")
-      @db.execute("INSERT INTO 
-                     vernacular_string_indices 
+      @db.execute("INSERT INTO
+                     vernacular_string_indices
                      (SELECT * FROM tmp_vernacular_string_indices)")
       @db.execute("DROP TEMPORARY TABLE tmp_name_string_indices")
       @db.execute("DROP TEMPORARY TABLE tmp_vernacular_string_indices")
@@ -291,8 +306,8 @@ class DwcaImporter < ActiveRecord::Base
     string_hash = vernacular ? @vernacular_strings : @name_strings
     begin
       unless string_hash[name_string][:id]
-        res = @db.select_rows('SELECT id FROM %s WHERE name = %s' % 
-                              [table_name, 
+        res = @db.select_rows('SELECT id FROM %s WHERE name = %s' %
+                              [table_name,
                                string_hash[name_string][:normalized]])
         string_hash[name_string][:id] = res.blank? ? nil : res[0][0]
       end
@@ -306,7 +321,7 @@ class DwcaImporter < ActiveRecord::Base
     classification_path = ''
     classification_path_ranks = ''
     if !taxon.classification_path_id.blank?
-      taxons = 
+      taxons =
         get_classification_path_array(taxon.classification_path_id.compact)
       classification_path = taxons.map(&:current_name_canonical).join('|')
       classification_path_ranks = taxons.map(&:rank).join('|')
@@ -334,10 +349,10 @@ class DwcaImporter < ActiveRecord::Base
       else
         current_name = @data[key].current_name
         name_string = @db.quote(NameString.normalize_space(current_name))
-        res = @db.select_rows("SELECT cf.name 
-                               FROM name_strings ns 
-                               JOIN canonical_forms cf 
-                                 ON ns.canonical_form_id = cf.id 
+        res = @db.select_rows("SELECT cf.name
+                               FROM name_strings ns
+                               JOIN canonical_forms cf
+                                 ON ns.canonical_form_id = cf.id
                                WHERE ns.name = #{name_string}")[0]
         @data[key].current_name_canonical = res.blank? ? '' : res[0]
         @data[key]
@@ -351,5 +366,14 @@ class DwcaImporter < ActiveRecord::Base
 
   def get_uuid(name)
     UUID.create_v5(name, Gni::Config.uuid_namespace).to_i
+  end
+
+  def gnub?
+    @data.first.last.class == DarwinCore::GnubTaxon
+  end
+
+  def insert_gnub_data(gnub_uuids)
+    require 'ruby-debug'; debugger
+    puts ''
   end
 end
