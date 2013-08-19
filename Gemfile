@@ -32,7 +32,7 @@ end
 
 group :development do
   gem 'rspec-rails'
-  gem 'debugger'
+  gem 'debugger', '~> 1.6'
 end
 
 group :test do

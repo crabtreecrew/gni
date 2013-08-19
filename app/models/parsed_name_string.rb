@@ -141,11 +141,11 @@ class ParsedNameString < ActiveRecord::Base
       semantic_meaning_id = data[6]
       word_pos = data[3]
       length = data[4]
-      [word_id, name_string_id, semantic_meaning_id, word_pos, length].join(",")
+      [word_id, name_string_id, semantic_meaning_id, word_pos, length, 'now()', 'now()'].join(",")
     end.join("),(")
     self.connection.execute("
       INSERT INTO name_word_semantic_meanings 
-        (name_word_id, name_string_id, semantic_meaning_id, position, length) 
+        (name_word_id, name_string_id, semantic_meaning_id, position, length, created_at, updated_at) 
         VALUES (#{insert_semantic_words})")
   end
   
