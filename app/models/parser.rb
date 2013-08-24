@@ -1,5 +1,6 @@
 #require 'rubygems'
 require 'biodiversity'
+
 class Parser
 
   def initialize()
@@ -103,5 +104,11 @@ private
     xml_string.gsub!('<node_value>', '')
     xml_string.gsub!('</node_value>', '')
     xml_string
+  end
+end
+
+class ParServer < Parser
+  def initialize
+
   end
 end

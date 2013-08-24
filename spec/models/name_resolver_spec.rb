@@ -19,28 +19,28 @@ describe NameResolver do
   it "should reconcile a name" do
     data = @resolver.resolve([@name1.name], [@data_source2.id])
     data.size.should == 1
-    data[0].keys.should == ["data_source_id", "name_string_id", "data_source_name", "search_name_string", "name_string"]
+    data[0].keys.sort.should == ["data_source_id", "name_string_id", "data_source_name", "search_name_string", "name_string"].sort
     data[0]['name_string'].should == 'Betula alba Linn.'
   end
 
   it "should reconcile a canonical name" do
     data = @resolver.resolve(['Betula alba'], [@data_source2.id], true)
     data.size.should == 1
-    data[0].keys.should == ["data_source_id", "name_string_id", "data_source_name", "search_name_string", "name_string"]
+    data[0].keys.sort.should == ["data_source_id", "name_string_id", "data_source_name", "search_name_string", "name_string"].sort
     data[0]['name_string'].should == 'Betula alba Linn.'
   end
 
   it "should reconcile multiple names agaist multiple data sources" do
     data = @resolver.resolve([@name1.name, @name2.name], [@data_source2.id, @data_source1.id])
     data.size.should == 4
-    data[0].keys.should == ["data_source_id", "name_string_id", "data_source_name", "search_name_string", "name_string"]
+    data[0].keys.sort.should == ["data_source_id", "name_string_id", "data_source_name", "search_name_string", "name_string"].sort
     data[0]['name_string'].match(/Betula alba L/).should be_true
   end
 
   it "should reconcile multiple names with canonicals agaist multiple data sources" do
     data = @resolver.resolve(['Betula alba', @name2.name], [@data_source2.id, @data_source1.id], true)
     data.size.should == 4
-    data[0].keys.should == ["data_source_id", "name_string_id", "data_source_name", "search_name_string", "name_string"]
+    data[0].keys.sort.should == ["data_source_id", "name_string_id", "data_source_name", "search_name_string", "name_string"].sort
     data[0]['name_string'].match(/Betula alba L/).should be_true
   end
 end
