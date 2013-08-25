@@ -6,6 +6,7 @@ require 'gni/net'
 require 'gni/xml'
 require 'gni/parser_result'
 require 'taxamatch_rb'
+require 'socket'
 
 module ActiveRecord #:nodoc:
   class Base

@@ -2,7 +2,7 @@ require File.dirname(__FILE__) + '/../spec_helper'
 
 describe 'Parser' do
   before :all do
-    @parser = Parser.new
+    @parser = ParServer.new
     @parser_version = ScientificNameParser::VERSION
   end
 

@@ -4,11 +4,12 @@ require 'biodiversity'
 class Parser
 
   def initialize()
-    @parser = ScientificNameParser.new
+    @socket = nil
     @parsed = nil
   end
 
   def parse_names_list(names, format = 'json')
+    set_socket
     parsed_names = []
     if names && !names.strip.blank?
       names = names.split(/\n|\r/)[0..5000]
@@ -107,8 +108,3 @@ private
   end
 end
 
-class ParServer < Parser
-  def initialize
-
-  end
-end

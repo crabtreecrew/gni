@@ -1,0 +1,21 @@
+language:
+  - ruby
+  - java
+rvm:
+  - 1.9.3
+jdk:
+  - oraclejdk7
+branches:
+  only:
+      - master
+bundler_args: --without development
+before_script:
+  - cp config/database.yml.example config/database.yml
+  - rake db:create:all
+  - rake db:migrate
+  - rake db:migrate RAILS_ENV=test
+  - rake db:seed
+  - rake db:seed RAILS_ENV=test
+  - rake solr:start
+  - rake solr:build
+
