@@ -2,11 +2,12 @@ require File.dirname(__FILE__) + '/../spec_helper'
 
 describe NameResolver do
   before :all do
+    truncate_all_tables
     @resolver = NameResolver.new
     @data_source1 = Factory(:data_source)
     @data_source2 = Factory(:data_source)
     @data_source3 = Factory(:data_source)
-    canonical_form = Factory(:canonical_form, :name => 'Betula alba')
+    canonical_form = CanonicalForm.find_by_name('Betula alba') || Factory(:canonical_form, :name => 'Betula alba')
     @name1 = Factory(:name_string, :name => "Betula alba L.", :canonical_form => canonical_form)
     @name2 = Factory(:name_string, :name => "Betula alba Linn.", :canonical_form => canonical_form)
     @lex_group = Factory(:lexical_group)
