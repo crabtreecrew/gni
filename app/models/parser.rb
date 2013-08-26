@@ -4,7 +4,7 @@ require 'biodiversity'
 class Parser
 
   def initialize()
-    @socket = nil
+    @parser = ScientificNameParser.new
     @parsed = nil
   end
 
@@ -14,8 +14,8 @@ class Parser
     if names && !names.strip.blank?
       names = names.split(/\n|\r/)[0..5000]
       names.map {|n| n.strip}.select {|n| !n.blank?}.each do |name|
-        parsed_name = parse(name)
-        parsed_names << parsed_name.format_json
+        parsed_name = @socket.puts(name)
+        parsed_names << @socket.gets
       end
     end
     @parsed_names = "[" + parsed_names.join(",\n") + "]"
@@ -40,6 +40,7 @@ class Parser
       end
       return html_string
     end
+    unset_socket
   end
 
   def parse(name, format = nil)
@@ -106,5 +107,15 @@ private
     xml_string.gsub!('</node_value>', '')
     xml_string
   end
+
+  def set_socket
+    @socket ||= TCPSocket.new('localhost', 4334) 
+  end
+
+  def unset_socket
+    @socket.close if @socket
+    @socket = nil
+  end
+
 end
 

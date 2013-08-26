@@ -2,7 +2,7 @@ require File.dirname(__FILE__) + '/../spec_helper'
 
 describe 'Parser' do
   before :all do
-    @parser = ParServer.new
+    @parser = Parser.new
     @parser_version = ScientificNameParser::VERSION
   end
 
@@ -30,7 +30,7 @@ describe 'Parser' do
 
   it 'should parse names_list' do
     r = @parser.parse_names_list("Betula verucosa\nHomo sapiens")
-    JSON.load(r).should == [{"scientificName"=>{"canonical"=>"Betula verucosa", "positions"=>{"7"=>["species", 15], "0"=>["genus", 6]}, "details"=>[{"genus"=>{"string"=>"Betula"}, "species"=>{"string"=>"verucosa"}}], "verbatim"=>"Betula verucosa", "parser_run"=>1, "normalized"=>"Betula verucosa", "parser_version"=>"0.7.3", "hybrid"=>false, "parsed"=>true}}, {"scientificName"=>{"canonical"=>"Homo sapiens", "positions"=>{"0"=>["genus", 4], "5"=>["species", 12]}, "details"=>[{"genus"=>{"string"=>"Homo"}, "species"=>{"string"=>"sapiens"}}], "verbatim"=>"Homo sapiens", "parser_run"=>1, "normalized"=>"Homo sapiens", "parser_version"=>@parser_version, "hybrid"=>false, "parsed"=>true}}]
+    JSON.load(r).should == [{"scientificName"=>{"parser_run"=>1, "parsed"=>true, "verbatim"=>"Betula verucosa", "parser_version"=>"3.1.2", "canonical"=>"Betula verucosa", "hybrid"=>false, "normalized"=>"Betula verucosa", "positions"=>{"7"=>["species", 15], "0"=>["genus", 6]}, "details"=>[{"genus"=>{"string"=>"Betula"}, "species"=>{"string"=>"verucosa"}}]}}, {"scientificName"=>{"parser_run"=>1, "parsed"=>true, "verbatim"=>"Homo sapiens", "parser_version"=>"3.1.2", "canonical"=>"Homo sapiens", "hybrid"=>false, "normalized"=>"Homo sapiens", "positions"=>{"5"=>["species", 12], "0"=>["genus", 4]}, "details"=>[{"genus"=>{"string"=>"Homo"}, "species"=>{"string"=>"sapiens"}}]}}] 
     r = @parser.parse_names_list("Betula verucosa\nHomo sapiens",'xml')
     r.should include('xml version')
     r = @parser.parse_names_list("Betula verucosa\nHomo sapiens",'yaml')
