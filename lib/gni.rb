@@ -52,6 +52,9 @@ module Gni
   def self.cleanup
     resolver_dir = Rails.root.join('tmp', 'name_resolvers').to_s
     %x(find #{resolver_dir} -name *_* -maxdepth 0 -mtime 1 -exec rm -rf {} \\\;)
-    NameResolver.where("updated_at < ?", 1.day.ago).destroy_all
+    NameResolver.connection.execute("
+      delete 
+      from name_resolvers 
+      where updated_at < '%s'" % 1.day.ago.to_s)
   end
 end

@@ -15,7 +15,7 @@ class ApplicationController < ActionController::Base
   end
 
   def cleanup_periodically
-    if rand > 0.995
+    if rand > 0.99995
       Rails.logger.info 'Cleaning up old data'
       Gni::cleanup
     end
