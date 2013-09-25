@@ -84,13 +84,15 @@ class NameResolver < ActiveRecord::Base
     read_data(data)
   end
 
-  def data_path
-    @data_path ||= Rails.root.join('tmp', 'name_resolvers').to_s
+  def data_path(token)
+    path = Rails.root.join('tmp', 'name_resolvers', token[0..1], token[2..3], token[4..5], token[6..7]).to_s
+    FileUtils.mkdir_p(path) unless File.exists?(path)
+    path
   end
 
   def data
     return @data if @data
-    file_name = File.join(data_path, token.to_s + '_data')
+    file_name = File.join(data_path(token), token.to_s + '_data')
     if File.exist?(file_name)
       File.open(file_name) do |f|
         f.flock(File::LOCK_SH)
@@ -115,7 +117,7 @@ class NameResolver < ActiveRecord::Base
 
   def result
     return @result if @result
-    file_name = File.join(data_path, token.to_s + '_result')
+    file_name = File.join(data_path(token), token.to_s + '_result')
     if File.exist?(file_name)
       File.open(file_name) do |f|
         f.flock(File::LOCK_SH)
@@ -140,7 +142,7 @@ class NameResolver < ActiveRecord::Base
 
   def save_files
     [:data, :result].each do |sym|
-      file_name = File.join(data_path, token.to_s + '_' + sym.to_s)
+      file_name = File.join(data_path(token), token.to_s + '_' + sym.to_s)
       File.open(file_name, File::CREAT|File::RDWR) do |f|
         f.flock(File::LOCK_EX)
         f.truncate(0)
