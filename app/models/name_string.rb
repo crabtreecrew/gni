@@ -6,11 +6,11 @@ class NameString < ActiveRecord::Base
   after_create :post_process_name_string
 
   scope :data_source, joins("join name_string_indices on name_string.id = name_string_indices.name_string_id").where("name_string_indices.data_source_id" => [1,2])
-  
+
   def self.parse_uuid(decimal_uuid)
     uuid_hex = decimal_uuid.to_i.to_s(16)
     if uuid_hex.size != 32
-      zeros = '0' * (32 - uuid_hex.size)  
+      zeros = '0' * (32 - uuid_hex.size)
       uuid_hex = zeros + uuid_hex
     end
     ::UUID.parse(uuid_hex).to_s
@@ -24,7 +24,7 @@ class NameString < ActiveRecord::Base
 
 
   def self.normalize_space(nstring)
-    nstring.gsub(/\s{2,}/, ' ').strip[0...255]
+    nstring.gsub(/\s{1,}/, ' ').strip[0...255]
   end
 
   def self.normalize(nstring)
@@ -50,7 +50,7 @@ class NameString < ActiveRecord::Base
     res = super
     res ? NameString.parse_uuid(res) : nil
   end
-  
+
   private
 
   def pre_process_name_string
@@ -58,7 +58,7 @@ class NameString < ActiveRecord::Base
     self.uuid = NameString.get_uuid(self.name)
     self.normalized = NameString.normalize(self.name)
   end
-  
+
   def post_process_name_string
     ParsedNameString.update
   end

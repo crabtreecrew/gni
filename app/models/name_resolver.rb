@@ -85,7 +85,9 @@ class NameResolver < ActiveRecord::Base
   end
 
   def data_path(token)
-    path = Rails.root.join('tmp', 'name_resolvers', token[0..1], token[2..3], token[4..5], token[6..7]).to_s
+    path = Rails.root.join('tmp', 'name_resolvers', 
+                           token[0..1], token[2..3], 
+                           token[4..5], token[6..7]).to_s
     FileUtils.mkdir_p(path) unless File.exists?(path)
     path
   end
