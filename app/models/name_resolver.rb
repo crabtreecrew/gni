@@ -206,14 +206,15 @@ private
       line = line.strip.gsub("\t", '|')
       fields = line.split('|')
       name = id = nil
-      return res if fields.blank?
-      if fields.size == 1
-        name = fields[0].strip
-      elsif fields.size > 1
-        id = fields[0].strip
-        name = fields[1].strip
+      unless fields.blank?
+        if fields.size == 1
+          name = fields[0].strip
+        elsif fields.size > 1
+          id = fields[0].strip
+          name = fields[1].strip
+        end
+        res << { id: id, name_string: name }
       end
-      res << { id: id, name_string: name }
       res
     end
   end
