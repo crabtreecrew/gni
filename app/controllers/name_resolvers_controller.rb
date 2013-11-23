@@ -53,7 +53,7 @@ class NameResolversController < ApplicationController
       token: token
     )
 
-    if new_data.size < 150 || !workers_running?
+    if new_data.size < 1001 || !workers_running?
       resolver.reconcile
     else
       resolver.progress_message = 'In the queue'
