@@ -35,6 +35,10 @@ group :development do
   gem 'debugger', '~> 1.6'
 end
 
+group :production do
+  gem 'unicorn-rails', '~> 1.1'
+end
+
 group :test do
   gem 'database_cleaner'
   gem 'rails3-generators'
