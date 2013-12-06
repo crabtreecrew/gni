@@ -4,11 +4,13 @@ module Gni
     attr_reader :url
 
     def initialize(opts) 
-      opts = { solr_url: Gni::Config.solr_url, update_csv_params: "" }.merge(opts)
+      opts = { solr_url: Gni::Config.solr_url, update_csv_params: '' }.
+        merge(opts)
       @url = opts[:solr_url]
-      @url_update = @url + "/update"
-      # @url_update_csv = @url + "/update/csv?wt=json&f.common_name.split=true&f.scientific_name_synonym_exact.split=true&f.scientific_name_synonym.split=true&stream.contentType=text/plain;charset=utf-8&stream.file=%s&commit=%s"
-      @url_update_csv = @url + "/update/csv?wt=json&stream.contentType=text/plain;charset=utf-8&stream.file=%s&commit=%s" + opts[:update_csv_params]
+      @url_update = @url + '/update'
+      @url_update_csv = @url + '/update/csv?wt=json&'\
+        'stream.contentType=text/plain;charset=utf-8&'\
+        "stream.file=%s&commit=%s" + opts[:update_csv_params]
       @url_search = @url + '/select/?version=2.2&indent=on&wt=json&q='
     end
 
@@ -57,17 +59,34 @@ module Gni
     private
     def post(xml_data, url = nil)
       url ||= @url_update
-      RestClient.post url, xml_data, :content_type => :xml, :accept => :xml
+      RestClient.post url, xml_data, content_type: :xml, accept: :xml
     end
 
     def get(url)
-      JSON.parse(RestClient.get(url, {:accept => :json}), :symbolize_names => true)
+      # res = RestClient.get(url, 
+      # {:accept => :json}), :symbolize_names => true)
+      res = RestClient::Request.
+        execute(method: :get,
+                url: url,
+                timeout: 9_000_000,
+                open_timeout: 9_000_000,
+                connection: 'Keep-Alive',
+                accept: :json)
+
+      JSON.parse(res, symbolize_names: true)
     end
 
     def get_query(query, options)
       url = @url_search.dup 
       url << set_query(query, options)
-      JSON.parse(RestClient.get(url, {:accept => :json}), :symbolize_names => true)
+      res = RestClient::Request.
+        execute(method: :get,
+                url: url,
+                timeout: 9_000_000,
+                open_timeout: 9_000_000,
+                connection: 'Keep-Alive',
+                accept: :json)
+      JSON.parse(res, symbolize_names: true)
     end
 
     def set_query(query, options)
@@ -80,7 +99,8 @@ module Gni
       res
     end
 
-    # Takes an array of hashes. Each hash has only string or array of strings values. Array is converted into an xml ready
+    # Takes an array of hashes. Each hash has only string or array 
+    # of strings values. Array is converted into an xml ready
     # for either create or update methods of Solr API  #
     # See the solr_api library spec for some examples.
     def build_solr_xml(ruby_data)
