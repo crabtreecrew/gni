@@ -2,13 +2,16 @@ language:
   - ruby
   - java
 rvm:
-  - 1.9.3
+  - 1.9.3-p448
 jdk:
   - oraclejdk7
 branches:
   only:
       - master
 bundler_args: --without development
+before_install:
+  - sudo apt-get update
+  - sudo apt-get install redis-server
 before_script:
   - cp config/database.yml.example config/database.yml
   - rake db:create:all
