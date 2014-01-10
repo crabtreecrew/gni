@@ -2,7 +2,7 @@ require 'spec_helper'
 
 describe DwcaImporter do
   before :all do
-    @ds = Factory("data_source")
+    @ds = build("data_source")
     @url = "file://"
     @url_linnean = @url + File.expand_path(File.join(File.dirname(__FILE__), '..', 'files', 'linnean.tar.gz'))
     @url += File.expand_path File.join(File.dirname(__FILE__), '..', 'files', 'data.tar.gz')

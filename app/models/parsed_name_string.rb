@@ -8,7 +8,7 @@ class ParsedNameString < ActiveRecord::Base
         select id 
           from name_strings 
           where parser_version < %s limit %s" % 
-        [Gni.version_to_int(ScientificNameParser::VERSION), 
+        [Gni.version_to_int(ScientificNameParser.version), 
          Gni::Config.batch_size])
       break if ids.size == 0
       ids_string = ids.join(",") 
@@ -33,7 +33,7 @@ class ParsedNameString < ActiveRecord::Base
   def self.update(opts = {})
     opts = {:update_outdated => false, :logger_object_id => 0}.merge(opts)
     Gni.logger_write(opts[:logger_object_id], "Parsing incoming strings")
-    parser_version_int = Gni.version_to_int(ScientificNameParser::VERSION)
+    parser_version_int = Gni.version_to_int(ScientificNameParser.version)
     count = 0
     NameString.transaction do
       while true do
