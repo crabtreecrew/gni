@@ -1,5 +1,5 @@
 class NameStringsController < ApplicationController
   def index
-    render :text => 'hi'
+    render :text => 'Name Strings'
   end
 end
