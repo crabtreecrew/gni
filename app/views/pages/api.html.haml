@@ -13,7 +13,10 @@
 
 %h3 Data Sources
 
-%p You can resolve names against specific data sources or against the entire resolver database. To resolve against data sources you must supply their ids; this simple API allows you to find them.
+%p 
+  You can resolve names against specific data sources or against the entire 
+  resolver database. To resolve against data sources you must supply their ids; 
+  this simple API allows you to find them.
 
 %h4 Resource URI
 - resource_url = Gni::Config.base_url + "/data_sources"
@@ -34,7 +37,9 @@
 %h3 Resolve Names
 
 %p
-  Receives a list of names and resolves each against the entire resolver database or against specific data sources. Underlying resolving and scoring algorithms are described
+  Receives a list of names and resolves each against the entire resolver 
+  database or against specific data sources. Underlying resolving and scoring 
+  algorithms are described
   = succeed '.' do
     %a{:href => '/about'} elsewhere
 
@@ -50,14 +55,14 @@
   %dt
     names
   %dd
-    Type: string, Default: none. List of names delimited by either pipe "|" or tab "\t". Use a pipe for GET requests
+    Type: string, Default: none. List of names delimited by either pipe "|" or 
+    tab "\t". Use a pipe for GET requests
 
   %dt
     data
   %dd
-    Type: string, Default: none. List of names delimited by new lines "\n". new lines. You may optionally supply your local id for each name as:
-
-
+    Type: string, Default: none. List of names delimited by new lines "\n". 
+    new lines. You may optionally supply your local id for each name as:
 
     %pre.code
       :preserve
@@ -65,26 +70,52 @@
         125|Parus thruppi
         126|Parus carpi
 
-    Names in the response will contain your supplied ids, facilitating integration. You can also upload files using a multipart POST request (see example below) with names and ids organized as in the example above.
+    Names in the response will contain your supplied ids, facilitating 
+    integration. You can also upload files using a multipart POST request 
+    (see example below) with names and ids organized as in the example above.
   %dt
     data_source_ids (optional)
   %dd
-    Type: string, Default: none. A pipe-delimited list of data sources. See a the list of
+    Type: string, Default: none. A pipe-delimited list of data sources. See a 
+    the list of
     = succeed '.' do
       %a{:href => '/data_sources'} data sources
 
   %dt
     resolve_once (optional)
   %dd
-    Type: boolean (true/false), Default: 'false'. Find the first available match instead of matches across all data sources with all possible renderings of a name. When 'true', response is rapid but incomplete.
+    Type: boolean (true/false), Default: 'false'. Find the first available 
+    match instead of matches across all data sources with all possible 
+    renderings of a name. When 'true', response is rapid but incomplete.
+  %dt best_match_only
+  %dd
+    Type: boolean (true/false), Default: 'false'. Returns just one result with
+    the highest score.
+  %dt preferred_data_sources
+  %dd
+    Type: string, Default: none. A pipe-delimited list of data sources (see
+    data_source_ids parameter).
+    %br
+    Creates a new section in results -- 'preferred_results' in addtion to
+    'results'. Preferred results contain only data received from requested data
+    sources. When used togther with 'best_match_only' returnes only one
+    highest scored result per a preffered data source. The resolution is still
+    performed according to 'data_source_id' parameter.
   %dt
     with_context (optional)
   %dd
-    Type: boolean (true/false), Default: 'true'. Reduce the likelihood of matches to taxonomic homonyms. When 'true' a common taxonomic context is calculated for all supplied names from matches in data sources that have classification tree paths. Names out of determined context are penalized during score calculation.
+    Type: boolean (true/false), Default: 'true'. Reduce the likelihood of 
+    matches to taxonomic homonyms. When 'true' a common taxonomic context is 
+    calculated for all supplied names from matches in data sources that have 
+    classification tree paths. Names out of determined context are penalized
+    during score calculation.
 
 %h4 Initial Output Example
+
 %p
-  The API operates in a queue with an initial response containing a url to be polled for a final response. For a query containing fewer than 1000 names, the queue is not used.
+  The API operates in a queue with an initial response containing a url to be
+  polled for a final response. For a query containing fewer than 1000 names,
+  the queue is not used.
 
 %pre.code
   :escaped
@@ -145,46 +176,74 @@
 %h4 Output Fields
 
 %dt id
-%dd Resolver request id. Your request is stored temporarily in the database and is assigned an id.
+%dd 
+  Resolver request id. Your request is stored temporarily in the database and
+  is assigned an id.
 %dt url
-%dd Using the url you can access your results for 7 days.
+%dd 
+  Using the url you can access your results for 7 days.
 %dt data_sources
-%dd A list of data source ids you used for name resolution. If no data sources were given the list is empty.
+%dd 
+  A list of data source ids you used for name resolution. If no data sources
+  were given the list is empty.
 %dt context
-%dd Appears if 'with_context' parameter is set to true.
+%dd 
+  Appears if 'with_context' parameter is set to true.
 %dt context_data_source_id
-%dd The id of a data source used to create the context.
+%dd 
+  The id of a data source used to create the context.
 %dt context_clade
-%dd A lowest taxonomic level in the data source that contains 90% or more of all names found. If there are too few names to determine, this element remains empty.
+%dd
+  A lowest taxonomic level in the data source that contains 90% or more of
+  all names found. If there are too few names to determine, this element
+  remains empty.
 %dt data
-%dd A container for the resolution data.
+%dd
+  A container for the resolution data.
 %dt supplied_name_string
-%dd The name string in the query.
+%dd
+  The name string in the query.
 %dt is_known_name
-%dd True if name was found by exact match, or by matching the name's canonical form (without authors etc). False otherwise.
+%dd
+  True if name was found by exact match, or by matching the name's canonical
+  form (without authors etc). False otherwise.
 %dt supplied_id
-%dd The id of the name string in the query (if provided).
+%dd
+  The id of the name string in the query (if provided).
 %dt results
-%dd A container for displaying results for a particular name string.
+%dd
+  A container for displaying results for a particular name string.
 %dt data_source_id
-%dd The id of the data source where a name was found.
+%dd
+  The id of the data source where a name was found.
 %dt gni_uuid
-%dd An identifier for the found name string used in Global Names.
+%dd
+  An identifier for the found name string used in Global Names.
 %dt name_string
-%dd The name string found in this data source.
+%dd
+  The name string found in this data source.
 %dt canonical_form
-%dd A "canonical" version of the name generated by the Global Names parser
+%dd
+  A "canonical" version of the name generated by the Global Names parser
 %dt classification_path
-%dd Tree path to the root if a name string was found within a data source classification.
+%dd
+  Tree path to the root if a name string was found within a data source
+  classification.
 %dt classification_path_ids
-%dd Same tree path using taxon_ids (see below)
+%dd
+  Same tree path using taxon_ids (see below)
 %dt taxon_id
-%dd An identifier supplied in the source Darwin Core Archive for the name string record
+%dd
+  An identifier supplied in the source Darwin Core Archive for the name
+  string record
 %dt local_id
-%dd Shows id local to the data source (if provided by the data source manager)
+%dd
+  Shows id local to the data source (if provided by the data source manager)
 %dt match_type
 %dd 
-  Explains how resolver found the name. If the resolver cannot find names corresponding to the entire queried name string, it sequentially removes terminal portions of the name string until a match is found.
+  Explains how resolver found the name. If the resolver cannot find names 
+  corresponding to the entire queried name string, it sequentially removes 
+  terminal portions of the name string until a match is found.
   %ul
     %li 1 - Exact match
     %li 2 - Exact match by canonical form of a name
@@ -193,10 +252,17 @@
     %li 5 - Partial fuzzy match by species part of canonical form
     %li 6 - Exact match by genus part of a canonical form
 %dt prescore
-%dd Displays points used to calculate the score delimited by '|' -- "Match points|Author match points|Context points". Negative points decrease the final result. 
+%dd 
+  Displays points used to calculate the score delimited by '|' -- "Match
+  points|Author match points|Context points". Negative points decrease the
+  final result. 
 %dt score
 %dd 
-  A confidence score calculated for the match. 0.5 means an uncertain result that will require investigation. Results higher than 0.9 correspond to 'good' matches. Results between 0.5 and 0.9 should be taken with caution. Results less than 0.5 are likely poor matches. The scoring is described in more details on the 
+  A confidence score calculated for the match. 0.5 means an uncertain result 
+  that will require investigation. Results higher than 0.9 correspond to 'good' 
+  matches. Results between 0.5 and 0.9 should be taken with caution. Results 
+  less than 0.5 are likely poor matches. The scoring is described in more
+  details on the 
   %a{:href => "/about"}About
   page
 %dt status
