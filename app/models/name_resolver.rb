@@ -780,6 +780,7 @@ private
     data.each do |d|
       res = {
         supplied_name_string: d[:name_string],
+        is_known_name: false
       }
       data_sources_set = Set.new
       res[:supplied_id] = d[:id] if d[:id]
