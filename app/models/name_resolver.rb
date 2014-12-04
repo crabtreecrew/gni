@@ -783,6 +783,7 @@ private
       }
       data_sources_set = Set.new
       res[:supplied_id] = d[:id] if d[:id]
+      validated = false
       if d[:results]
         res[:results] = []
         d[:results].values.each do |dr|
@@ -822,10 +823,12 @@ private
             end
           end
           match[:match_type] = dr[:match_type]
+          validated = true if !validated && [1, 2].include?(dr[:match_type])
           match[:prescore] = dr[:prescore]
           match[:score] = dr[:score]
           res[:results] << match
         end
+        res[:is_known_name] = validated
         res[:results] = res[:results].compact
         sort_data_sources(res)
         if options[:best_match_only]
