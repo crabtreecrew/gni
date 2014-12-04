@@ -2,7 +2,6 @@
 bundle_bin
 bin
 db/*.sqlite3
-db/schema.rb
 log/*
 tmp/*
 .sass-cache/

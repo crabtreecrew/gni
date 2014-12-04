@@ -482,8 +482,8 @@ private
           found_canonical_form = row[10]
           next if canonical_form.split(" ").size !=
                   found_canonical_form.split(" ").size
-          is_match = match_names(canonical_form, found_canonical_form)
-          if is_match
+          edit_distance = match_names(canonical_form, found_canonical_form)
+          if edit_distance
             record = {
               gni_id: row[0],
               name_uuid: row[1],
@@ -495,6 +495,7 @@ private
               classification_path: row[8],
               classification_path_ids: row[9],
               canonical_form: found_canonical_form,
+              edit_distance: edit_distance,
               local_id: row[12],
               classification_path_ranks: row[13]
             }
@@ -637,33 +638,40 @@ private
   end
 
   def match_names(name1, name2)
+    edit_distance = 0
     words = name1.split(' ').zip(name2.split(' '))
     count = nil
     words.each_with_index do |w, i|
       return nil unless w[0] && w[1] #should never happen
       count = i
       match = match_words(w[0], w[1], i)
-      return nil unless match
+      return nil unless match['match']
+      edit_distance += match['edit_distance']
     end
-    count
+    edit_distance
   end
 
   def match_words(word1, word2, index)
     index = 1 if index > 0
-    return true if word1 == word2
+    return { 'match' => true, 'edit_distance' => 0 } if word1 == word2
     words_concatenate = [index.to_s, word1, word2].sort.join('_')
     if @matched_words.has_key?(words_concatenate)
       return @matched_words[words_concatenate]
     end
-    if @matched_words[words_concatenate] = index == 0
-      @taxamatch.match_genera({ normalized: word1 },
-                              { normalized: word2 },
-                              with_phonetic_match: false)['match']
+    if index == 0
+      @matched_words[words_concatenate] = @taxamatch.match_genera(
+        { normalized: word1 },
+        { normalized: word2 },
+        with_phonetic_match: false
+      )
     else
-      @taxamatch.match_species({ normalized: word1 },
-                               { normalized: word2 },
-                               with_phonetic_match: false)['match']
+      @matched_words[words_concatenate] = @taxamatch.match_species(
+        { normalized: word1 },
+        { normalized: word2 },
+        with_phonetic_match: false
+      )
     end
+    @matched_words[words_concatenate]
   end
 
   def get_contexts
@@ -803,6 +811,7 @@ private
           match[:taxon_id] = dr[:taxon_id]
           match[:local_id] = dr[:local_id] unless dr[:local_id].blank?
           match[:global_id] = dr[:global_id] unless dr[:global_id].blank?
+          match[:edit_distance] = dr[:edit_distance] || 0
           match[:url] = dr[:url] unless dr[:url].blank?
           if dr[:classification_path_ids]
             last_classification_id = dr[:classification_path_ids].
@@ -846,6 +855,7 @@ private
     res[:results].sort_by! do |r|
       [-r[:score],
       r[:match_type],
+      r[:edit_distance],
       r[:data_source_id]]
     end
     preferred_data_sources(res)

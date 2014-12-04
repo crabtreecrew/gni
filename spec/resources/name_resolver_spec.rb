@@ -95,6 +95,7 @@ describe 'name_resolvers API' do
     res = JSON.parse(body, symbolize_names: true)
     res[:data][-1].should == {
       supplied_name_string: 'Treron something',
+      is_known_name: false,
       supplied_id: '5',
       results: [{
         data_source_id: 1,
@@ -108,6 +109,7 @@ describe 'name_resolvers API' do
         classification_path_ids:
           '2362377|2362754|2363138|2363188|2363295|2378348',
         taxon_id: '2378348',
+        edit_distance: 0,
         match_type: 6,
         prescore: '1|0|0',
         score: 0.75}]
@@ -183,6 +185,7 @@ describe 'name_resolvers API' do
     res[:data][0][:results].first.should == {
       data_source_id: 2,
       data_source_title: nil,
+      edit_distance: 0,
       gni_uuid: '6bfd9d6f-9c68-5f5a-bbc6-99759c730a84',
       name_string: 'Calidris cooperi',
       canonical_form: 'Calidris cooperi',
@@ -197,6 +200,7 @@ describe 'name_resolvers API' do
     res[:data][1][:results].first.should == {
       data_source_id: 1,
       data_source_title: 'Catalogue of Life',
+      edit_distance: 1,
       gni_uuid: '4f273f15-8b8f-5412-9a02-b256585d8991',
       name_string: 'Leiothrix argentauris (Hodgson, 1838)',
       canonical_form: 'Leiothrix argentauris',
@@ -264,8 +268,9 @@ describe 'name_resolvers API' do
     res1 = res[:data][1]
     res1[:supplied_name_string].should == 'Liothrix argentauris ssp.'
     res1[:results].map {|r| r[:name_string]}.
-      uniq.should == ['Leiothrix argentauris (Hodgson, 1838)',
-                      'Leiothrix argentauris']
+      should == ["Leiothrix argentauris (Hodgson, 1838)", 
+                 "Leiothrix argentauris",
+                 "Leiothrix argentauris (Hodgson, 1838)"]
     res2 = res[:data][2]
     res2[:supplied_name_string].should ==
       'Treron aff. argentauris (Hodgson, 1838)'
