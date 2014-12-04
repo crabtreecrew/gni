@@ -33,7 +33,7 @@
 %hr
 %h3 Resolve Names
 
-%p 
+%p
   Receives a list of names and resolves each against the entire resolver database or against specific data sources. Underlying resolving and scoring algorithms are described
   = succeed '.' do
     %a{:href => '/about'} elsewhere
@@ -44,14 +44,14 @@
 #base-url
   %p= resource_url + ".xml (XML output)"
   %p= resource_url + ".json (JSON output)"
-  
+
 %h4 Parameters (GET or POST)
 %dl
   %dt
     names
   %dd
     Type: string, Default: none. List of names delimited by either pipe "|" or tab "\t". Use a pipe for GET requests
-    
+
   %dt
     data
   %dd
@@ -119,6 +119,7 @@
       "data": [
         {
           "supplied_name_string": "Plantago major",
+          "is_known_name": true,
           "supplied_id": "1",
           "results": [
             {
@@ -159,6 +160,8 @@
 %dd A container for the resolution data.
 %dt supplied_name_string
 %dd The name string in the query.
+%dt is_known_name
+%dd True if name was found by exact match, or by matching the name's canonical form (without authors etc). False otherwise.
 %dt supplied_id
 %dd The id of the name string in the query (if provided).
 %dt results
