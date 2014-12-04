@@ -1,5 +1,5 @@
 # encoding: utf-8
-require 'ruby-prof'
+#require 'ruby-prof'
 
 class DwcaImporter < ActiveRecord::Base
   belongs_to :data_source
