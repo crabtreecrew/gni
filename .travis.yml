@@ -13,11 +13,11 @@ services:
   - redis-server
 before_script:
   - cp config/database.yml.example config/database.yml
-  - rake db:create:all
-  - rake db:migrate
-  - rake db:migrate RAILS_ENV=test
-  - rake db:seed
-  - rake db:seed RAILS_ENV=test
-  - rake solr:start
-  - rake solr:build
+  - bundle exec rake db:create:all
+  - bundle exec rake db:migrate
+  - bundle exec rake db:migrate RAILS_ENV=test
+  - bundle exec rake db:seed
+  - bundle exec rake db:seed RAILS_ENV=test
+  - bundle exec rake solr:start
+  - bundle exec rake solr:build
 
