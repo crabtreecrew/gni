@@ -866,6 +866,12 @@ private
     return if options[:preferred_data_sources].empty?
     res[:preferred_results] = res[:results].select do |r|
       options[:preferred_data_sources].include? r[:data_source_id]
+    end.sort_by! do |r|
+      [options[:preferred_data_sources].index(r[:data_source_id]),
+       -r[:score],
+       r[:match_type],
+       r[:edit_distance],
+       r[:data_source_id]]
     end
     if options[:best_match_only]
       pref_data_sources = {}
