@@ -29,7 +29,7 @@ end
 
 group :development do
   gem 'rspec-rails'
-  gem 'debugger', '~> 1.6'
+  gem 'byebug', '~> 3.4'
 end
 
 group :production do

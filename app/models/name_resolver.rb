@@ -1,4 +1,3 @@
-require 'iconv'
 class NameResolver < ActiveRecord::Base
   @queue = :name_resolver
   attr :contexts
@@ -196,11 +195,12 @@ class NameResolver < ActiveRecord::Base
 private
 
   def self.process_data(new_data)
-    conv = Iconv.new('UTF-8', 'ISO-8859-1')
     new_data.inject([]) do |res, line|
       # for now we assume that non-utf8
       # charachters are in latin1, might need to add others
-      line = conv.conv(line) unless line.valid_encoding?
+      unless line.valid_encoding?
+        line.encode!('UTF-8', 'ISO-8859-1', invalid: :replace, replace: '?')
+      end
       # skip the line if encoding is still wrong
       next unless line.valid_encoding?
       line = line.strip.gsub("\t", '|')
