@@ -25,6 +25,7 @@ module Gni
                                                  'locales',
                                                  '*.{rb,yml}').to_s]
     config.i18n.default_locale = :en
+    config.i18n.enforce_available_locales = false
 
     config.encoding = "utf-8"
     config.filter_parameters += [:password]
