@@ -4,6 +4,7 @@ module GNI
       @parallel_parser = ParallelParser.new
       @parser = ScientificNameParser.new
     end
+
     def parse_list(name_list)
       @parallel_parser.parse(name_list)
     end

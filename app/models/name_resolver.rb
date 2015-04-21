@@ -571,6 +571,7 @@ private
     return if @names.blank?
     @names.keys.each do |key|
       @names[key][:parsed] = @atomizer.parse(@names[key][:name_string]) rescue nil
+      # require 'byebug'; byebug
       if @names[key][:parsed]
         @names[key][:canonical_form] = @names[key][:parsed][:canonical_form]
       else
