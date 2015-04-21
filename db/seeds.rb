@@ -50,7 +50,7 @@ class Seeder
 
   def collect_data(file, table)
     @columns = @db.select_values("show columns from %s" % table)
-    csv_args = { col_sep: "\t", quote_char: "\b"}
+    csv_args = { col_sep: "\t", quote_char: "щ"}
     puts "*" * 80
     puts file
     CSV.open(File.join(@path, file), csv_args).map do |row|
