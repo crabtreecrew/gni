@@ -27,11 +27,6 @@ group :assets do
   gem 'uglifier', '~> 1.0.3'
 end
 
-group :development do
-  gem 'rspec-rails'
-  gem 'byebug', '~> 3.4'
-end
-
 group :production do
   gem 'unicorn-rails', '~> 1.1'
 end

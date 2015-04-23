@@ -8,7 +8,6 @@ jdk:
 branches:
   only:
       - master
-bundler_args: --without development
 services:
   - redis-server
 before_script:
