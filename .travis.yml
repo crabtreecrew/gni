@@ -1,10 +1,12 @@
+sudo: false
 language:
   - ruby
   - java
 rvm:
-  - 2.1.2
+  - 2.1.6
+  - 2.2.2
 jdk:
-  - oraclejdk7
+  - oraclejdk8
 branches:
   only:
       - master
