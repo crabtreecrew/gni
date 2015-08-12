@@ -84,8 +84,8 @@ class NameResolver < ActiveRecord::Base
   end
 
   def data_path(token)
-    path = Rails.root.join('tmp', 'name_resolvers', 
-                           token[0..1], token[2..3], 
+    path = Rails.root.join('tmp', 'name_resolvers',
+                           token[0..1], token[2..3],
                            token[4..5], token[6..7]).to_s
     FileUtils.mkdir_p(path) unless File.exists?(path)
     path
@@ -571,7 +571,6 @@ private
     return if @names.blank?
     @names.keys.each do |key|
       @names[key][:parsed] = @atomizer.parse(@names[key][:name_string]) rescue nil
-      # require 'byebug'; byebug
       if @names[key][:parsed]
         @names[key][:canonical_form] = @names[key][:parsed][:canonical_form]
       else
@@ -814,6 +813,11 @@ private
           match[:global_id] = dr[:global_id] unless dr[:global_id].blank?
           match[:edit_distance] = dr[:edit_distance] || 0
           match[:url] = dr[:url] unless dr[:url].blank?
+          if options[:with_vernaculars]
+          match[:vernaculars] = VernacularStringIndex.vernaculars(
+            dr[:data_source_id], dr[:taxon_id]
+          )
+          end
           if dr[:classification_path_ids]
             last_classification_id = dr[:classification_path_ids].
                                        split('|').last

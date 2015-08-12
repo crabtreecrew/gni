@@ -268,7 +268,7 @@ describe 'name_resolvers API' do
     res1 = res[:data][1]
     res1[:supplied_name_string].should == 'Liothrix argentauris ssp.'
     res1[:results].map {|r| r[:name_string]}.
-      should == ["Leiothrix argentauris (Hodgson, 1838)", 
+      should == ["Leiothrix argentauris (Hodgson, 1838)",
                  "Leiothrix argentauris",
                  "Leiothrix argentauris (Hodgson, 1838)"]
     res2 = res[:data][2]
@@ -313,4 +313,24 @@ describe 'name_resolvers API' do
       should_not raise_error(ActionController::RoutingError)
   end
 
+  it "takes option with_vernaculars" do
+    get("/name_resolvers.json",
+        names: "Leiothrix argentauris (Hodgson, 1838)|" +
+        "Treron|Larus occidentalis wymani|Plantago major L.",
+        with_vernaculars: true)
+    body = last_response.body
+    res = JSON.parse(body, symbolize_names: true)
+    res[:parameters][:with_vernaculars].should == true
+  end
+
+  it "returns vernacular names" do
+    get("/name_resolvers.json",
+        names: "Actenoides bougainvillei (Rothschild, 1904)|"\
+        "Chloroceryle amazona (Latham, 1790)|"\
+        "Merops viridis Linnaeus, 1758",
+        with_vernaculars: true)
+    body = last_response.body
+    res = JSON.parse(body, symbolize_names: true)
+    res[:data].last[:results].last[:vernaculars].should == [{:name=>"Blue-throated Bee-eater", :language=>"English", :locality=>nil, :country_code=>nil}]
+  end
 end

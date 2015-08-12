@@ -111,12 +111,11 @@ class NameResolversController < ApplicationController
   def get_opts
     opts = {}
 
-    if params.has_key?(:with_context)
-      opts[:with_context] = !(params[:with_context] == 'false')
-    end
-    
-    if params.has_key?(:header_only)
-      opts[:header_only] = !(params[:header_only] == 'false')
+    [:with_context, :header_only, :best_match_only,
+     :resolve_once, :with_vernaculars].each do |s|
+      if params.has_key?(s)
+        opts[s] = !(params[s] == 'false')
+      end
     end
 
     if params[:data_source_ids]
@@ -133,14 +132,6 @@ class NameResolversController < ApplicationController
       opts[:preferred_data_sources] = params[:preferred_data_sources].
                                     split('|').
                                     map(&:to_i)
-    end
-
-    if params[:best_match_only]
-      opts[:best_match_only] = !(params[:best_match_only] == 'false')
-    end
-
-    if params.has_key?(:resolve_once)
-      opts[:resolve_once] = !(params[:resolve_once] == 'false')
     end
     opts
   end
