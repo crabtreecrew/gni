@@ -4,7 +4,6 @@ language:
   - java
 rvm:
   - 2.1.6
-  - 2.2.2
 jdk:
   - oraclejdk8
 branches:
