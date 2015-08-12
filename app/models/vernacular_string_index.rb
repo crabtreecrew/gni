@@ -8,6 +8,6 @@ class VernacularStringIndex < ActiveRecord::Base
       "select vs.name, vsi.language, vsi.locality, vsi.country_code
       from vernacular_string_indices vsi
       join vernacular_strings vs on vs.id = vsi.vernacular_string_id
-      where data_source_id = %d and taxon_id = %d" % [data_source_id, taxon_id])
+      where data_source_id = %d and taxon_id = %s" % [data_source_id, NameString.connection.quote(taxon_id)])
   end
 end
