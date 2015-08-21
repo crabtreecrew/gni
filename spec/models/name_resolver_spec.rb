@@ -62,6 +62,8 @@ describe NameResolver do
     elr.data[0].should == { id: nil,
                             name_string: 'Andrena anthrisci Blüthgen, 1925' }
     elr.options.should == { with_context: true,
+                            with_vernaculars: false,
+                            with_canonical_ranks: false,
                             header_only: false,
                             best_match_only: false,
                             data_sources: [],

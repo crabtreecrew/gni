@@ -757,6 +757,8 @@ private
   def add_default_options
     self.options = { with_context: false,
                      header_only: false,
+                     with_canonical_ranks: false,
+                     with_vernaculars: false,
                      best_match_only: false,
                      data_sources: [],
                      preferred_data_sources: [],
@@ -805,6 +807,10 @@ private
           match[:gni_uuid] = dr[:name_uuid]
           match[:name_string] = dr[:name]
           match[:canonical_form] = dr[:canonical_form]
+          if options[:with_canonical_ranks] &&
+            dr[:canonical_form].split(" ").size > 2
+            match[:canonical_form] = ranked_canonical(dr[:gni_id])
+          end
           match[:classification_path] = dr[:classification_path]
           match[:classification_path_ranks] = dr[:classification_path_ranks]
           match[:classification_path_ids] = dr[:classification_path_ids]
@@ -888,4 +894,9 @@ private
     end
   end
 
+  def ranked_canonical(gn_id)
+    parsed = JSON.parse(ParsedNameString.find(gn_id).data, symbolize_names: true)
+    ScientificNameParser.
+      add_rank_to_canonical(parsed)[:scientificName][:canonical]
+  end
 end
