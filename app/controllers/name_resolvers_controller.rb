@@ -112,7 +112,7 @@ class NameResolversController < ApplicationController
     opts = {}
 
     [:with_context, :header_only, :best_match_only,
-     :resolve_once, :with_vernaculars].each do |s|
+     :resolve_once, :with_vernaculars, :with_canonical_ranks].each do |s|
       if params.has_key?(s)
         opts[s] = !(params[s] == 'false')
       end

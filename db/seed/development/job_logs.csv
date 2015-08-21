@@ -1,0 +1,14 @@
+65	\N	5	Import started for data source /home/dimus/tmp/dwca-alfa_checklist_florapt.zip	2015-08-21 15:26:58	2015-08-21 15:26:58
+66	\N	5	Reading metadata	2015-08-21 15:26:58	2015-08-21 15:26:58
+67	\N	5	Started normalization of the classification	2015-08-21 15:26:58	2015-08-21 15:26:58
+68	\N	5	Reading core data	2015-08-21 15:26:58	2015-08-21 15:26:58
+69	\N	5	Calculating the classification parent/child paths	2015-08-21 15:26:58	2015-08-21 15:26:58
+70	\N	5	Ingesting data from extensions	2015-08-21 15:26:58	2015-08-21 15:26:58
+71	\N	5	Populating local database	2015-08-21 15:26:58	2015-08-21 15:26:58
+72	\N	5	Processing scientific name strings	2015-08-21 15:26:58	2015-08-21 15:26:58
+73	\N	5	Traversed 10000 scientific name strings	2015-08-21 15:26:59	2015-08-21 15:26:59
+74	\N	5	Processing vernacular name strings	2015-08-21 15:26:59	2015-08-21 15:26:59
+75	\N	5	Inserting indices	2015-08-21 15:27:09	2015-08-21 15:27:09
+76	\N	5	Processed 10000 indices	2015-08-21 15:27:11	2015-08-21 15:27:11
+77	\N	5	Making new data available	2015-08-21 15:27:11	2015-08-21 15:27:11
+78	\N	5	Import finished	2015-08-21 15:27:11	2015-08-21 15:27:11

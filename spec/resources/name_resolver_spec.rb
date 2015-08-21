@@ -51,9 +51,9 @@ describe 'name_resolvers API' do
 
   it 'should be able to use POST for resolving names' do
     post('/name_resolvers.json',
-        data: "1|Leiothrix argentauris (Hodgson, 1838)\n" +
-              "2|Treron\n" +
-              "3|Larus occidentalis wymani\n" +
+        data: "1|Leiothrix argentauris (Hodgson, 1838)\n" \
+              "2|Treron\n" \
+              "3|Larus occidentalis wymani\n" \
               "4|Plantago major L.",
         data_source_ids: '1|3')
     body = last_response.body
@@ -130,6 +130,8 @@ describe 'name_resolvers API' do
     body = last_response.body
     res = JSON.parse(body, symbolize_names: true)
     res[:parameters].should == { with_context: false,
+                                 with_vernaculars: false,
+                                 with_canonical_ranks: false,
                                  header_only: false,
                                  best_match_only: false,
                                  data_sources: [],
@@ -227,7 +229,10 @@ describe 'name_resolvers API' do
         resolve_once: false)
     body = last_response.body
     res = JSON.parse(body, symbolize_names: true)
-    res[:parameters].should == { with_context: false,
+    res[:parameters].should == {
+                                 with_canonical_ranks: false,
+                                 with_context: false,
+                                 with_vernaculars: false,
                                  header_only: false,
                                  best_match_only: true,
                                  data_sources: [],
@@ -243,7 +248,9 @@ describe 'name_resolvers API' do
         resolve_once: false)
     body = last_response.body
     res = JSON.parse(body, symbolize_names: true)
-    res[:parameters].should == { with_context: false,
+    res[:parameters].should == { with_canonical_ranks: false,
+                                 with_context: false,
+                                 with_vernaculars: false,
                                  header_only: false,
                                  best_match_only: true,
                                  data_sources: [],
@@ -332,5 +339,15 @@ describe 'name_resolvers API' do
     body = last_response.body
     res = JSON.parse(body, symbolize_names: true)
     res[:data].last[:results].last[:vernaculars].should == [{:name=>"Blue-throated Bee-eater", :language=>"English", :locality=>nil, :country_code=>nil}]
+  end
+
+  it "returns canonicals with infraspecific epithets" do
+    get("/name_resolvers.json",
+        names: "Symphytum officinale L. subsp. officinale|" \
+        "Serratula flavescens (L.) Poir. subsp. mucronata (Desf.) Cantó",
+        with_canonical_ranks: true)
+    body = last_response.body
+    res = JSON.parse(body, symbolize_names: true)
+    res[:data].last[:results].last[:canonical_form].should == "Serratula flavescens subsp. mucronata"
   end
 end

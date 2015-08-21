@@ -4,8 +4,8 @@ require 'uri'
 require File.expand_path("../../../config/environment", __FILE__)
 
 def process_file(file)
-  # ds = DataSource.create(title:file)
-  ds = DataSource.find(169)
+  ds = DataSource.create(title:file)
+  #ds = DataSource.find(169)
   url = URI.encode("file://" + file)
   di = DwcaImporter.create(data_source:ds, url:url)
   di.import
