@@ -30,7 +30,7 @@ GEM
       multi_json (~> 1.0)
     archive-tar-minitar (0.5.2)
     arel (3.0.3)
-    biodiversity (3.4.0)
+    biodiversity (3.4.1)
       gn_uuid (~> 0.5)
       parallel (~> 1.4)
       treetop (~> 1.4.1)
