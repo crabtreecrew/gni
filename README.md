@@ -7,6 +7,21 @@ Global Names Index v.2
 Indexes occurances of biological scientific names in the world, normalizes and
 reconsiles lexical and taxonomic variants of the name strings.
 
+Dependencies
+------------
+
+Install Ruby (see version in .ruby-version)
+Install bundle gem
+Install Java JDK 6-8
+Install Redis
+
+Run
+
+```
+bundle install
+```
+
+
 Testing
 -------
 
