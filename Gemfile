@@ -18,6 +18,7 @@ gem 'indifferent-variable-hash', :git => 'https://github.com/remi/indifferent-va
 
 group :production do
   gem "newrelic_rpm"
+  gem "unicorn"
 end
 
 group :development do
