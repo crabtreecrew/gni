@@ -109,7 +109,7 @@ private
   end
 
   def set_socket
-    @socket ||= TCPSocket.new('localhost', 4334) 
+    @socket ||= TCPSocket.new(ENV["GNI_PARSER_HOST"], 4334)
   end
 
   def unset_socket

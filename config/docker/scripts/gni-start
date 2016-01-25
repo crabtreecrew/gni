@@ -1,0 +1,6 @@
+#!/bin/bash
+
+/usr/bin/docker run -d --name gni-app \
+    --env-file /opt/gni/config/production.env \
+    -p 0.0.0.0:8080:8080 \
+  gnames/gni

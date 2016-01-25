@@ -10,7 +10,6 @@
 .project
 .loadpath
 gna-ror.war
-config/database.yml
 config/newrelic.yml
 config/environments/development_local.rb
 db/schema.rb
