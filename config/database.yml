@@ -14,8 +14,9 @@ development:
   reconnect: false
   database: gni_dev
   pool: 5
-  username: root
-  password: 
+  host: <%= ENV["GNI_DATABASE_HOST"] %>
+  username: <%= ENV["GNI_DATABASE_USER"] %>
+  password: <%= ENV["GNI_DATABASE_PASSWORD"] %>
   # socket: /tmp/mysql.sock
 
 # Warning: The database defined as "test" will be erased and
@@ -28,7 +29,7 @@ test: &test
   database: gni_test
   pool: 5
   username: root
-  password: 
+  password:
   # socket: /tmp/mysql.sock
 
 production:
@@ -37,9 +38,9 @@ production:
   reconnect: false
   database: gni
   pool: 5
-  host: <%= ENV[GNI_DATABASE] %>
-  username: <%= ENV[GNI_USERNAME] %>
-  password: <%= ENV[GNI_PASSWORD] %>
+  host: <%= ENV["GNI_DATABASE_HOST"] %>
+  username: <%= ENV["GNI_DATABASE_USER"] %>
+  password: <%= ENV["GNI_DATABASE_PASSWORD"] %>
   # socket: /tmp/mysql.sock
 
 cucumber:
