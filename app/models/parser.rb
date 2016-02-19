@@ -109,7 +109,8 @@ private
   end
 
   def set_socket
-    @socket ||= TCPSocket.new(ENV["GNI_PARSER_HOST"], 4334)
+    host = ENV["GNI_PARSER_HOST"] ? ENV["GNI_PARSER_HOST"] : "0.0.0.0"
+    @socket ||= TCPSocket.new(host, 4334)
   end
 
   def unset_socket
