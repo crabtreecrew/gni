@@ -19,3 +19,4 @@ config/application_local.rb
 solr/multicore/**/data
 solr/work/*
 public/*
+.vim.custom
