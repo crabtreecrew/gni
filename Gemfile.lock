@@ -116,7 +116,7 @@ GEM
     mono_logger (1.1.0)
     multi_json (1.8.4)
     multi_test (0.0.3)
-    mysql2 (0.3.14)
+    mysql2 (0.3.21)
     net-scp (1.1.2)
       net-ssh (>= 2.6.5)
     net-ssh (2.7.0)
@@ -238,37 +238,37 @@ PLATFORMS
 
 DEPENDENCIES
   biodiversity (~> 3.4)
-  byebug
-  capistrano
-  capybara
+  byebug (~> 5.0)
+  capistrano (~> 3.0)
+  capybara (~> 2.2)
   coffee-rails (~> 3.1)
   composite_primary_keys (~> 5.0)
-  cucumber-rails
-  database_cleaner
+  cucumber-rails (~> 1.4)
+  database_cleaner (~> 1.2)
   dwc-archive (~> 0.9)
-  escape
-  factory_girl_rails
+  escape (~> 0)
+  factory_girl_rails (~> 4.3)
   haml (~> 4.0)
   haml-rails
-  high_voltage
-  jquery-rails
-  mocha
-  mysql2
-  optiflag
+  high_voltage (~> 2.1)
+  jquery-rails (~> 3.0)
+  mocha (~> 0.14)
+  mysql2 (~> 0.3.14)
+  optiflag (~> 0.7)
   rack (~> 1.3)
-  rack-test
+  rack-test (~> 0.6)
   rails (~> 3.2)
-  rails3-generators
+  rails3-generators (~> 1.0)
   railties (~> 3.2)
   resque (~> 1.24)
-  rest-client
-  rspec-rails
-  ruby-stemmer
+  rest-client (~> 1.6)
+  rspec-rails (~> 2.14)
+  ruby-stemmer (~> 0.9)
   sass-rails (~> 3.2)
   taxamatch_rb (~> 1.1.1)
-  thin
+  thin (~> 1.6)
   uglifier (~> 1.0.3)
   unicorn-rails (~> 1.1)
 
 BUNDLED WITH
-   1.10.0.rc
+   1.11.2

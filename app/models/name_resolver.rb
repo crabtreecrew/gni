@@ -279,6 +279,7 @@ private
            cf.name,
            nsi.local_id,
            nsi.classification_path_ranks
+           nsi.updated_at
          from
            name_string_indices nsi
            join name_strings ns
@@ -367,6 +368,7 @@ private
       pns.data,
       nsi.local_id,
       nsi.classification_path_ranks
+      nsi.updated_at
     from
       name_string_indices nsi
       join name_strings ns
@@ -463,6 +465,7 @@ private
           pns.data,
           nsi.local_id,
           nsi.classification_path_ranks
+          nsi.updated_at
         from
           canonical_forms cf
           join name_strings ns
@@ -819,10 +822,11 @@ private
           match[:global_id] = dr[:global_id] unless dr[:global_id].blank?
           match[:edit_distance] = dr[:edit_distance] || 0
           match[:url] = dr[:url] unless dr[:url].blank?
+          match[:updated_at] = dr[:updated_at]
           if options[:with_vernaculars]
-          match[:vernaculars] = VernacularStringIndex.vernaculars(
-            dr[:data_source_id], dr[:taxon_id]
-          )
+            match[:vernaculars] = VernacularStringIndex.vernaculars(
+              dr[:data_source_id], dr[:taxon_id]
+            )
           end
           if dr[:classification_path_ids]
             last_classification_id = dr[:classification_path_ids].

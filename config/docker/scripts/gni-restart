@@ -1,0 +1,5 @@
+#!/bin/bash
+
+/usr/local/bin/gni-mysql-stop
+/usr/local/bin/gni-mysql-start
+
