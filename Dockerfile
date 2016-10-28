@@ -50,6 +50,5 @@ RUN bundle install
 COPY . /app
 RUN bundle exec rake assets:precompile RAILS_ENV=production
 
-# CMD ["unicorn", "-c", "/app/config/docker/files/unicorn.rb"]
-CMD /usr/bin/supervisord
+CMD ["unicorn", "-c", "/app/config/docker/files/unicorn.rb"]
 
