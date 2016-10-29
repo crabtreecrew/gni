@@ -278,7 +278,8 @@ private
            nsi.classification_path_ids,
            cf.name,
            nsi.local_id,
-           nsi.classification_path_ranks
+           nsi.classification_path_ranks,
+           nsi.updated_at
          from
            name_string_indices nsi
            join name_strings ns
@@ -303,7 +304,8 @@ private
         classification_path_ids: row[9],
         canonical_form: row[10],
         local_id: row[11],
-        classification_path_ranks: row[12]
+        classification_path_ranks: row[12],
+        imported_at: row[13]
       }
       update_found_words(record[:canonical_form])
       name_normalized = row[2]
@@ -366,7 +368,8 @@ private
       cf.name,
       pns.data,
       nsi.local_id,
-      nsi.classification_path_ranks
+      nsi.classification_path_ranks,
+      nsi.updated_at
     from
       name_string_indices nsi
       join name_strings ns
@@ -392,7 +395,8 @@ private
         classification_path_ids: row[9],
         canonical_form: row[10],
         local_id: row[12],
-        classification_path_ranks: row[13]
+        classification_path_ranks: row[13],
+        imported_at: row[14]
 
       }
       parse_res = JSON.parse(row[11], symbolize_names: true)
@@ -462,7 +466,8 @@ private
           cf.name,
           pns.data,
           nsi.local_id,
-          nsi.classification_path_ranks
+          nsi.classification_path_ranks,
+          nsi.updated_at
         from
           canonical_forms cf
           join name_strings ns
@@ -497,7 +502,8 @@ private
               canonical_form: found_canonical_form,
               edit_distance: edit_distance,
               local_id: row[12],
-              classification_path_ranks: row[13]
+              classification_path_ranks: row[13],
+              imported_at: row[14]
             }
             parsed_name = JSON.parse(row[11],
                                      symbolize_names: true)[:scientificName]
