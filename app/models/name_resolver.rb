@@ -278,7 +278,7 @@ private
            nsi.classification_path_ids,
            cf.name,
            nsi.local_id,
-           nsi.classification_path_ranks
+           nsi.classification_path_ranks,
            nsi.updated_at
          from
            name_string_indices nsi
@@ -367,7 +367,7 @@ private
       cf.name,
       pns.data,
       nsi.local_id,
-      nsi.classification_path_ranks
+      nsi.classification_path_ranks,
       nsi.updated_at
     from
       name_string_indices nsi
@@ -464,7 +464,7 @@ private
           cf.name,
           pns.data,
           nsi.local_id,
-          nsi.classification_path_ranks
+          nsi.classification_path_ranks,
           nsi.updated_at
         from
           canonical_forms cf

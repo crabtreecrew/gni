@@ -1,0 +1,80 @@
+2016-10-29 09:49:23,372 CRIT Supervisor running as root (no user in config file)
+2016-10-29 09:49:23,374 INFO supervisord started with pid 1
+2016-10-29 09:49:24,376 INFO spawnerr: can't parse command 'bundle exec unicorn -c /app/config/docker/files/unicorn.rb"': No closing quotation
+2016-10-29 09:49:24,377 INFO spawned: ' solr' with pid 8
+2016-10-29 09:49:25,379 INFO spawnerr: can't parse command 'bundle exec unicorn -c /app/config/docker/files/unicorn.rb"': No closing quotation
+2016-10-29 09:49:25,379 INFO success:  solr entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
+2016-10-29 09:49:27,381 INFO spawnerr: can't parse command 'bundle exec unicorn -c /app/config/docker/files/unicorn.rb"': No closing quotation
+2016-10-29 09:49:30,667 INFO spawnerr: can't parse command 'bundle exec unicorn -c /app/config/docker/files/unicorn.rb"': No closing quotation
+2016-10-29 09:49:30,667 INFO gave up:  unicorn entered FATAL state, too many start retries too quickly
+2016-10-29 09:50:30,474 WARN received SIGTERM indicating exit request
+2016-10-29 09:50:30,475 INFO waiting for  solr to die
+2016-10-29 09:50:30,542 INFO stopped:  solr (exit status 1)
+2016-10-29 09:50:35,332 CRIT Supervisor running as root (no user in config file)
+2016-10-29 09:50:35,334 INFO supervisord started with pid 1
+2016-10-29 09:50:36,335 INFO spawnerr: can't find command 'bundle exec unicorn -c /app/config/docker/files/unicorn.rb'
+2016-10-29 09:50:36,337 INFO spawned: ' solr' with pid 9
+2016-10-29 09:50:37,338 INFO spawnerr: can't find command 'bundle exec unicorn -c /app/config/docker/files/unicorn.rb'
+2016-10-29 09:50:37,338 INFO success:  solr entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
+2016-10-29 09:50:39,372 INFO spawnerr: can't find command 'bundle exec unicorn -c /app/config/docker/files/unicorn.rb'
+2016-10-29 09:50:42,687 INFO spawnerr: can't find command 'bundle exec unicorn -c /app/config/docker/files/unicorn.rb'
+2016-10-29 09:50:42,687 INFO gave up:  unicorn entered FATAL state, too many start retries too quickly
+2016-10-29 09:51:31,911 WARN received SIGTERM indicating exit request
+2016-10-29 09:51:31,911 INFO waiting for  solr to die
+2016-10-29 09:51:31,964 INFO stopped:  solr (exit status 1)
+2016-10-29 09:51:36,533 CRIT Supervisor running as root (no user in config file)
+2016-10-29 09:51:36,535 INFO supervisord started with pid 1
+2016-10-29 09:51:37,537 INFO spawned: ' unicorn' with pid 8
+2016-10-29 09:51:37,539 INFO spawned: ' solr' with pid 9
+2016-10-29 09:51:39,027 INFO success:  unicorn entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
+2016-10-29 09:51:39,027 INFO success:  solr entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
+2016-10-29 09:52:52,221 WARN received SIGTERM indicating exit request
+2016-10-29 09:52:52,222 INFO waiting for  unicorn,  solr to die
+2016-10-29 09:52:52,288 INFO stopped:  solr (exit status 1)
+2016-10-29 09:52:52,398 INFO stopped:  unicorn (exit status 0)
+2016-10-29 09:52:56,347 CRIT Supervisor running as root (no user in config file)
+2016-10-29 09:52:56,349 INFO supervisord started with pid 1
+2016-10-29 09:52:57,351 INFO spawned: ' unicorn' with pid 9
+2016-10-29 09:52:57,353 INFO spawned: ' solr' with pid 10
+2016-10-29 09:52:58,919 INFO success:  unicorn entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
+2016-10-29 09:52:58,919 INFO success:  solr entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
+2016-10-29 10:09:23,675 WARN received SIGTERM indicating exit request
+2016-10-29 10:09:23,675 INFO waiting for  unicorn,  solr to die
+2016-10-29 10:09:23,739 INFO stopped:  solr (exit status 1)
+2016-10-29 10:09:23,852 INFO stopped:  unicorn (exit status 0)
+2016-10-29 10:09:30,046 CRIT Supervisor running as root (no user in config file)
+2016-10-29 10:09:30,048 INFO supervisord started with pid 1
+2016-10-29 10:09:31,051 INFO spawned: ' unicorn' with pid 9
+2016-10-29 10:09:31,053 INFO spawned: ' solr' with pid 10
+2016-10-29 10:09:32,585 INFO success:  unicorn entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
+2016-10-29 10:09:32,585 INFO success:  solr entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
+2016-10-29 10:13:10,575 WARN received SIGTERM indicating exit request
+2016-10-29 10:13:10,575 INFO waiting for  unicorn,  solr to die
+2016-10-29 10:13:10,644 INFO stopped:  solr (exit status 1)
+2016-10-29 10:13:10,762 INFO stopped:  unicorn (exit status 0)
+2016-10-29 10:14:15,941 CRIT Supervisor running as root (no user in config file)
+2016-10-29 10:14:15,943 INFO supervisord started with pid 1
+2016-10-29 10:14:16,946 INFO spawned: ' unicorn' with pid 9
+2016-10-29 10:14:16,948 INFO spawned: ' solr' with pid 10
+2016-10-29 10:14:18,463 INFO success:  unicorn entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
+2016-10-29 10:14:18,463 INFO success:  solr entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
+2016-10-29 10:14:55,768 WARN received SIGTERM indicating exit request
+2016-10-29 10:14:55,768 INFO waiting for  unicorn,  solr to die
+2016-10-29 10:14:55,816 INFO stopped:  solr (exit status 1)
+2016-10-29 10:14:55,930 INFO stopped:  unicorn (exit status 0)
+2016-10-29 10:15:08,555 CRIT Supervisor running as root (no user in config file)
+2016-10-29 10:15:08,556 INFO supervisord started with pid 1
+2016-10-29 10:15:09,559 INFO spawned: ' unicorn' with pid 9
+2016-10-29 10:15:09,560 INFO spawned: ' solr' with pid 10
+2016-10-29 10:15:11,050 INFO success:  unicorn entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
+2016-10-29 10:15:11,050 INFO success:  solr entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
+2016-10-29 10:19:29,105 WARN received SIGTERM indicating exit request
+2016-10-29 10:19:29,106 INFO waiting for  unicorn,  solr to die
+2016-10-29 10:19:29,170 INFO stopped:  solr (exit status 1)
+2016-10-29 10:19:29,283 INFO stopped:  unicorn (exit status 0)
+2016-10-29 10:19:34,080 CRIT Supervisor running as root (no user in config file)
+2016-10-29 10:19:34,082 INFO supervisord started with pid 1
+2016-10-29 10:19:35,084 INFO spawned: ' unicorn' with pid 8
+2016-10-29 10:19:35,084 INFO spawned: ' solr' with pid 9
+2016-10-29 10:19:36,551 INFO success:  unicorn entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)
+2016-10-29 10:19:36,551 INFO success:  solr entered RUNNING state, process has stayed up for > than 1 seconds (startsecs)

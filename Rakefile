@@ -5,7 +5,6 @@
 require File.expand_path('../config/application', __FILE__)
 require 'rake'
 require 'escape'
-require 'resque/tasks'
 
 Gni::Application.load_tasks
 
@@ -13,8 +12,6 @@ task(:default).clear
 task :default => :spec
 
 task :spec => 'db:seed'
-
-task "resque:setup" => :environment
 
 namespace :db do
   desc "dumps tables from the environment to csv files"

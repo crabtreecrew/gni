@@ -9,8 +9,6 @@ jdk:
 branches:
   only:
       - master
-services:
-  - redis-server
 before_script:
   - cp config/database.yml.example config/database.yml
   - bundle exec rake db:create:all

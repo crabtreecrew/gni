@@ -8,7 +8,7 @@ RUN apt-get update && \
     apt-add-repository ppa:brightbox/ruby-ng && \
     apt-get update && \
     apt-get install -y ruby2.1 ruby2.1-dev ruby-switch \
-    curl redis-server zlib1g-dev liblzma-dev libxml2-dev \
+    openjdk-7-jdk curl zlib1g-dev liblzma-dev libxml2-dev \
     libxslt-dev libmysqlclient-dev supervisor build-essential nodejs && \
     add-apt-repository -y ppa:nginx/stable && \
     apt-get update && \
@@ -36,9 +36,6 @@ RUN gem install bundler && \
     mkdir /app
 
 
-COPY config/docker/files/nginx-sites.conf /etc/nginx/sites-enabled/default
-COPY config/docker/files/supervisord.conf /etc/supervisor/conf.d/supervisord.conf
-
 WORKDIR /app
 
 ENV BUNDLE_APP_CONFIG $GEM_HOME
@@ -48,7 +45,7 @@ COPY Gemfile.lock /app/
 RUN bundle install
 
 COPY . /app
-RUN bundle exec rake assets:precompile RAILS_ENV=production
+
 
 CMD ["unicorn", "-c", "/app/config/docker/files/unicorn.rb"]
 

@@ -15,7 +15,8 @@ development:
   database: gni_dev
   pool: 5
   username: root
-  password:
+  password: resolver
+  host: mysql
   # socket: /tmp/mysql.sock
 
 # Warning: The database defined as "test" will be erased and
@@ -28,7 +29,8 @@ test: &test
   database: gni_test
   pool: 5
   username: root
-  password:
+  password: resolver
+  host: mysql
   # socket: /tmp/mysql.sock
 
 production:
@@ -38,7 +40,8 @@ production:
   database: gni
   pool: 5
   username: root
-  password:
+  password: resolver
+  host: mysql
   # socket: /tmp/mysql.sock
 
 cucumber:

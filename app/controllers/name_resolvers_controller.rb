@@ -70,8 +70,7 @@ class NameResolversController < ApplicationController
   private
 
   def workers_running?
-    workers = Resque.redis.smembers('workers')
-    !workers.select {|w| w.index('name_resolver')}.empty?
+    false
   end
 
   def present_result(format, resolver, is_show = false)

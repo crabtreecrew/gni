@@ -51,11 +51,6 @@ the command reads data from spec/files/addnames.csv to add more records
 to the system.
 
 
-Resolver worker
----------------
-
-    RAILS_ENV=production RAKE_ENV=production QUEUE=name_resolver rake resque:work
-
 Assets precompiling
 -------------------
 

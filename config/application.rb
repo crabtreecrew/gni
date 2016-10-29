@@ -51,8 +51,8 @@ module Gni
     uuid_namespace: ::UUID.create_v5("globalnames.org", UUID::NameSpace_DNS),
     batch_size: 10_000,
     temp_dir: "/tmp",
-    solr_url: "http://localhost:8983/solr",
-    base_url: "http://localhost:3000",
+    solr_url: ENV["SOLR_URL"] || "http://localhost:8983/solr",
+    base_url: ENV["BASE_URL"] || "http://localhost:3000",
     reference_data_source_id: "1",
     curated_data_sources: [],
   )
