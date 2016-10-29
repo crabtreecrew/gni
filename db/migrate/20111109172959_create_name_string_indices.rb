@@ -3,7 +3,7 @@ class CreateNameStringIndices < ActiveRecord::Migration
     execute "CREATE TABLE `name_string_indices` (
       `data_source_id` int(11) NOT NULL,
       `name_string_id` int(11) UNSIGNED NOT NULL,
-      `taxon_id` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
+      `taxon_id` varchar(255) COLLATE utf8_unicode_ci NOT NULL,
       `global_id` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
       `url` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
       `rank` varchar(255) COLLATE utf8_unicode_ci DEFAULT NULL,
