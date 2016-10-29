@@ -31,6 +31,7 @@ module Gni
     config.filter_parameters += [:password]
     config.assets.enabled = true
     config.assets.version = '1.0'
+    config.assets.initialize_on_precompile = false
 
     config.generators do |g|
       g.test_framework :rspec, :views => false, :fixture => true
@@ -47,12 +48,15 @@ module Gni
   require Rails.root.join('vendor', 'lib', 'ruby-uuid', 'uuid').to_s
   require Rails.root.join('lib', 'gni').to_s
 
+  solr_url = ENV["GNI_SOLR_URL"] || "http://localhost:8983/solr"
+  base_url = ENV["GNI_BASE_URL"] || "http://localhost:3000"
+
   Config = OpenStruct.new(
     uuid_namespace: ::UUID.create_v5("globalnames.org", UUID::NameSpace_DNS),
     batch_size: 10_000,
     temp_dir: "/tmp",
-    solr_url: "http://localhost:8983/solr",
-    base_url: "http://localhost:3000",
+    solr_url: solr_url,
+    base_url: base_url,
     reference_data_source_id: "1",
     curated_data_sources: [],
   )

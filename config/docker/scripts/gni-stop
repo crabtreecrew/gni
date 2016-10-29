@@ -1,0 +1,8 @@
+#!/bin/bash
+
+if [[ $(/usr/bin/docker ps |grep gni-app) ]]; then
+  /usr/bin/docker stop gni-app
+fi
+if [[ $(/usr/bin/docker ps -a |grep gni-app) ]]; then
+  /usr/bin/docker rm gni-app
+fi
