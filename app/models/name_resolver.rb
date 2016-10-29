@@ -55,6 +55,12 @@ class NameResolver < ActiveRecord::Base
       'Preparing results',
   }
 
+  MATCH_VALUES = { 1 => "Exact string match",
+                   2 => "Exact match by canonical form",
+                   3 => "Fuzzy match by canonical form",
+                   4 => "Partial exact match",
+                   5 => "Partial fuzzy match",
+                   6 => "Could only match genus" }
   def self.perform(name_resolver_id)
     r = NameResolver.find(name_resolver_id)
 
@@ -825,6 +831,7 @@ private
           match[:global_id] = dr[:global_id] unless dr[:global_id].blank?
           match[:edit_distance] = dr[:edit_distance] || 0
           match[:url] = dr[:url] unless dr[:url].blank?
+          match[:imported_at] = dr[:imported_at] unless dr[:imported_at].blank?
           if options[:with_vernaculars]
           match[:vernaculars] = VernacularStringIndex.vernaculars(
             dr[:data_source_id], dr[:taxon_id]
@@ -850,6 +857,7 @@ private
             end
           end
           match[:match_type] = dr[:match_type]
+          match[:match_value] = MATCH_VALUES[dr[:match_type]]
           validated = true if !validated && [1, 2].include?(dr[:match_type])
           match[:prescore] = dr[:prescore]
           match[:score] = dr[:score]

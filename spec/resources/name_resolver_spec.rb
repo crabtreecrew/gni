@@ -112,6 +112,8 @@ describe 'name_resolvers API' do
         edit_distance: 0,
         match_type: 6,
         prescore: '1|0|0',
+        match_value: 'Could only match genus',
+        imported_at: '2012-07-10T12:14:56Z',
         score: 0.75}]
     }
     res[:data][-3][:supplied_name_string].should ==
@@ -189,6 +191,8 @@ describe 'name_resolvers API' do
       data_source_title: nil,
       edit_distance: 0,
       gni_uuid: '6bfd9d6f-9c68-5f5a-bbc6-99759c730a84',
+      imported_at: '2012-07-10T12:14:56Z',
+      match_value: 'Exact string match',
       name_string: 'Calidris cooperi',
       canonical_form: 'Calidris cooperi',
       classification_path: nil,
@@ -215,6 +219,8 @@ describe 'name_resolvers API' do
       taxon_id: '6868221',
       match_type: 3,
       prescore: '1|0|0',
+      match_value: 'Fuzzy match by canonical form',
+      imported_at: '2012-07-10T12:14:56Z',
       score: 0.75
     }
   end
