@@ -35,9 +35,12 @@ spec:
       volumes:
         - name: app-vol
           emptyDir: {}
+        - name: tmp-vol
+          persistentVolumeClaim:
+            claimName: resolver-tmp-pvc
       containers:
         - name: resolver
-          image: gnames/resolver:2017-07-18-c6150bd
+          image: gnames/resolver:0.0.15
 
           env:
             - name: RAILS_ENV
@@ -85,6 +88,8 @@ spec:
           volumeMounts:
             - name: app-vol
               mountPath: /var/www
+            # - name: tmp-vol
+            #   mountPath: /var/www/app/tmp/name_resolvers
 
         - name: redis
           image: redis

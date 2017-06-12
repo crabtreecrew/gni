@@ -1,0 +1,11 @@
+#!/bin/bash
+set -euo pipefail
+
+while [[ ! -d /var/www/app ]]; do
+  echo "Waiting for resolver directory"
+  sleep 0.1
+done
+
+cp /var/www/app/config/docker/files/nginx-sites.conf /etc/nginx/conf.d/default.conf
+
+nginx -g "daemon off;"

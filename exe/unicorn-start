@@ -1,0 +1,12 @@
+#!/bin/bash
+set -euo pipefail
+
+cp -r  /app /var/www
+
+if [ ! -e /var/www/app/tmp/name_resolvers ]; then
+  mkdir -p /var/www/app/tmp/name_resolvers
+fi
+
+cd /var/www/app
+rm -rf /var/www/tmp/name_resolvers/*
+bundle exec unicorn -c ./config/docker/files/unicorn.rb
