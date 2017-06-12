@@ -1,0 +1,89 @@
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: resolver
+  namespace: gn
+  labels:
+    app: resolver
+    tier: frontend
+spec:
+  type: NodePort
+  ports:
+    - port: 80
+      targetPort: 80
+  selector:
+    app: resolver
+    tier: frontend
+
+---
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: resolver
+  namespace: gn
+spec:
+  replicas: 3
+  template:
+    metadata:
+      namespace: gn
+      name: resolver
+      labels:
+        app: resolver
+        tier: frontend
+    spec:
+      volumes:
+        - name: resolver-vol
+          persistentVolumeClaim:
+            claimName: resolver-pvc
+      containers:
+        - name: resolver
+          image: gnames/resolver:0.0.1
+          # livenessProbe:
+          #   httpGet:
+          #     path: /
+          #     port: 80
+          #   initialDelaySeconds: 180
+          #   timeoutSeconds: 3
+          env:
+            - name: RAILS_ENV
+              value: production
+            - name: SERVER_NAME
+                configMapKeyRef:
+                  name: resolver
+                  key: server
+            - name: POSTGRES_HOST
+              value: taxonworks-db
+            - name: POSTGRES_DB
+              valueFrom:
+                configMapKeyRef:
+                  name: taxonworks
+                  key: db
+            - name: POSTGRES_USER
+              valueFrom:
+                secretKeyRef:
+                  name: taxonworks
+                  key: db.user
+            - name: POSTGRES_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: taxonworks
+                  key: db.user.password
+            - name: NGINX_SECRET_KEY
+              value: secret!
+            - name: SECRET_KEY_BASE
+              valueFrom:
+                secretKeyRef:
+                  name: taxonworks
+                  key: secret_key_base
+          ports:
+            - containerPort: 80
+              name: http
+          volumeMounts:
+            - mountPath: /app/public/system
+              name: taxonworks-media-vol
+            - mountPath: /backup
+              name: taxonworks-backup-vol
+            - mountPath: /staging/
+              name: taxonworks-staging-vol
+
