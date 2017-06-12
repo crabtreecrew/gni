@@ -32,10 +32,9 @@ spec:
         app: resolver
         tier: frontend
     spec:
-      volumes:
-        - name: resolver-vol
-          persistentVolumeClaim:
-            claimName: resolver-pvc
+      # volumes:
+      #   - name: app-vol
+      #     emptyDir: {}
       containers:
         - name: resolver
           image: gnames/resolver:0.0.1
@@ -45,45 +44,48 @@ spec:
           #     port: 80
           #   initialDelaySeconds: 180
           #   timeoutSeconds: 3
+
           env:
             - name: RAILS_ENV
               value: production
-            - name: SERVER_NAME
+            - name: GNI_UNICORN_WORKER_PROCESSES
+              valueFrom:
                 configMapKeyRef:
                   name: resolver
-                  key: server
-            - name: POSTGRES_HOST
-              value: taxonworks-db
-            - name: POSTGRES_DB
+                  key: unicorn.workers
+            - name: GNI_BASE_URL
               valueFrom:
                 configMapKeyRef:
-                  name: taxonworks
+                  name: resolver
+                  key: server.url
+            - name: GNI_DATABASE_HOST
+              valueFrom:
+                configMapKeyRef:
+                  name: resolver
                   key: db
-            - name: POSTGRES_USER
+            - name: GNI_DATABASE
+              valueFrom:
+                configMapKeyRef:
+                  name: resolver
+                  key: db.database
+            - name: GNI_SOLR_URL
+              valueFrom:
+                configMapKeyRef:
+                  name: resolver
+                  key: solr.url
+            - name: GNI_DATABASE_USER
               valueFrom:
                 secretKeyRef:
-                  name: taxonworks
+                  name: resolver
                   key: db.user
-            - name: POSTGRES_PASSWORD
+            - name: GNI_DATABASE_PASSWORD
               valueFrom:
                 secretKeyRef:
-                  name: taxonworks
+                  name: resolver
                   key: db.user.password
-            - name: NGINX_SECRET_KEY
-              value: secret!
-            - name: SECRET_KEY_BASE
-              valueFrom:
-                secretKeyRef:
-                  name: taxonworks
-                  key: secret_key_base
           ports:
             - containerPort: 80
               name: http
-          volumeMounts:
-            - mountPath: /app/public/system
-              name: taxonworks-media-vol
-            - mountPath: /backup
-              name: taxonworks-backup-vol
-            - mountPath: /staging/
-              name: taxonworks-staging-vol
-
+          # volumeMounts:
+          #   - name: app-vol
+          #     mountPath: /app
