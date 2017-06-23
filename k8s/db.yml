@@ -1,0 +1,63 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: gni-db
+  labels:
+    app: gni
+    tier: backend
+spec:
+  type: NodePort
+  ports:
+    - port: 3306
+      targetPort: 3306
+  selector:
+    app: gni
+    tier: backend
+---
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: gni-db
+spec:
+  replicas: 1
+  template:
+    metadata:
+      name: gni-db
+      labels:
+        app: gni
+        tier: backend
+    spec:
+      volumes:
+        - name: gni-vol
+          persistentVolumeClaim:
+            claimName: gni-pvc
+      containers:
+        - name: gni-db
+          image: gnames/mysql
+          env:
+            - name: MYSQL_ROOT_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: gni
+                  key: db.root.password
+            - name: MYSQL_USER
+              valueFrom:
+                secretKeyRef:
+                  name: gni
+                  key: db.user
+            - name: MYSQL_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: gni
+                  key: db.user.password
+            - name: MYSQL_DATABASE
+              valueFrom:
+                configMapKeyRef:
+                  name: gni
+                  key: db
+          ports:
+            - containerPort: 3306
+              name: mysql
+          volumeMounts:
+            - mountPath: /var/lib/mysql
+              name: gni-vol
