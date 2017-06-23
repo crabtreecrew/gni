@@ -9,6 +9,7 @@
 .cache
 .project
 .loadpath
+.vim.custom
 gna-ror.war
 config/newrelic.yml
 config/environments/development_local.rb
