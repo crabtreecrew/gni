@@ -454,7 +454,10 @@ private
     @names.keys.each do |key|
       next unless key
       canonical_form = key
-      canonical_forms = @spellchecker.find(canonical_form)
+      canonical_forms = @spellchecker.find(canonical_form + "~")
+      # if canonical_forms.empty?
+      #   canonical_forms = @spellchecker.find(canonical_form + "~")
+      # end
       q_canonical = canonical_forms.map { |n| NameString.connection.quote(n) }.
                                           join(',')
       unless canonical_forms.blank?
