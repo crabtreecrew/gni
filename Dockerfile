@@ -30,11 +30,10 @@ RUN echo 'gem: --no-rdoc --no-ri >> "$HOME/.gemrc"'
 ENV GEM_HOME /usr/local/bundle
 ENV PATH $GEM_HOME/bin:$PATH
 
-RUN gem install bundler && \
+RUN gem install bundler -v 1.17.3 && \
     bundle config --global path "$GEM_HOME" && \
     bundle config --global bin "$GEM_HOME/bin" && \
     mkdir /app
-
 
 WORKDIR /app
 
