@@ -1,4 +1,5 @@
-version: "2"
+version: "3.7"
+
 services:
   app:
     build: .
@@ -6,28 +7,31 @@ services:
       - RAILS_ENV=development
       - SOLR_URL=http://solr:8983/solr
       - BASE_URL=http://0.0.0.0:3000
-      - DB_HOST=mysql
-      - DB_USER=root
+      - DB_HOST=db
+      - DB_USER=mysql
       - DB_PASSWORD=resolver
     volumes:
       - .:/app
     ports:
-      - 0.0.0.0:3000:3000
+      - 3000:3000
     depends_on:
-      - mysql
+      - db
+      - solr
   solr:
     image: gnames/solr
     ports:
-      - 0.0.0.0:8983:8983
+      - 8983:8983
     volumes:
       - ./solr/solr:/opt/cores/solr
-  mysql:
+  db:
     image: mysql:5.6
+    ports:
+      - 3307:3306
     environment:
       - MYSQL_ROOT_PASSWORD=resolver
     volumes:
-      - mysql:/var/lib/mysql
+      - db:/var/lib/mysql
+
 volumes:
-  mysql:
-    external: false
+  db:
 

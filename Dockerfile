@@ -1,7 +1,4 @@
 FROM ubuntu:14.04.4
-MAINTAINER Dmitry Mozzherin
-ENV LAST_FULL_REBUILD 2016-03-06
-
 
 RUN apt-get update && \
     apt-get install -y software-properties-common && \
@@ -35,16 +32,18 @@ RUN gem install bundler -v 1.17.3 && \
     bundle config --global bin "$GEM_HOME/bin" && \
     mkdir /app
 
-WORKDIR /app
+WORKDIR /tmp
 
 ENV BUNDLE_APP_CONFIG $GEM_HOME
 
-COPY Gemfile /app/
-COPY Gemfile.lock /app/
+COPY Gemfile .
+COPY Gemfile.lock .
 RUN bundle install
 
-COPY . /app
+WORKDIR /app
 
+COPY . .
 
-CMD ["unicorn", "-c", "/app/config/docker/files/unicorn.rb"]
+CMD tail -f /dev/null
 
+# CMD ["unicorn", "-c", "/app/config/docker/files/unicorn.rb"]
