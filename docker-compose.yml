@@ -8,25 +8,26 @@ services:
       - SOLR_URL=http://solr:8983/solr
       - BASE_URL=http://0.0.0.0:3000
       - DB_HOST=db
-      - DB_USER=mysql
+      - DB_PORT=3306
+      - DB_USER=root
       - DB_PASSWORD=resolver
     volumes:
       - .:/app
     ports:
-      - 3000:3000
+      - "3000:3000"
     depends_on:
       - db
       - solr
   solr:
     image: gnames/solr
     ports:
-      - 8983:8983
+      - "8983:8983"
     volumes:
       - ./solr/solr:/opt/cores/solr
   db:
     image: mysql:5.6
     ports:
-      - 3307:3306
+      - "3306:3306"
     environment:
       - MYSQL_ROOT_PASSWORD=resolver
     volumes:
@@ -34,4 +35,3 @@ services:
 
 volumes:
   db:
-

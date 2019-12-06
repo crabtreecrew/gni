@@ -1,6 +1,13 @@
 Global Names Index v.2
 ======================
 
+This is a fork of: https://github.com/GlobalNamesArchitecture/gni
+
+The main reason for forking is to get the application set up to run locally with Docker. There is an existing `dockerize` branch in https://github.com/GlobalNamesArchitecture/gni, but its last commit message is `wip` from 3 years ago.
+
+Notes on the progress towards a working Docker Compose file are here: [./doc/dockerizing_notes.md](./doc/dockerizing_notes.md).
+
+
 [![Continuous Integration Status][1]][2]
 [![Dependency Status][3]][4]
 

@@ -19,6 +19,7 @@ RUN locale-gen en_US.UTF-8
 ENV LANG en_US.UTF-8
 ENV LANGUAGE en_US:en
 ENV LC_ALL en_US.UTF-8
+ENV MYSQL_ROOT_HOST %
 
 RUN ruby-switch --set ruby2.1
 RUN echo 'gem: --no-rdoc --no-ri >> "$HOME/.gemrc"'
@@ -44,6 +45,15 @@ WORKDIR /app
 
 COPY . .
 
+EXPOSE 3000
+
+# This keeps the container running so we can execute commands manually to set up the databases
+# and then run the startup.sh script
 CMD tail -f /dev/null
 
-# CMD ["unicorn", "-c", "/app/config/docker/files/unicorn.rb"]
+# Currently, if we try to run this ENTRYPOINT it will fail because the databases can't be created.
+# Normally this would be done by running: `bundle exec rake db:create:all`, but this doesn't work
+# when the command is run from a different host than MySQL is running on (which is how we have it
+# set up with docker-compose.yml). The workaround is to create the database manually.
+# See: doc/dockerizing_notes.md
+# ENTRYPOINT ["sh", "./config/docker/scripts/startup.sh"]
