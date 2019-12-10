@@ -9,10 +9,11 @@ sh ./config/docker/scripts/wait-for-services.sh
 sh ./config/docker/scripts/prepare-db.sh
 
 # Prepare solr
-# sh ./config/docker/scripts/prepare-solr.sh
+sh ./config/docker/scripts/prepare-solr.sh
 
 # Pre-comple app assets
-# sh ./config/docker/scripts/assets-pre-compile.sh
+sh ./config/docker/scripts/assets-pre-compile.sh
 
-# Start Application
-# unicorn -c /app/config/docker/files/unicorn.rb
+# Start Unicorn
+unicorn -c /app/config/docker/files/unicorn.rb
+
