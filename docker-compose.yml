@@ -5,8 +5,8 @@ services:
     build: .
     environment:
       - RAILS_ENV=development
-      - SOLR_URL=http://solr:8983/solr
-      - BASE_URL=http://0.0.0.0:3000
+      - SOLR_URL=http://localhost:8983/solr
+      - BASE_URL=http://localhost:3000
       - DB_HOST=db
       - DB_PORT=3306
       - DB_USER=root

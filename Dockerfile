@@ -15,6 +15,9 @@ RUN apt-get update && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/*
 
+ADD config/docker/files/nginx-sites.conf /etc/nginx/sites-enabled/default
+ADD config/docker/files/nginx.conf /etc/nginx/nginx.conf
+
 RUN locale-gen en_US.UTF-8
 ENV LANG en_US.UTF-8
 ENV LANGUAGE en_US:en
