@@ -27,6 +27,8 @@ To run the GNI app with Docker Compose, do the following:
 4. In another terminal, do: `docker exec -it gni_app_1 /bin/bash`. This gives you access to a Bash command line in the `app` container.
 5. From here, run: `sh config/docker/scripts/startup.sh`
 
+You'll only need to create the databases the first time you run `docker-compose up` because the docker-compose.yml file is set up with a volume called `db` which persists beyond each run. You can wipe out this volume by running `docker-compose down -v`. The normal `docker-compose down` does not delete volumes. Here's a handy article about [how to clean up unused Docker images and containers](https://www.digitalocean.com/community/tutorials/how-to-remove-docker-images-containers-and-volumes). 
+
 You will see that the database migrations run and the seed data is populated. However, the app is not quite working yet.
 
 We should be able to go to http://localhost:3000 and see the running application, but we get no response right now. I believe there are a few possible causes:
