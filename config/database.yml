@@ -1,0 +1,38 @@
+development:
+  host: db
+  adapter: mysql2
+  encoding: utf8
+  reconnect: false
+  database: gni_dev
+  pool: 5
+  username: root
+  password: resolver
+  socket: /var/run/mysqld/mysqld.sock
+
+# Warning: The database defined as "test" will be erased and
+# re-generated from your development database when you run "rake".
+# Do not set this db to the same as development or production.
+test: &test
+  host: db
+  adapter: mysql2
+  encoding: utf8
+  reconnect: false
+  database: gni_test
+  pool: 5
+  username: root
+  password: resolver
+  socket: /var/run/mysqld/mysqld.sock
+
+production:
+  host: db
+  adapter: mysql2
+  encoding: utf8
+  reconnect: false
+  database: gni
+  pool: 5
+  username: root
+  password: resolver
+  socket: /var/run/mysqld/mysqld.sock
+
+cucumber:
+  <<: *test
