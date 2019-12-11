@@ -38,4 +38,4 @@ Although the app runs in the browser, it looks like the name lookup is failing w
 
 ### More on Docker and volumes
 
-You only need to create the databases the first time you run `docker-compose up` because the docker-compose.yml file is set up with a volume called `db` which persists beyond each run. You can wipe out this volume by running `docker-compose down -v`. The normal `docker-compose down` does not delete volumes. Here's a handy article about [how to clean up unused Docker images and containers](https://www.digitalocean.com/community/tutorials/how-to-remove-docker-images-containers-and-volumes).
+You only need to create the databases the first time you run `docker-compose up` because the docker-compose.yml file is set up with a volume called `db`, which persists beyond each run. You can wipe out this volume by running `docker-compose down -v`. The normal `docker-compose down` does not delete volumes. Here's a handy article about [how to clean up unused Docker images and containers](https://www.digitalocean.com/community/tutorials/how-to-remove-docker-images-containers-and-volumes).
