@@ -13,9 +13,8 @@ before_script:
   - cp config/database.yml.example config/database.yml
   - bundle exec rake db:create:all
   - bundle exec rake db:migrate
-  - bundle exec rake db:migrate RAILS_ENV=test
+  - bundle exec rake db:migrate RAILS_ENV=production
   - bundle exec rake db:seed
-  - bundle exec rake db:seed RAILS_ENV=test
+  - bundle exec rake db:seed RAILS_ENV=production
   - bundle exec rake solr:start
   - bundle exec rake solr:build
-

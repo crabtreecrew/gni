@@ -4,7 +4,7 @@ services:
   app:
     build: .
     environment:
-      - RAILS_ENV=development
+      - RAILS_ENV=production
       - SOLR_URL=http://localhost:8983/solr
       - BASE_URL=http://localhost:3000
       - DB_HOST=db
