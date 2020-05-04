@@ -30,7 +30,7 @@ Go to http://localhost:3000 to see the running application.
 
 ### Issues
 
-Although the app runs in the browser, it looks like the name lookup is failing with a 500. This might be a Solr configuration issue. When running `sh config/docker/scripts/startup.sh`, we see this message repeated:
+When running `sh config/docker/scripts/startup.sh`, we see this message repeated:
     ```
     ********************WARNING: COULD NOT LOAD DEVELOPMENT_GNI_SITE FILE***********************
     ```

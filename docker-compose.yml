@@ -32,6 +32,9 @@ services:
       - MYSQL_ROOT_PASSWORD=resolver
     volumes:
       - db:/var/lib/mysql
+  static-file-server:
+    image: halverneus/static-file-server:latest
+
 
 volumes:
   db:
