@@ -7,6 +7,7 @@ services:
       - RAILS_ENV=production
       - SOLR_URL=http://localhost:8983/solr
       - BASE_URL=http://localhost:3000
+      - REDIS_URL=redis://redis:6379
       - DB_HOST=db
       - DB_PORT=3306
       - DB_USER=root
@@ -18,12 +19,21 @@ services:
     depends_on:
       - db
       - solr
+      - redis
   solr:
     image: gnames/solr
     ports:
       - "8983:8983"
     volumes:
       - ./solr/solr:/opt/cores/solr
+  redis:
+    image: redis:6.0.1-alpine
+    ports:
+      - "6379:6379"
+    command: redis-server
+    volumes:
+      - redis:/data
+
   db:
     image: mysql:5.6
     ports:
@@ -34,7 +44,18 @@ services:
       - db:/var/lib/mysql
   static-file-server:
     image: halverneus/static-file-server:latest
-
+    volumes:
+      - type: bind
+        source: ./config/docker/static-file-server/web
+        target: /web
+    ports:
+      - "8080:8080"
+    environment:
+      - PORT=8080
+      - DEBUG=true
+      - SHOW_LISTING=true
+      - REFERRERS=,http://localhost
 
 volumes:
   db:
+  redis:

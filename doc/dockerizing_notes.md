@@ -13,6 +13,8 @@ I've started automating this by creating a Bash script at /config/docker/scripts
 
 To run the GNI app with Docker Compose, do the following:
 
+### Running with docker-compose: first time
+
 1. If running for the first time, do `docker-compose up`. If you have made changes in the Dockerfile, do `docker-compose up --build` to rebuild. Wait until the logs stop populating; you should see this message when MySQL is ready for connections:
     ```
     db_1    | 2019-12-06 20:22:34 1 [Note] mysqld: ready for connections.
@@ -23,18 +25,31 @@ To run the GNI app with Docker Compose, do the following:
     CREATE DATABASE gni_dev CHARACTER SET utf8;
     CREATE DATABASE gni_test CHARACTER SET utf8;
     ```
-3. In another terminal, do: `docker exec -it gni_app_1 /bin/bash`. This gives you access to a Bash command line in the `app` container. From here, run: `sh config/docker/scripts/startup.sh`. This is a Bash script that runs several other scripts to set up the MySQL and Solr services. You will see output as these tasks are run. This script also starts up the [Unicorn](https://bogomips.org/unicorn/) server at the end.
+3. In another terminal, do: `docker exec -it gni_app_1 /bin/bash`. This gives you access to a Bash command line in the `app` container. From here, run: `sh config/docker/scripts/startup.sh`. This is a Bash script that runs several other scripts to set up the MySQL and Solr services. You will see output as these tasks are run. The last  This script also starts up the [Unicorn](https://bogomips.org/unicorn/) server at the end. When the startup script is finished, you will see:
+    ```
+    STARTUP.SH: DONE
+    ```
 4. Unicorn requires a reverse proxy in front of it. We are using NGINX. In another terminal, do: `docker exec -it gni_app_1 /bin/bash`, then do `service nginx start`. Now that NGINX is running, the app should be up.
 
-Go to http://localhost:3000 to see the running application.
+If it's working, you can go to [http://localhost:3000](http://localhost:3000) to see the running application.
+
+### Running with docker-compose: coming back
+
+If you have previously run the steps above, you can start things up again by doing the following:
+1. `docker exec -it gni_app_1 /bin/bash`
+2. `sh config/docker/scripts/startup.sh`
+3. In another terminal window: `docker exec -it gni_app_1 /bin/bash` again
+4. `service nginx start`
+
+If it's working, you can go to [http://localhost:3000](http://localhost:3000) to see the running application.
 
 ### Issues
 
 When running `sh config/docker/scripts/startup.sh`, we see this message repeated:
     ```
-    ********************WARNING: COULD NOT LOAD DEVELOPMENT_GNI_SITE FILE***********************
+    ********************WARNING: COULD NOT LOAD PRODUCTION_GNI_SITE FILE***********************
     ```
-    This is coming from config/environments/development.rb. I'm not sure what this file is for and I haven't found it anywhere in the original repo.
+    This is coming from config/environments/production.rb, which is trying to load a `.gitignore`d file. I can't find any notes on what this file is or what it contains.
 
 ### More on Docker and volumes
 

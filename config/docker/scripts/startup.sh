@@ -17,3 +17,4 @@ sh ./config/docker/scripts/assets-pre-compile.sh
 # Start Unicorn
 unicorn -c /app/config/docker/files/unicorn.rb
 
+echo "STARTUP.SH: DONE"
