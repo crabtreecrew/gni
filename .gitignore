@@ -11,7 +11,7 @@ tags
 *.sql
 config/environments/development_local.rb
 config/environments/production_gni_site.rb
-config/docker/static-file-server/public/files/
+config/docker/static-file-server/web/files/
 vendor/gni_private
 vendor/gni_deploy
 restart.txt
