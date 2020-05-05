@@ -23,9 +23,9 @@ The `DwcaImporter` class expects to download datasources over http from a gzippe
 1. Download the .zip file of the datasource, then uncompress the .zip file into its original folder. On a Mac you do this by simply double-clicking the .zip file in Finder.
 2. Use `tar cvzf` to create a gzipped tarball within the `config/docker/static-file-server/web/files` folder. This folder has been added to `.gitignore`, so it will not be included in git commits. Here is an example of how you would run the command.
     ```
-    tar cvzf config/docker/static-file-server/archive-kingdom-plantae-phylum-tracheophyta-bl3.tar.gz archive-kingdom-plantae-phylum-tracheophyta-bl3
+    tar cvzf config/docker/static-file-server/web/files/archive-kingdom-plantae-phylum-tracheophyta-bl3.tar.gz archive-kingdom-plantae-phylum-tracheophyta-bl3
     ```
-    In this example, the first argument following the `tar cvzf` command is the output destination, which ends in `.tar.gz`. The second argument is the input folder. This command was run from within the root of the gni repo.
+    In this example, the first argument following the `tar cvzf` command is the output destination, which ends in `.tar.gz`. The second argument is the input folder. This command was run from within the root of the gni repo, assuming that the target folder was also saved within the root of the gni repo.
 3. Make note of the URL for your new tarball.  As you can see in the `docker-compose.yml` file, the `static-file-server` service is set up to serve any file within `config/docker/static-file-server/web` at port 8080. You can verify this by viewing [http://localhost:8080](http://localhost:8080), which shows you the index.html file at config/docker/static-file-server/web/index.html. This is how you can access a file from outside of a Docker container; however, networking **within** a Docker container works differently. To access a file in the static file server from inside of a different Docker container, you can use the name that Docker assigns to the containers. To see a list of running containers, do: `docker ps`. You should see something like this:
     ```
     CONTAINER ID        IMAGE                                  COMMAND                  CREATED             STATUS              PORTS                            NAMES
