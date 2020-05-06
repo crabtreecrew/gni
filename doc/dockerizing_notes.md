@@ -36,10 +36,11 @@ If it's working, you can go to [http://localhost:3000](http://localhost:3000) to
 ### Running with docker-compose: coming back
 
 If you have previously run the steps above, you can start things up again by doing the following:
-1. `docker exec -it gni_app_1 /bin/bash`
-2. `sh config/docker/scripts/startup.sh`
-3. In another terminal window: `docker exec -it gni_app_1 /bin/bash` again
-4. `service nginx start`
+1. `docker-compose up`
+2. In another terminal window: `docker exec -it gni_app_1 /bin/bash`
+3. `sh config/docker/scripts/startup.sh`, then wait until you see `STARTUP.SH: Done pre-compiling asssets`
+4. In another terminal window: `docker exec -it gni_app_1 /bin/bash` again
+5. `service nginx start`
 
 If it's working, you can go to [http://localhost:3000](http://localhost:3000) to see the running application.
 
