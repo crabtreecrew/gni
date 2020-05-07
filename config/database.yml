@@ -2,7 +2,7 @@ development:
   host: db
   adapter: mysql2
   encoding: utf8
-  reconnect: false
+  reconnect: true
   database: gni_dev
   pool: 5
   username: root
@@ -16,7 +16,7 @@ test: &test
   host: db
   adapter: mysql2
   encoding: utf8
-  reconnect: false
+  reconnect: true
   database: gni_test
   pool: 5
   username: root
@@ -27,7 +27,7 @@ production:
   host: db
   adapter: mysql2
   encoding: utf8
-  reconnect: false
+  reconnect: true
   database: gni
   pool: 5
   username: root
