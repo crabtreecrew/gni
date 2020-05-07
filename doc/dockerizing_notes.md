@@ -38,7 +38,7 @@ If it's working, you can go to [http://localhost:3000](http://localhost:3000) to
 If you have previously run the steps above, you can start things up again by doing the following:
 1. `docker-compose up`
 2. In another terminal window: `docker exec -it gni_app_1 /bin/bash`
-3. `sh config/docker/scripts/startup.sh`, then wait until you see `STARTUP.SH: Done pre-compiling asssets`
+3. `sh config/docker/scripts/startup.sh`, then wait until you see `STARTUP.SH: Done with setup, starting Unicorn server`
 4. In another terminal window: `docker exec -it gni_app_1 /bin/bash` again
 5. `service nginx start`
 

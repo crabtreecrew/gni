@@ -61,7 +61,11 @@ require File.expand_path("../../../config/environment", __FILE__)
 # url = "http://betula.mbl.edu/gna_test/eol/dwca.tar.gz"
 # di = DwcaImporter.create(data_source:ds, url:url)
 # di.import
-ds = DataSource.create(title: "Tracheophyta")
-url = "gni_static-file-server_1:8080/files/archive-kingdom-plantae-phylum-tracheophyta-bl3.tar.gz"
+# ds = DataSource.create(title: "Tracheophyta")
+# url = "gni_static-file-server_1:8080/files/archive-kingdom-plantae-phylum-tracheophyta-bl3.tar.gz"
+# di = DwcaImporter.create(data_source:ds, url:url)
+# di.import
+ds = DataSource.create(title: "Test source")
+url = "gni_static-file-server_1:8080/files/test_source.tar.gz"
 di = DwcaImporter.create(data_source:ds, url:url)
 di.import

@@ -14,7 +14,8 @@ sh ./config/docker/scripts/prepare-solr.sh
 # Pre-comple app assets
 sh ./config/docker/scripts/assets-pre-compile.sh
 
+echo "STARTUP.SH: Done with setup, starting Unicorn server"
+
 # Start Unicorn
 unicorn -c /app/config/docker/files/unicorn.rb
 
-echo "STARTUP.SH: DONE"
